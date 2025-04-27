@@ -18,7 +18,7 @@ Ce projet est une application web conçue pour aider les joueurs d'osu! à visua
     *   **Centrer :** Bouton pour centrer automatiquement la zone active sur la tablette.
     *   **Copier Infos :** Copie les détails de la zone active (largeur, hauteur, ratio, offset X/Y) dans le presse-papiers pour une utilisation facile ailleurs.
     *   **Grille :** Option pour afficher/masquer une grille d'arrière-plan pour une meilleure perception des dimensions et de la position.
-    *   **(Probable) Menu Contextuel :** Un menu contextuel (clic droit sur la zone ?) offre des options d'alignement rapide (gauche, centre H, droite, haut, centre V, bas, centrer tout).
+    *   **Menu Contextuel :** Un menu contextuel (clic droit sur la zone ?) offre des options d'alignement rapide (gauche, centre H, droite, haut, centre V, bas, centrer tout).
 *   **Gestion des Favoris :**
     *   **Sauvegarder :** Enregistre la configuration actuelle (dimensions tablette, dimensions zone, offsets, ratio, nom/commentaire) comme favori dans le stockage local du navigateur.
     *   **Charger :** Charge une configuration favorite sauvegardée dans les champs de saisie et met à jour la visualisation.
