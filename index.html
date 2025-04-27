@@ -1,310 +1,187 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Visualiseur d'Area pour osu! - Fix @apply</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-    /* Styles CSS purs */
-    #tablet-boundary { transition: width 0.2s ease, height 0.2s ease; }
-    .rectangle { cursor: grab; user-select: none; }
-    .rectangle:active { cursor: grabbing; }
-    #context-menu hr { border-color: theme('colors.gray.600'); margin-top: 0.25rem; margin-bottom: 0.25rem; }
-    select { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; padding-right: 2.5rem; -webkit-appearance: none; -moz-appearance: none; appearance: none; }
-    select:disabled { opacity: 0.6; cursor: not-allowed; }
-    select option[value=""][disabled] { color: theme('colors.gray.500'); }
-    /* SUPPRIMÉ: La règle .sort-button.active avec @apply */
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualiseur d'Area pour osu! - Structure Séparée</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lien vers ton fichier CSS personnalisé -->
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="bg-gray-900 text-gray-200 font-sans p-5">
 
-<div class="container max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="container max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-    <!-- Colonne de Gauche: Configuration + Récapitulatif -->
-    <div class="lg:col-span-1 flex flex-col gap-6">
-        <div class="card bg-gray-800 p-6 rounded-xl shadow-lg">
-            <h2 class="text-xl font-semibold text-white mb-4 pb-2 border-b border-gray-700">Tablette</h2>
-            <div class="space-y-4">
-                <div class="input-group flex items-center gap-3">
-                    <label for="tabletPresetSelect" class="w-20 font-medium text-gray-400 flex-shrink-0">Preset:</label>
-                    <select id="tabletPresetSelect" class="flex-grow bg-gray-700 border border-gray-600 rounded-md p-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                        <option value="" disabled selected>-- Choisir un modèle --</option>
-                        <option value="custom">-- Personnalisé --</option>
-                    </select>
+        <!-- Colonne de Gauche: Configuration + Récapitulatif -->
+        <div class="lg:col-span-1 flex flex-col gap-6">
+            <!-- Card: Tablette -->
+            <div class="card bg-gray-800 p-6 rounded-xl shadow-lg">
+                <h2 class="text-xl font-semibold text-white mb-4 pb-2 border-b border-gray-700">Tablette</h2>
+                <div class="space-y-4">
+                    <div class="input-group flex items-center gap-3">
+                        <label for="tabletPresetSelect" class="w-20 font-medium text-gray-400 flex-shrink-0">Preset:</label>
+                        <select id="tabletPresetSelect" class="flex-grow bg-gray-700 border border-gray-600 rounded-md p-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" disabled>
+                            <option value="" disabled selected>-- Chargement... --</option>
+                            <option value="custom">-- Personnalisé --</option>
+                            <!-- Les presets seront chargés ici par JS -->
+                        </select>
+                    </div>
+                    <hr id="tablet-manual-hr" class="border-gray-600/50 hidden">
+                    <div id="tablet-width-group" class="input-group flex items-center gap-3 hidden">
+                        <label for="tabletWidth" class="w-28 font-medium text-gray-400 flex-shrink-0">Largeur:</label>
+                        <input type="number" id="tabletWidth" min="0.1" value="152" step="0.1" class="w-28 bg-gray-700 border border-gray-600 rounded-md p-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        <span class="unit text-gray-500 text-sm pl-1">mm</span>
+                    </div>
+                    <div id="tablet-height-group" class="input-group flex items-center gap-3 hidden">
+                        <label for="tabletHeight" class="w-28 font-medium text-gray-400 flex-shrink-0">Hauteur:</label>
+                        <input type="number" id="tabletHeight" min="0.1" value="95" step="0.1" class="w-28 bg-gray-700 border border-gray-600 rounded-md p-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        <span class="unit text-gray-500 text-sm pl-1">mm</span>
+                    </div>
                 </div>
-                <hr id="tablet-manual-hr" class="border-gray-600/50 hidden">
-                <div id="tablet-width-group" class="input-group flex items-center gap-3 hidden">
-                    <label for="tabletWidth" class="w-28 font-medium text-gray-400 flex-shrink-0">Largeur:</label>
-                    <input type="number" id="tabletWidth" min="0.1" value="152" step="0.1" class="w-28 bg-gray-700 border border-gray-600 rounded-md p-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                    <span class="unit text-gray-500 text-sm pl-1">mm</span>
+            </div>
+            <!-- Card: Zone Active -->
+            <div class="card bg-gray-800 p-6 rounded-xl shadow-lg">
+                <h2 class="text-xl font-semibold text-white mb-4 pb-2 border-b border-gray-700">Zone Active</h2>
+                <div class="space-y-4">
+                    <!-- Ratio -->
+                    <div>
+                        <h3 class="text-base font-medium text-gray-400 mb-2">Ratio</h3>
+                        <div class="flex flex-wrap items-center gap-4">
+                            <div class="input-group flex items-center gap-3 flex-1 min-w-[150px]">
+                                <label for="customRatio" class="w-16 font-medium text-gray-400 flex-shrink-0">Ratio:</label>
+                                <input type="number" id="customRatio" min="0.001" step="0.001" value="1.600" class="w-28 bg-gray-700 border border-gray-600 rounded-md p-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            </div>
+                            <label for="lockRatio" class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="lockRatio" class="sr-only peer" checked>
+                            <div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 peer-focus:ring-offset-2 peer-focus:ring-offset-gray-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                            <span class="ml-3 text-sm font-medium text-gray-300">Verrouiller</span>
+                            </label>
+                        </div>
+                    </div>
+                    <!-- Taille -->
+                    <div>
+                        <h3 class="text-base font-medium text-gray-400 mb-2">Taille</h3>
+                        <div class="space-y-3">
+                            <div class="input-group flex items-center gap-3">
+                                <label for="areaWidth" class="w-20 font-medium text-gray-400 flex-shrink-0">Largeur:</label>
+                                <input type="number" id="areaWidth" min="0.1" value="152" step="0.1" class="w-28 bg-gray-700 border border-gray-600 rounded-md p-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                <span class="unit text-gray-500 text-sm pl-1">mm</span>
+                            </div>
+                            <div class="input-group flex items-center gap-3">
+                                <label for="areaHeight" class="w-20 font-medium text-gray-400 flex-shrink-0">Hauteur:</label>
+                                <input type="number" id="areaHeight" min="0.1" value="95" step="0.1" class="w-28 bg-gray-700 border border-gray-600 rounded-md p-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                <span class="unit text-gray-500 text-sm pl-1">mm</span>
+                            </div>
+                            <button id="swap-btn" class="btn btn-primary btn-sm w-full mt-1 px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 rounded-md font-medium text-white transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800">Inverser Largeur / Hauteur</button>
+                        </div>
+                    </div>
+                    <!-- Position -->
+                    <div>
+                        <h3 class="text-base font-medium text-gray-400 mb-2">Position (Centre)</h3>
+                        <div class="space-y-3">
+                            <div class="input-group flex items-center gap-3">
+                                <label for="areaOffsetX" class="w-20 font-medium text-gray-400 flex-shrink-0">Offset X:</label>
+                                <input type="number" id="areaOffsetX" value="76.000" step="0.001" class="w-28 bg-gray-700 border border-gray-600 rounded-md p-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                <span class="unit text-gray-500 text-sm pl-1">mm</span>
+                            </div>
+                            <div class="input-group flex items-center gap-3">
+                                <label for="areaOffsetY" class="w-20 font-medium text-gray-400 flex-shrink-0">Offset Y:</label>
+                                <input type="number" id="areaOffsetY" value="47.500" step="0.001" class="w-28 bg-gray-700 border border-gray-600 rounded-md p-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                <span class="unit text-gray-500 text-sm pl-1">mm</span>
+                            </div>
+                            <button id="center-btn" class="btn btn-secondary btn-sm w-full mt-1 px-3 py-1.5 text-sm bg-purple-600 hover:bg-purple-700 focus:ring-purple-500 rounded-md font-medium text-white transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800">Centrer la Zone Active</button>
+                        </div>
+                    </div>
+                    <!-- Actions -->
+                    <hr class="!my-6 border-gray-700">
+                    <div class="flex flex-wrap gap-3 justify-center">
+                        <button id="copy-btn" class="btn btn-info px-4 py-2 rounded-md font-medium text-white transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 bg-sky-600 hover:bg-sky-700 focus:ring-sky-500">Copier Infos</button>
+                        <button id="save-btn" class="btn btn-success px-4 py-2 rounded-md font-medium text-white transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 bg-green-600 hover:bg-green-700 focus:ring-green-500">Sauvegarder Area</button>
+                        <button id="cancel-edit-btn" class="btn btn-danger px-4 py-2 rounded-md font-medium text-white transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 bg-red-600 hover:bg-red-700 focus:ring-red-500 hidden">Annuler Édition</button>
+                    </div>
                 </div>
-                <div id="tablet-height-group" class="input-group flex items-center gap-3 hidden">
-                    <label for="tabletHeight" class="w-28 font-medium text-gray-400 flex-shrink-0">Hauteur:</label>
-                    <input type="number" id="tabletHeight" min="0.1" value="95" step="0.1" class="w-28 bg-gray-700 border border-gray-600 rounded-md p-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                    <span class="unit text-gray-500 text-sm pl-1">mm</span>
+            </div>
+            <!-- Card: Récapitulatif -->
+            <div class="card bg-gray-800 p-6 rounded-xl shadow-lg">
+                <h2 class="text-xl font-semibold text-white mb-4 pb-2 border-b border-gray-700">Récapitulatif</h2>
+                <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                    <p><strong>Dims Tablette:</strong></p>
+                    <p class="text-gray-300 text-right" id="tablet-dimensions-info">... mm</p>
+                    <p><strong>Ratio Tablette:</strong></p>
+                    <p class="text-gray-300 text-right" id="tablet-ratio-info">...</p>
+                    <p class="mt-2"><strong>Dims Area:</strong></p>
+                    <p class="text-gray-300 text-right mt-2" id="dimensions-info">... mm</p>
+                    <p><strong>Surface Area:</strong></p>
+                    <p class="text-gray-300 text-right" id="area-info">... mm²</p>
+                    <p><strong>Ratio Area:</strong></p>
+                    <p class="text-gray-300 text-right" id="ratio-info">...</p>
+                    <p><strong>Position Area:</strong></p>
+                    <p class="text-gray-300 text-right" id="position-info">... mm</p>
                 </div>
             </div>
         </div>
-        <div class="card bg-gray-800 p-6 rounded-xl shadow-lg">
-            <h2 class="text-xl font-semibold text-white mb-4 pb-2 border-b border-gray-700">Zone Active</h2>
-            <div class="space-y-4">
-                <div>
-                    <h3 class="text-base font-medium text-gray-400 mb-2">Ratio</h3>
-                    <div class="flex flex-wrap items-center gap-4">
-                        <div class="input-group flex items-center gap-3 flex-1 min-w-[150px]">
-                            <label for="customRatio" class="w-16 font-medium text-gray-400 flex-shrink-0">Ratio:</label>
-                            <input type="number" id="customRatio" min="0.001" step="0.001" value="1.600" class="w-28 bg-gray-700 border border-gray-600 rounded-md p-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                        </div>
-                        <label for="lockRatio" class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" id="lockRatio" class="sr-only peer" checked>
-                        <div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 peer-focus:ring-offset-2 peer-focus:ring-offset-gray-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                        <span class="ml-3 text-sm font-medium text-gray-300">Verrouiller</span>
-                        </label>
-                    </div>
+
+        <!-- Colonne Centrale: Visualisation & Favoris -->
+        <div class="lg:col-span-2 flex flex-col gap-6">
+            <!-- Card: Visualisation -->
+            <div class="card bg-gray-800 p-6 rounded-xl shadow-lg flex flex-col">
+                <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-700">
+                    <h2 class="text-xl font-semibold text-white flex-shrink-0">Visualisation</h2>
+                    <label for="toggleGridCheckbox" class="flex items-center gap-2 cursor-pointer text-sm">
+                        <input type="checkbox" id="toggleGridCheckbox" checked class="h-4 w-4 rounded border-gray-500 bg-gray-600 text-blue-500 focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-gray-800">
+                        <span class="text-gray-300 select-none">Afficher Grille</span>
+                    </label>
                 </div>
-                <div>
-                    <h3 class="text-base font-medium text-gray-400 mb-2">Taille</h3>
-                    <div class="space-y-3">
-                        <div class="input-group flex items-center gap-3">
-                            <label for="areaWidth" class="w-20 font-medium text-gray-400 flex-shrink-0">Largeur:</label>
-                            <input type="number" id="areaWidth" min="0.1" value="152" step="0.1" class="w-28 bg-gray-700 border border-gray-600 rounded-md p-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                            <span class="unit text-gray-500 text-sm pl-1">mm</span>
+                <div id="visual-container" class="visual-container relative flex justify-center items-center h-[350px] bg-gray-900/50 rounded-lg p-4 overflow-hidden">
+                    <div id="tablet-boundary" class="border-2 border-gray-500 box-border relative bg-black/20 flex-shrink-0">
+                        <!-- Grille générée par Tailwind -->
+                        <div id="backgroundGrid" class="absolute inset-0 bg-[radial-gradient(theme('colors.gray.700/50%')_1px,transparent_1px)] [background-size:1rem_1rem] opacity-30"></div>
+                        <!-- Rectangle représentant la zone active -->
+                        <div id="rectangle" class="rectangle absolute bg-blue-600/80 border border-blue-400 shadow-lg shadow-blue-500/30" style="transition: width 0.1s linear, height 0.1s linear, top 0.1s linear, left 0.1s linear;">
                         </div>
-                        <div class="input-group flex items-center gap-3">
-                            <label for="areaHeight" class="w-20 font-medium text-gray-400 flex-shrink-0">Hauteur:</label>
-                            <input type="number" id="areaHeight" min="0.1" value="95" step="0.1" class="w-28 bg-gray-700 border border-gray-600 rounded-md p-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                            <span class="unit text-gray-500 text-sm pl-1">mm</span>
-                        </div>
-                        <button id="swap-btn" class="btn btn-primary btn-sm w-full mt-1 px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 rounded-md font-medium text-white transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800">Inverser Largeur / Hauteur</button>
                     </div>
-                </div>
-                <div>
-                    <h3 class="text-base font-medium text-gray-400 mb-2">Position (Centre)</h3>
-                    <div class="space-y-3">
-                        <div class="input-group flex items-center gap-3">
-                            <label for="areaOffsetX" class="w-20 font-medium text-gray-400 flex-shrink-0">Offset X:</label>
-                            <input type="number" id="areaOffsetX" value="76.000" step="0.001" class="w-28 bg-gray-700 border border-gray-600 rounded-md p-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                            <span class="unit text-gray-500 text-sm pl-1">mm</span>
-                        </div>
-                        <div class="input-group flex items-center gap-3">
-                            <label for="areaOffsetY" class="w-20 font-medium text-gray-400 flex-shrink-0">Offset Y:</label>
-                            <input type="number" id="areaOffsetY" value="47.500" step="0.001" class="w-28 bg-gray-700 border border-gray-600 rounded-md p-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                            <span class="unit text-gray-500 text-sm pl-1">mm</span>
-                        </div>
-                        <button id="center-btn" class="btn btn-secondary btn-sm w-full mt-1 px-3 py-1.5 text-sm bg-purple-600 hover:bg-purple-700 focus:ring-purple-500 rounded-md font-medium text-white transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800">Centrer la Zone Active</button>
-                    </div>
-                </div>
-                <hr class="!my-6 border-gray-700">
-                <div class="flex flex-wrap gap-3 justify-center">
-                    <button id="copy-btn" class="btn btn-info px-4 py-2 rounded-md font-medium text-white transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 bg-sky-600 hover:bg-sky-700 focus:ring-sky-500">Copier Infos</button>
-                    <button id="save-btn" class="btn btn-success px-4 py-2 rounded-md font-medium text-white transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 bg-green-600 hover:bg-green-700 focus:ring-green-500">Sauvegarder Area</button>
-                    <button id="cancel-edit-btn" class="btn btn-danger px-4 py-2 rounded-md font-medium text-white transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 bg-red-600 hover:bg-red-700 focus:ring-red-500 hidden">Annuler Édition</button>
                 </div>
             </div>
-        </div>
-        <div class="card bg-gray-800 p-6 rounded-xl shadow-lg">
-            <h2 class="text-xl font-semibold text-white mb-4 pb-2 border-b border-gray-700">Récapitulatif</h2>
-            <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-                <p><strong>Dims Tablette:</strong></p>
-                <p class="text-gray-300 text-right" id="tablet-dimensions-info">... mm</p>
-                <p><strong>Ratio Tablette:</strong></p>
-                <p class="text-gray-300 text-right" id="tablet-ratio-info">...</p>
-                <p class="mt-2"><strong>Dims Area:</strong></p>
-                <p class="text-gray-300 text-right mt-2" id="dimensions-info">... mm</p>
-                <p><strong>Surface Area:</strong></p>
-                <p class="text-gray-300 text-right" id="area-info">... mm²</p>
-                <p><strong>Ratio Area:</strong></p>
-                <p class="text-gray-300 text-right" id="ratio-info">...</p>
-                <p><strong>Position Area:</strong></p>
-                <p class="text-gray-300 text-right" id="position-info">... mm</p>
+            <!-- Card: Mes Areas Favoris -->
+            <div class="card bg-gray-800 p-6 rounded-xl shadow-lg">
+                <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-700">
+                    <h2 class="text-xl font-semibold text-white">Mes Areas Favoris</h2>
+                    <div id="sort-options" class="flex gap-2">
+                        <!-- Boutons de tri (les classes actives seront gérées par JS) -->
+                        <button data-sort="date" class="sort-button btn btn-primary btn-sm px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 rounded-md font-medium text-white transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800" title="Trier par Date (plus récent)">Date</button>
+                        <button data-sort="name" class="sort-button btn btn-primary btn-sm px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 rounded-md font-medium text-white transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800" title="Trier par Nom (A-Z)">Nom</button>
+                        <button data-sort="size" class="sort-button btn btn-primary btn-sm px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 rounded-md font-medium text-white transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800" title="Trier par Taille (plus grand)">Taille</button>
+                    </div>
+                </div>
+                <div id="favorites-list" class="space-y-2 max-h-60 overflow-y-auto pr-2">
+                    <!-- Placeholder si la liste est vide -->
+                    <p class="text-gray-500 italic text-center hidden">Aucun favori sauvegardé.</p>
+                    <!-- Les favoris seront chargés ici par JS -->
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Colonne Centrale: Visualisation & Favoris -->
-    <div class="lg:col-span-2 flex flex-col gap-6">
-        <div class="card bg-gray-800 p-6 rounded-xl shadow-lg flex flex-col">
-            <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-700">
-                <h2 class="text-xl font-semibold text-white flex-shrink-0">Visualisation</h2>
-                <label for="toggleGridCheckbox" class="flex items-center gap-2 cursor-pointer text-sm">
-                    <input type="checkbox" id="toggleGridCheckbox" checked class="h-4 w-4 rounded border-gray-500 bg-gray-600 text-blue-500 focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-gray-800">
-                    <span class="text-gray-300 select-none">Afficher Grille</span>
-                </label>
-            </div>
-            <div id="visual-container" class="visual-container relative flex justify-center items-center h-[350px] bg-gray-900/50 rounded-lg p-4 overflow-hidden">
-                <div id="tablet-boundary" class="border-2 border-gray-500 box-border relative bg-black/20 flex-shrink-0">
-                    <div id="backgroundGrid" class="absolute inset-0 bg-[radial-gradient(theme('colors.gray.700/50%')_1px,transparent_1px)] [background-size:1rem_1rem] opacity-30"></div>
-                    <div id="rectangle" class="rectangle absolute bg-blue-600/80 border border-blue-400 shadow-lg shadow-blue-500/30" style="transition: width 0.1s linear, height 0.1s linear, top 0.1s linear, left 0.1s linear;">
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="card bg-gray-800 p-6 rounded-xl shadow-lg">
-            <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-700">
-                <h2 class="text-xl font-semibold text-white">Mes Areas Favoris</h2>
-                <div id="sort-options" class="flex gap-2">
-                    <!-- Appliquer classes de base ici, JS ajoutera/retirera les classes actives -->
-                    <button data-sort="date" class="sort-button btn btn-primary btn-sm px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 rounded-md font-medium text-white transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800" title="Trier par Date (plus récent)">Date</button>
-                    <button data-sort="name" class="sort-button btn btn-primary btn-sm px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 rounded-md font-medium text-white transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800" title="Trier par Nom (A-Z)">Nom</button>
-                    <button data-sort="size" class="sort-button btn btn-primary btn-sm px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 rounded-md font-medium text-white transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800" title="Trier par Taille (plus grand)">Taille</button>
-                </div>
-            </div>
-            <div id="favorites-list" class="space-y-2 max-h-60 overflow-y-auto pr-2">
-                <p class="text-gray-500 italic text-center hidden">Aucun favori sauvegardé.</p>
-            </div>
-        </div>
+    <!-- Menu Contextuel (pour l'alignement) -->
+    <div id="context-menu" class="absolute hidden bg-gray-700 border border-gray-600 rounded-md p-1 shadow-xl z-50 min-w-[200px]">
+        <button id="align-left" class="context-menu-button block w-full text-left px-4 py-2 text-sm text-gray-200 rounded-md hover:bg-blue-700 hover:text-white">Aligner à Gauche</button>
+        <button id="align-center-h" class="context-menu-button block w-full text-left px-4 py-2 text-sm text-gray-200 rounded-md hover:bg-blue-700 hover:text-white">Centrer Horizontalement</button>
+        <button id="align-right" class="context-menu-button block w-full text-left px-4 py-2 text-sm text-gray-200 rounded-md hover:bg-blue-700 hover:text-white">Aligner à Droite</button>
+        <hr class="border-gray-600 my-1"> <!-- Utilise la classe CSS pour hr -->
+        <button id="align-top" class="context-menu-button block w-full text-left px-4 py-2 text-sm text-gray-200 rounded-md hover:bg-blue-700 hover:text-white">Aligner en Haut</button>
+        <button id="align-center-v" class="context-menu-button block w-full text-left px-4 py-2 text-sm text-gray-200 rounded-md hover:bg-blue-700 hover:text-white">Centrer Verticalement</button>
+        <button id="align-bottom" class="context-menu-button block w-full text-left px-4 py-2 text-sm text-gray-200 rounded-md hover:bg-blue-700 hover:text-white">Aligner en Bas</button>
+        <hr class="border-gray-600 my-1"> <!-- Utilise la classe CSS pour hr -->
+        <button id="align-center" class="context-menu-button block w-full text-left px-4 py-2 text-sm text-gray-200 rounded-md hover:bg-blue-700 hover:text-white">Centrer Tout</button>
     </div>
-</div>
 
-<!-- Menu Contextuel -->
-<div id="context-menu" class="absolute hidden bg-gray-700 border border-gray-600 rounded-md p-1 shadow-xl z-50 min-w-[200px]">
-    <button id="align-left" class="context-menu-button block w-full text-left px-4 py-2 text-sm text-gray-200 rounded-md hover:bg-blue-700 hover:text-white">Aligner à Gauche</button>
-    <button id="align-center-h" class="context-menu-button block w-full text-left px-4 py-2 text-sm text-gray-200 rounded-md hover:bg-blue-700 hover:text-white">Centrer Horizontalement</button>
-    <button id="align-right" class="context-menu-button block w-full text-left px-4 py-2 text-sm text-gray-200 rounded-md hover:bg-blue-700 hover:text-white">Aligner à Droite</button>
-    <hr class="border-gray-600 my-1">
-    <button id="align-top" class="context-menu-button block w-full text-left px-4 py-2 text-sm text-gray-200 rounded-md hover:bg-blue-700 hover:text-white">Aligner en Haut</button>
-    <button id="align-center-v" class="context-menu-button block w-full text-left px-4 py-2 text-sm text-gray-200 rounded-md hover:bg-blue-700 hover:text-white">Centrer Verticalement</button>
-    <button id="align-bottom" class="context-menu-button block w-full text-left px-4 py-2 text-sm text-gray-200 rounded-md hover:bg-blue-700 hover:text-white">Aligner en Bas</button>
-    <hr class="border-gray-600 my-1">
-    <button id="align-center" class="context-menu-button block w-full text-left px-4 py-2 text-sm text-gray-200 rounded-md hover:bg-blue-700 hover:text-white">Centrer Tout</button>
-</div>
+    <!-- Placeholder pour les notifications (peut être géré dynamiquement par JS) -->
+    <div id="notification-placeholder"></div>
 
-<div id="notification-placeholder"></div>
-
-<script>
-// --- Références aux éléments ---
-const tabletWidthInput = document.getElementById('tabletWidth');
-const tabletHeightInput = document.getElementById('tabletHeight');
-const areaWidthInput = document.getElementById('areaWidth');
-const areaHeightInput = document.getElementById('areaHeight');
-const areaOffsetXInput = document.getElementById('areaOffsetX');
-const areaOffsetYInput = document.getElementById('areaOffsetY');
-const customRatioInput = document.getElementById('customRatio');
-const lockRatio = document.getElementById('lockRatio');
-const rectangle = document.getElementById('rectangle');
-const tabletBoundary = document.getElementById('tablet-boundary');
-const visualContainer = document.getElementById('visual-container');
-const contextMenu = document.getElementById('context-menu');
-const notificationPlaceholder = document.getElementById('notification-placeholder');
-const favoritesList = document.getElementById('favorites-list');
-const favoritesPlaceholder = favoritesList.querySelector('p');
-const tabletPresetSelect = document.getElementById('tabletPresetSelect');
-const tabletWidthGroup = document.getElementById('tablet-width-group');
-const tabletHeightGroup = document.getElementById('tablet-height-group');
-const tabletManualHr = document.getElementById('tablet-manual-hr');
-const tabletDimensionsInfo = document.getElementById('tablet-dimensions-info');
-const tabletRatioInfo = document.getElementById('tablet-ratio-info');
-const dimensionsInfo = document.getElementById('dimensions-info');
-const ratioInfo = document.getElementById('ratio-info');
-const areaInfo = document.getElementById('area-info');
-const positionInfo = document.getElementById('position-info');
-const saveBtn = document.getElementById('save-btn');
-const cancelEditBtn = document.getElementById('cancel-edit-btn');
-const toggleGridCheckbox = document.getElementById('toggleGridCheckbox');
-const backgroundGrid = document.getElementById('backgroundGrid');
-const sortOptionsDiv = document.getElementById('sort-options');
-
-// --- State ---
-let currentRatio = 1.0; let isDragging = false; let dragStartX, dragStartY; let initialCenterOffsetX, initialCenterOffsetY; let currentScale = 1.0; let tabletData = [];
-let editingFavoriteId = null;
-let currentSortCriteria = 'date';
-let throttleTimer = null;
-
-// --- Fonctions Utilitaires ---
-function showNotification(message) { const n = document.createElement('div'); n.textContent = message; n.className = 'fixed bottom-5 right-5 p-3 bg-blue-600 text-white rounded-lg shadow-xl z-50 animate-pulse opacity-0 transition-opacity duration-300 ease-out'; document.body.appendChild(n); void n.offsetWidth; n.style.opacity = '1'; setTimeout(() => { n.style.opacity = '0'; setTimeout(() => n.remove(), 300); }, 2500); }
-function toggleManualTabletInputs(show) { tabletWidthGroup.classList.toggle('hidden', !show); tabletHeightGroup.classList.toggle('hidden', !show); tabletManualHr.classList.toggle('hidden', !show); }
-function updateTabletBoundarySize() { let w = parseFloat(tabletWidthInput.value); let h = parseFloat(tabletHeightInput.value); if (isNaN(w) || w <= 0) w = 1; if (isNaN(h) || h <= 0) h = 1; const p = 32; const cw = visualContainer.clientWidth - p; const ch = visualContainer.clientHeight - p; if (cw <= 0 || ch <= 0) return; const scX = cw / w; const scY = ch / h; const sc = Math.min(scX, scY); const bw = w * sc; const bh = h * sc; tabletBoundary.style.width = `${bw.toFixed(1)}px`; tabletBoundary.style.height = `${bh.toFixed(1)}px`; }
-
-// --- Fonction Throttle ---
-function throttle(func, limit) { return function(...args) { if (!throttleTimer) { func.apply(this, args); throttleTimer = setTimeout(() => { throttleTimer = null; }, limit); } } }
-
-// --- Fonction Principale de Mise à Jour de l'Affichage ---
-function updateDisplay() {
-    updateTabletBoundarySize();
-    let tw = parseFloat(tabletWidthInput.value), th = parseFloat(tabletHeightInput.value);
-    let aw = parseFloat(areaWidthInput.value), ah = parseFloat(areaHeightInput.value);
-    let cx = parseFloat(areaOffsetXInput.value), cy = parseFloat(areaOffsetYInput.value);
-    if (isNaN(tw) || tw <= 0) tw = 1; if (isNaN(th) || th <= 0) th = 1; if (isNaN(aw) || aw < 0) aw = 0; if (isNaN(ah) || ah < 0) ah = 0; if (isNaN(cx)) cx = tw / 2; if (isNaN(cy)) cy = th / 2;
-    aw = Math.min(aw, tw); ah = Math.min(ah, th);
-    if (parseFloat(areaWidthInput.value) > tw) areaWidthInput.value = tw.toFixed(1); if (parseFloat(areaHeightInput.value) > th) areaHeightInput.value = th.toFixed(1);
-    let tlx = cx - (aw / 2), tly = cy - (ah / 2);
-    tlx = Math.max(0, Math.min(tlx, tw - aw)); tly = Math.max(0, Math.min(tly, th - ah));
-    let ccx = tlx + (aw / 2), ccy = tly + (ah / 2);
-    if (Math.abs(parseFloat(areaOffsetXInput.value) - ccx) > 0.0001) areaOffsetXInput.value = ccx.toFixed(3); if (Math.abs(parseFloat(areaOffsetYInput.value) - ccy) > 0.0001) areaOffsetYInput.value = ccy.toFixed(3);
-    const containerPadding = 32; const containerWidth = visualContainer.clientWidth - containerPadding; const containerHeight = visualContainer.clientHeight - containerPadding; let targetBoundaryWidth = 1, targetBoundaryHeight = 1;
-    if (containerWidth > 0 && containerHeight > 0 && tw > 0 && th > 0) { const scaleX = containerWidth / tw; const scaleY = containerHeight / th; const containerScale = Math.min(scaleX, scaleY); targetBoundaryWidth = tw * containerScale; targetBoundaryHeight = th * containerScale; }
-    if (tw > 0) currentScale = targetBoundaryWidth / tw; else currentScale = 1; if (!isFinite(currentScale) || currentScale <= 0) currentScale = 1;
-    const rw = aw * currentScale, rh = ah * currentScale, rl = tlx * currentScale, rt = tly * currentScale;
-    rectangle.style.width = `${rw}px`; rectangle.style.height = `${rh}px`; rectangle.style.left = `${rl}px`; rectangle.style.top = `${rt}px`;
-    rectangle.style.display = (targetBoundaryWidth > 0 && targetBoundaryHeight > 0) ? 'block' : 'none';
-    if (th > 0) tabletRatioInfo.textContent = `${(tw / th).toFixed(3)}`; else tabletRatioInfo.textContent = 'N/A';
-    tabletDimensionsInfo.textContent = `${tw.toFixed(1)} x ${th.toFixed(1)} mm`;
-    if (ah > 0) { const cr = aw / ah; ratioInfo.textContent = `${cr.toFixed(3)}`; if (lockRatio.checked) { const lr = parseFloat(customRatioInput.value); if (!isNaN(lr) && lr > 0) currentRatio = lr; else currentRatio = cr; } else currentRatio = cr; } else { ratioInfo.textContent = `N/A`; if (lockRatio.checked) { const lr = parseFloat(customRatioInput.value); if (!isNaN(lr) && lr > 0) currentRatio = lr; else currentRatio = 1.0; } else currentRatio = NaN; }
-    dimensionsInfo.textContent = `${aw.toFixed(1)} x ${ah.toFixed(1)} mm`; areaInfo.textContent = `${(aw * ah).toFixed(1)} mm²`; positionInfo.textContent = `${ccx.toFixed(3)}, ${ccy.toFixed(3)} mm`;
-}
-const throttledUpdateDisplay = throttle(updateDisplay, 50);
-
-// --- Logique Drag & Drop ---
-rectangle.addEventListener('mousedown', (e) => { if (e.button !== 0) return; isDragging = true; dragStartX = e.clientX; dragStartY = e.clientY; initialCenterOffsetX = parseFloat(areaOffsetXInput.value); initialCenterOffsetY = parseFloat(areaOffsetYInput.value); if (isNaN(initialCenterOffsetX)) initialCenterOffsetX = 0; if (isNaN(initialCenterOffsetY)) initialCenterOffsetY = 0; rectangle.style.transition = 'none'; rectangle.style.cursor = 'grabbing'; document.addEventListener('mousemove', handleDrag); document.addEventListener('mouseup', stopDrag); e.preventDefault(); });
-function handleDrag(e) { if (!isDragging) return; const dx = e.clientX - dragStartX; const dy = e.clientY - dragStartY; if (currentScale === 0) return; const drX = dx / currentScale; const drY = dy / currentScale; let ncx = initialCenterOffsetX + drX; let ncy = initialCenterOffsetY + drY; areaOffsetXInput.value = ncx.toFixed(3); areaOffsetYInput.value = ncy.toFixed(3); throttledUpdateDisplay(); }
-function stopDrag() { if (isDragging) { isDragging = false; rectangle.style.transition = 'width 0.1s linear, height 0.1s linear, top 0.1s linear, left 0.1s linear'; rectangle.style.cursor = 'grab'; document.removeEventListener('mousemove', handleDrag); document.removeEventListener('mouseup', stopDrag); updateDisplay(); } }
-
-// --- Fonction pour annuler le mode édition ---
-function cancelEditMode() { editingFavoriteId = null; saveBtn.textContent = "Sauvegarder Area"; saveBtn.classList.remove('bg-yellow-600', 'hover:bg-yellow-700', 'focus:ring-yellow-500'); saveBtn.classList.add('bg-green-600', 'hover:bg-green-700', 'focus:ring-green-500'); cancelEditBtn.classList.add('hidden'); }
-
-// --- Gestion des Inputs ---
-function handleInputChange() { if (editingFavoriteId) cancelEditMode(); updateDisplay(); }
-tabletWidthInput.addEventListener('input', () => { toggleManualTabletInputs(true); tabletPresetSelect.value = 'custom'; cancelEditMode(); updateDisplay(); });
-tabletHeightInput.addEventListener('input', () => { toggleManualTabletInputs(true); tabletPresetSelect.value = 'custom'; cancelEditMode(); updateDisplay(); });
-areaWidthInput.addEventListener('input', () => { cancelEditMode(); if (lockRatio.checked && currentRatio > 0 && !isNaN(currentRatio)) { const h = parseFloat(areaWidthInput.value) / currentRatio; if (!isNaN(h) && h >= 0 && Math.abs(parseFloat(areaHeightInput.value) - h) > 0.01) areaHeightInput.value = h.toFixed(1); } updateDisplay(); });
-areaHeightInput.addEventListener('input', () => { cancelEditMode(); if (lockRatio.checked && currentRatio > 0 && !isNaN(currentRatio)) { const w = parseFloat(areaHeightInput.value) * currentRatio; if (!isNaN(w) && w >= 0 && Math.abs(parseFloat(areaWidthInput.value) - w) > 0.01) areaWidthInput.value = w.toFixed(1); } updateDisplay(); });
-customRatioInput.addEventListener('input', () => { cancelEditMode(); const nr = parseFloat(customRatioInput.value); if (!isNaN(nr) && nr > 0) { currentRatio = nr; if (lockRatio.checked) { const cw = parseFloat(areaWidthInput.value); const nh = cw / currentRatio; if (!isNaN(nh) && nh >= 0 && Math.abs(parseFloat(areaHeightInput.value) - nh) > 0.01) areaHeightInput.value = nh.toFixed(1); } } else currentRatio = NaN; updateDisplay(); });
-areaOffsetXInput.addEventListener('input', handleInputChange); areaOffsetYInput.addEventListener('input', handleInputChange);
-lockRatio.addEventListener('change', () => { if(lockRatio.checked) { const w = parseFloat(areaWidthInput.value), h = parseFloat(areaHeightInput.value); if(h > 0) { currentRatio = w / h; customRatioInput.value = currentRatio.toFixed(3); } else { const r = parseFloat(customRatioInput.value); if (!isNaN(r) && r > 0) currentRatio = r; else { currentRatio = 1.0; customRatioInput.value = currentRatio.toFixed(3); }}} updateDisplay(); });
-tabletPresetSelect.addEventListener('change', (event) => { const sv = event.target.value; const so = event.target.selectedOptions[0]; if (sv === 'custom') { toggleManualTabletInputs(true); } else if (sv && so.dataset.width) { const w = parseFloat(so.dataset.width); const h = parseFloat(so.dataset.height); if (!isNaN(w) && !isNaN(h)) { tabletWidthInput.value = w.toFixed(1); tabletHeightInput.value = h.toFixed(1); toggleManualTabletInputs(false); cancelEditMode(); updateDisplay(); } } else { toggleManualTabletInputs(false); } });
-document.getElementById('swap-btn').addEventListener('click', () => { cancelEditMode(); const w = areaWidthInput.value; areaWidthInput.value = areaHeightInput.value; areaHeightInput.value = w; if (lockRatio.checked) { const width = parseFloat(areaWidthInput.value), height = parseFloat(areaHeightInput.value); if(height > 0) { currentRatio = width / height; customRatioInput.value = currentRatio.toFixed(3); } else { const r = parseFloat(customRatioInput.value); if (!isNaN(r) && r > 0) currentRatio = r; else currentRatio = 1.0; customRatioInput.value = currentRatio.toFixed(3); }} updateDisplay(); });
-document.getElementById('center-btn').addEventListener('click', () => { cancelEditMode(); centerArea(); });
-cancelEditBtn.addEventListener('click', cancelEditMode);
-
-// --- Bouton Copier ---
-document.getElementById('copy-btn').addEventListener('click', () => { const w = parseFloat(areaWidthInput.value), h = parseFloat(areaHeightInput.value), x = parseFloat(areaOffsetXInput.value), y = parseFloat(areaOffsetYInput.value); const r = (h > 0) ? (w / h).toFixed(3) : 'N/A'; navigator.clipboard.writeText(`-- Zone Active Réelle --\nLargeur: ${w.toFixed(1)} mm\nHauteur: ${h.toFixed(1)} mm\nRatio: ${r}\nCentre X: ${x.toFixed(3)} mm\nCentre Y: ${y.toFixed(3)} mm`); showNotification('Infos (Centre) copiées !'); });
-
-// --- Gestion des Favoris ---
-const FAVORITES_KEY = 'osuAreaVisualizerFavorites_v1';
-function saveFavorite() { const w = parseFloat(areaWidthInput.value), h = parseFloat(areaHeightInput.value), x = parseFloat(areaOffsetXInput.value), y = parseFloat(areaOffsetYInput.value), tw = parseFloat(tabletWidthInput.value), th = parseFloat(tabletHeightInput.value), r = customRatioInput.value; let c = ""; if (!editingFavoriteId) { c = prompt("Ajouter un commentaire (optionnel, max 40 caractères):"); if (c === null) return; if (c.length > 40) { showNotification("Le commentaire ne doit pas dépasser 40 caractères."); return; } } if (isNaN(w)||isNaN(h)||isNaN(x)||isNaN(y)||isNaN(tw)||isNaN(th)) { showNotification("Erreur: Valeurs invalides."); return; } let presetInfo = "Personnalisé"; const currentWStr = tw.toFixed(1); const currentHStr = th.toFixed(1); const selectedPresetValue = tabletPresetSelect.value; const matchedPreset = tabletData.find(t => t.width.toFixed(1) === currentWStr && t.height.toFixed(1) === currentHStr); if (matchedPreset && selectedPresetValue && selectedPresetValue !== 'custom' && selectedPresetValue !== '') { const so = tabletPresetSelect.querySelector(`option[value="${selectedPresetValue}"]`); if(so) presetInfo = `${matchedPreset.brand} - ${so.textContent}`; else presetInfo = `${matchedPreset.brand} - ${matchedPreset.model}`; } let favs = JSON.parse(localStorage.getItem(FAVORITES_KEY)) || []; let notificationMessage = ''; if (editingFavoriteId) { const index = favs.findIndex(fav => fav.id.toString() === editingFavoriteId.toString()); if (index > -1) { const existingComment = favs[index].comment; favs[index] = { ...favs[index], width: w, height: h, ratio: r, x, y, tabletW: tw, tabletH: th, presetInfo: presetInfo, comment: existingComment }; notificationMessage = 'Favori mis à jour !'; } else { showNotification("Erreur: Favori à éditer non trouvé."); cancelEditMode(); return; } } else { const a = { width: w, height: h, ratio: r, x, y, comment: c || '', tabletW: tw, tabletH: th, id: Date.now(), presetInfo: presetInfo }; favs.push(a); notificationMessage = 'Favori sauvegardé !'; } localStorage.setItem(FAVORITES_KEY, JSON.stringify(favs)); displayFavorites(); showNotification(notificationMessage); cancelEditMode(); }
-function startEditFavorite(id) { const favs = JSON.parse(localStorage.getItem(FAVORITES_KEY)) || []; const f = favs.find(fav => fav.id.toString() === id.toString()); if (!f) { showNotification("Erreur: Favori non trouvé pour édition."); return; } if (f.tabletW !== undefined) tabletWidthInput.value = f.tabletW.toFixed(1); if (f.tabletH !== undefined) tabletHeightInput.value = f.tabletH.toFixed(1); areaWidthInput.value = f.width.toFixed(1); areaHeightInput.value = f.height.toFixed(1); areaOffsetXInput.value = f.x !== undefined ? f.x.toFixed(3) : '0.000'; areaOffsetYInput.value = f.y !== undefined ? f.y.toFixed(3) : '0.000'; if (f.ratio && f.ratio !== 'N/A') { const sr = parseFloat(f.ratio); if(!isNaN(sr) && sr > 0) { customRatioInput.value = sr.toFixed(3); currentRatio = sr; } else { if (f.height > 0) currentRatio = f.width / f.height; else currentRatio = 1.0; customRatioInput.value = currentRatio.toFixed(3); }} else if (f.height > 0) { currentRatio = f.width / f.height; customRatioInput.value = currentRatio.toFixed(3); } else { currentRatio = 1.0; customRatioInput.value = currentRatio.toFixed(3); } lockRatio.checked = (!isNaN(currentRatio) && currentRatio > 0); const loadedWStr = f.tabletW.toFixed(1); const loadedHStr = f.tabletH.toFixed(1); const matchedPresetOption = Array.from(tabletPresetSelect.options).find(opt => opt.dataset.width && opt.dataset.height && parseFloat(opt.dataset.width).toFixed(1) === loadedWStr && parseFloat(opt.dataset.height).toFixed(1) === loadedHStr); if (matchedPresetOption && f.presetInfo !== "Personnalisé") { tabletPresetSelect.value = matchedPresetOption.value; toggleManualTabletInputs(false); } else { tabletPresetSelect.value = 'custom'; toggleManualTabletInputs(true); } editingFavoriteId = id; saveBtn.textContent = "Mettre à Jour"; saveBtn.classList.remove('bg-green-600', 'hover:bg-green-700', 'focus:ring-green-500'); saveBtn.classList.add('bg-yellow-600', 'hover:bg-yellow-700', 'focus:ring-yellow-500'); cancelEditBtn.classList.remove('hidden'); updateDisplay(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-function displayFavorites() { favoritesList.innerHTML = ''; let favs = JSON.parse(localStorage.getItem(FAVORITES_KEY)) || []; favoritesPlaceholder.classList.toggle('hidden', favs.length > 0); if (favs.length === 0) return; favs.sort((a, b) => { switch (currentSortCriteria) { case 'name': return (a.comment || '').toLowerCase().localeCompare((b.comment || '').toLowerCase()); case 'size': const areaA = (a.width || 0) * (a.height || 0); const areaB = (b.width || 0) * (b.height || 0); return areaB - areaA; case 'date': default: return (b.id || 0) - (a.id || 0); } }); favs.forEach((f) => { const d = document.createElement('div'); d.className = 'favorite-item bg-gray-700/50 p-3 rounded-lg flex justify-between items-center gap-2 text-sm hover:bg-gray-700 transition duration-150 ease-in-out'; const cm = f.comment ? `<span class="font-semibold text-white">${f.comment}</span> - ` : ''; const dm = `${f.width.toFixed(1)}x${f.height.toFixed(1)}mm`; const rt = f.ratio && f.ratio !== 'N/A' ? ` (${parseFloat(f.ratio).toFixed(3)})` : ''; const pt = (f.x !== undefined && f.y !== undefined) ? ` @(${f.x.toFixed(3)}, ${f.y.toFixed(3)})` : ''; const presetText = f.presetInfo && f.presetInfo !== "Personnalisé" ? `<span class="text-xs text-cyan-400" title="Basé sur le preset tablette">[${f.presetInfo}]</span>` : `<span class="text-xs text-gray-400" title="Dimensions tablette personnalisées">[Perso.]</span>`; const tb = (f.tabletW && f.tabletH) ? ` <span class="text-xs text-gray-500">(Tab: ${f.tabletW.toFixed(1)}x${f.tabletH.toFixed(1)})</span>` : ''; d.innerHTML = `<div class="flex-grow mr-2 space-x-1 flex flex-wrap items-baseline gap-x-2">${cm}<span>${dm}${rt}${pt}</span>${presetText}${tb}</div><div class="flex-shrink-0 space-x-1"><button onclick="startEditFavorite('${f.id}')" class="btn btn-secondary btn-sm px-3 py-1.5 text-sm bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-500 rounded-md font-medium text-white transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800" title="Modifier">✎</button><button onclick="loadFavorite('${f.id}')" class="btn btn-primary btn-sm px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 rounded-md font-medium text-white transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800" title="Charger">Charger</button><button onclick="deleteFavorite('${f.id}')" class="btn btn-danger btn-sm px-3 py-1.5 text-sm bg-red-600 hover:bg-red-700 focus:ring-red-500 rounded-md font-medium text-white transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800" title="Supprimer">X</button></div>`; favoritesList.appendChild(d); }); updateSortButtonsUI(); }
-function loadFavorite(id) { const favs = JSON.parse(localStorage.getItem(FAVORITES_KEY)) || []; const f = favs.find(fav => fav.id.toString() === id.toString()); if (!f) { showNotification("Erreur: Favori non trouvé."); return; } if (f.tabletW !== undefined) tabletWidthInput.value = f.tabletW.toFixed(1); if (f.tabletH !== undefined) tabletHeightInput.value = f.tabletH.toFixed(1); areaWidthInput.value = f.width.toFixed(1); areaHeightInput.value = f.height.toFixed(1); areaOffsetXInput.value = f.x !== undefined ? f.x.toFixed(3) : '0.000'; areaOffsetYInput.value = f.y !== undefined ? f.y.toFixed(3) : '0.000'; if (f.ratio && f.ratio !== 'N/A') { const sr = parseFloat(f.ratio); if(!isNaN(sr) && sr > 0) { customRatioInput.value = sr.toFixed(3); currentRatio = sr; } else { if (f.height > 0) currentRatio = f.width / f.height; else currentRatio = 1.0; customRatioInput.value = currentRatio.toFixed(3); }} else if (f.height > 0) { currentRatio = f.width / f.height; customRatioInput.value = currentRatio.toFixed(3); } else { currentRatio = 1.0; customRatioInput.value = currentRatio.toFixed(3); } lockRatio.checked = (!isNaN(currentRatio) && currentRatio > 0); const loadedWStr = f.tabletW.toFixed(1); const loadedHStr = f.tabletH.toFixed(1); const matchedPresetOption = Array.from(tabletPresetSelect.options).find(opt => opt.dataset.width && opt.dataset.height && parseFloat(opt.dataset.width).toFixed(1) === loadedWStr && parseFloat(opt.dataset.height).toFixed(1) === loadedHStr); if (matchedPresetOption && f.presetInfo !== "Personnalisé") { tabletPresetSelect.value = matchedPresetOption.value; toggleManualTabletInputs(false); } else { tabletPresetSelect.value = 'custom'; toggleManualTabletInputs(true); } cancelEditMode(); updateDisplay(); showNotification(`Favori "${f.comment || 'Sans nom'}" chargé !`); }
-function deleteFavorite(id) { let favs = JSON.parse(localStorage.getItem(FAVORITES_KEY)) || []; const len = favs.length; favs = favs.filter(fav => fav.id.toString() !== id.toString()); if (favs.length < len) { localStorage.setItem(FAVORITES_KEY, JSON.stringify(favs)); displayFavorites(); showNotification('Favori supprimé.'); } else { showNotification('Erreur: Favori non trouvé.'); } }
-document.getElementById('save-btn').addEventListener('click', saveFavorite);
-
-// --- Logique d'Alignement ---
-function setCenterOffset(x, y) { cancelEditMode(); if (x !== null) areaOffsetXInput.value = x.toFixed(3); if (y !== null) areaOffsetYInput.value = y.toFixed(3); updateDisplay(); contextMenu.style.display = 'none'; }
-function centerArea() { const tw = parseFloat(tabletWidthInput.value); const th = parseFloat(tabletHeightInput.value); if (isNaN(tw) || isNaN(th)) return; setCenterOffset(tw / 2, th / 2); }
-rectangle.addEventListener('contextmenu', (e) => { e.preventDefault(); const mw = contextMenu.offsetWidth, mh = contextMenu.offsetHeight, bw = document.body.clientWidth, bh = document.body.clientHeight; let mx = e.clientX, my = e.clientY; if (mx + mw > bw) mx = bw - mw - 5; if (my + mh > bh) my = bh - mh - 5; contextMenu.style.left = `${mx}px`; contextMenu.style.top = `${my}px`; contextMenu.style.display = 'block'; });
-document.addEventListener('click', (e) => { if (!contextMenu.contains(e.target) && e.target !== rectangle) contextMenu.style.display = 'none'; });
-document.getElementById('align-left').addEventListener('click', () => { cancelEditMode(); const w = parseFloat(areaWidthInput.value); if (!isNaN(w)) setCenterOffset(w / 2, null); });
-document.getElementById('align-right').addEventListener('click', () => { cancelEditMode(); const tw = parseFloat(tabletWidthInput.value), aw = parseFloat(areaWidthInput.value); if (!isNaN(tw) && !isNaN(aw)) setCenterOffset(tw - aw / 2, null); });
-document.getElementById('align-center-h').addEventListener('click', () => { cancelEditMode(); const tw = parseFloat(tabletWidthInput.value); if (!isNaN(tw)) setCenterOffset(tw / 2, null); });
-document.getElementById('align-top').addEventListener('click', () => { cancelEditMode(); const h = parseFloat(areaHeightInput.value); if (!isNaN(h)) setCenterOffset(null, h / 2); });
-document.getElementById('align-bottom').addEventListener('click', () => { cancelEditMode(); const th = parseFloat(tabletHeightInput.value), ah = parseFloat(areaHeightInput.value); if (!isNaN(th) && !isNaN(ah)) setCenterOffset(null, th - ah / 2); });
-document.getElementById('align-center-v').addEventListener('click', () => { cancelEditMode(); const th = parseFloat(tabletHeightInput.value); if (!isNaN(th)) setCenterOffset(null, th / 2); });
-document.getElementById('align-center').addEventListener('click', centerArea);
-
-// --- Toggle Grid ---
-toggleGridCheckbox.addEventListener('change', () => { backgroundGrid.classList.toggle('hidden', !toggleGridCheckbox.checked); });
-
-// --- Tri Favoris ---
-function updateSortButtonsUI() { sortOptionsDiv.querySelectorAll('.sort-button').forEach(button => { const isActive = button.dataset.sort === currentSortCriteria; button.classList.toggle('bg-blue-700', isActive); button.classList.toggle('ring-2', isActive); button.classList.toggle('ring-blue-400', isActive); button.classList.toggle('bg-blue-600', !isActive); button.classList.toggle('hover:bg-blue-700', !isActive); }); }
-sortOptionsDiv.addEventListener('click', (e) => { if (e.target.classList.contains('sort-button')) { const sortBy = e.target.dataset.sort; if (sortBy) { currentSortCriteria = sortBy; displayFavorites(); } } });
-
-// --- Initialisation ---
-async function loadTabletPresets() { try { const response = await fetch('tablets.json'); if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`); tabletData = await response.json(); tabletData.sort((a, b) => { if (a.brand < b.brand) return -1; if (a.brand > b.brand) return 1; if (a.model < b.model) return -1; if (a.model > b.model) return 1; return 0; }); const groupedByBrand = tabletData.reduce((acc, t) => { (acc[t.brand] = acc[t.brand] || []).push(t); return acc; }, {}); for (const brand in groupedByBrand) { const optgroup = document.createElement('optgroup'); optgroup.label = brand; groupedByBrand[brand].forEach(t => { const option = document.createElement('option'); option.value = `${brand}-${t.model}`; option.textContent = t.model; option.dataset.width = t.width; option.dataset.height = t.height; optgroup.appendChild(option); }); tabletPresetSelect.appendChild(optgroup); } tabletPresetSelect.disabled = false; } catch (error) { console.error("Could not load tablet presets:", error); tabletPresetSelect.disabled = true; const errorOption = document.createElement('option'); errorOption.textContent = "Erreur chargement presets"; errorOption.disabled = true; tabletPresetSelect.insertBefore(errorOption, tabletPresetSelect.children[1]); } }
-function initialize() { const w = parseFloat(areaWidthInput.value), h = parseFloat(areaHeightInput.value); if(h > 0) { currentRatio = w / h; customRatioInput.value = currentRatio.toFixed(3); } else { const r = parseFloat(customRatioInput.value); if (!isNaN(r) && r > 0) currentRatio = r; else { currentRatio = 1.0; customRatioInput.value = currentRatio.toFixed(3); } } backgroundGrid.classList.toggle('hidden', !toggleGridCheckbox.checked); loadTabletPresets().then(() => { toggleManualTabletInputs(tabletPresetSelect.value === 'custom'); updateDisplay(); displayFavorites(); window.addEventListener('resize', updateDisplay); }); }
-document.addEventListener('DOMContentLoaded', initialize);
-
-</script>
+    <!-- Lien vers ton fichier JavaScript -->
+    <!-- Placé à la fin du body pour s'assurer que le DOM est chargé -->
+    <script src="js/script.js"></script>
 
 </body>
 </html>
