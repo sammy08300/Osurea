@@ -1,5 +1,7 @@
 # Visualiseur d'Area pour osu!
 
+! En cours de dev. Peut être jamais fini car la situation actuel me convient a moi ^^.
+
 Ce projet est une application web conçue pour aider les joueurs d'osu! à visualiser, configurer et gérer les zones actives de leur tablette graphique. Il offre une interface interactive pour définir précisément la zone de jeu et sauvegarder les configurations préférées.
 
 ## Fonctionnalités Principales
