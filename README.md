@@ -1,4 +1,4 @@
-# osu! Area Visualizer v2
+# Osu!rea - Area Visualizer v2
 
 Un outil interactif pour les joueurs d'osu! permettant de visualiser et configurer la zone active de leur tablette graphique.
 

@@ -1,4 +1,4 @@
-// Service Worker pour osu! Area Visualizer
+// Service Worker pour Osu!rea - Area Visualizer
 const CACHE_NAME = 'osu-area-visualizer-v2';
 const ASSETS_TO_CACHE = [
   '/',
@@ -48,7 +48,7 @@ self.addEventListener('fetch', (event) => {
   // Stratégie Network First pour HTML et CSS
   if (url.pathname.endsWith('.html') || url.pathname.endsWith('.css') || url.pathname.endsWith('.js')) {
     event.respondWith(
-      fetch(event.request)
+      fetch(event.request, { cache: 'no-store' })
         .then((response) => {
           // Mettre à jour le cache avec la nouvelle réponse
           const responseToCache = response.clone();

@@ -4,7 +4,7 @@
 
 const StorageManager = {
     // Storage key for favorites
-    FAVORITES_KEY: 'osuAreaVisualizerFavorites_v2',
+    FAVORITES_KEY: 'Osu!reaFavorites_v2',
     
     /**
      * Gets all favorites from local storage
