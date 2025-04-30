@@ -1,0 +1,128 @@
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(31, 41, 55, 0.3);
+    border-radius: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(75, 85, 99, 0.8);
+    border-radius: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(107, 114, 128, 0.9);
+}
+
+/* Tablet boundary styling */
+#tablet-boundary {
+    transition: width 0.25s ease, height 0.25s ease;
+}
+
+/* Rectangle styling for area */
+.rectangle {
+    cursor: grab;
+    user-select: none;
+    transition: width 0.1s ease, height 0.1s ease, transform 0.1s ease;
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+}
+
+.rectangle:active {
+    cursor: grabbing;
+}
+
+/* Tablet preset select */
+select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+select:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Context menu styles */
+#context-menu hr {
+    border-color: rgba(75, 85, 99, 0.6);
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+}
+
+/* Favorite items styles */
+.favorite-item {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.favorite-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Notifications */
+.notification {
+    animation: slide-in 0.3s ease forwards, fade-out 0.3s ease 3s forwards;
+    max-width: 300px;
+    pointer-events: auto;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+@keyframes slide-in {
+    0% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fade-out {
+    0% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Focus styling improvements */
+input:focus, select:focus, button:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+/* Number input arrows styling */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    opacity: 1;
+    background: rgba(31, 41, 55, 0.1);
+    border-left: 1px solid rgba(75, 85, 99, 0.4);
+    height: 100%;
+}
+
+/* Highlight effect for recently updated favorites */
+.highlight-effect {
+    animation: highlight-pulse 1.5s ease-in-out;
+}
+
+@keyframes highlight-pulse {
+    0% {
+        background-color: rgba(59, 130, 246, 0.3);
+    }
+    100% {
+        background-color: rgba(55, 65, 81, 0.5);
+    }
+}
