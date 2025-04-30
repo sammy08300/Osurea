@@ -1,33 +1,44 @@
+:root {
+    --scrollbar-width: 8px;
+    --scrollbar-track-bg: rgba(31, 41, 55, 0.3);
+    --scrollbar-thumb-bg: rgba(75, 85, 99, 0.8);
+    --scrollbar-thumb-hover: rgba(107, 114, 128, 0.9);
+    --transition-fast: 0.1s ease;
+    --transition-normal: 0.25s ease;
+    --shadow-color: rgba(59, 130, 246, 0.3);
+    --focus-ring: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
 /* Custom scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
-    width: 8px;
+    width: var(--scrollbar-width);
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-    background: rgba(31, 41, 55, 0.3);
-    border-radius: 8px;
+    background: var(--scrollbar-track-bg);
+    border-radius: var(--scrollbar-width);
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(75, 85, 99, 0.8);
-    border-radius: 8px;
+    background: var(--scrollbar-thumb-bg);
+    border-radius: var(--scrollbar-width);
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(107, 114, 128, 0.9);
+    background: var(--scrollbar-thumb-hover);
 }
 
 /* Tablet boundary styling */
 #tablet-boundary {
-    transition: width 0.25s ease, height 0.25s ease;
+    transition: width var(--transition-normal), height var(--transition-normal);
 }
 
 /* Rectangle styling for area */
 .rectangle {
     cursor: grab;
     user-select: none;
-    transition: width 0.1s ease, height 0.1s ease, transform 0.1s ease;
-    box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+    transition: width var(--transition-fast), height var(--transition-fast), transform var(--transition-fast);
+    box-shadow: 0 0 15px var(--shadow-color);
 }
 
 .rectangle:active {
@@ -101,7 +112,7 @@ select:disabled {
 /* Focus styling improvements */
 input:focus, select:focus, button:focus {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+    box-shadow: var(--focus-ring);
 }
 
 /* Number input arrows styling */

@@ -1,5 +1,5 @@
 // Service Worker pour osu! Area Visualizer
-const CACHE_NAME = 'osu-area-visualizer-v1';
+const CACHE_NAME = 'osu-area-visualizer-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -41,39 +41,49 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Stratégie de mise en cache : Cache First, puis réseau
+// Stratégie de mise en cache : Network First pour HTML et CSS, Cache First pour le reste
 self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Retourner la réponse mise en cache si elle existe
-        if (response) {
+  const url = new URL(event.request.url);
+  
+  // Stratégie Network First pour HTML et CSS
+  if (url.pathname.endsWith('.html') || url.pathname.endsWith('.css') || url.pathname.endsWith('.js')) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          // Mettre à jour le cache avec la nouvelle réponse
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME)
+            .then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
           return response;
-        }
-        
-        // Sinon, faire la requête au réseau
-        return fetch(event.request)
-          .then((response) => {
-            // Ne pas mettre en cache les réponses d'API ou les requêtes non réussies
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-            
-            // Mettre en cache la nouvelle réponse
-            const responseToCache = response.clone();
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                cache.put(event.request, responseToCache);
-              });
-              
+        })
+        .catch(() => {
+          // Fallback au cache si le réseau échoue
+          return caches.match(event.request);
+        })
+    );
+  } else {
+    // Stratégie Cache First pour les autres ressources
+    event.respondWith(
+      caches.match(event.request)
+        .then((response) => {
+          if (response) {
             return response;
-          });
-      })
-      .catch(() => {
-        // Fallback pour les requêtes qui échouent
-        if (event.request.url.indexOf('.html') > -1) {
-          return caches.match('/index.html');
-        }
-      })
-  );
+          }
+          return fetch(event.request)
+            .then((response) => {
+              if (!response || response.status !== 200 || response.type !== 'basic') {
+                return response;
+              }
+              const responseToCache = response.clone();
+              caches.open(CACHE_NAME)
+                .then((cache) => {
+                  cache.put(event.request, responseToCache);
+                });
+              return response;
+            });
+        })
+    );
+  }
 }); 

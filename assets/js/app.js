@@ -417,4 +417,35 @@ document.addEventListener('DOMContentLoaded', () => {
         ContextMenu.init();
         console.log('Menu contextuel initialisé depuis le chargement du DOM');
     }, 500);
+
+    // Gestion du menu dépliant du récapitulatif
+    const recapToggle = document.getElementById('recap-toggle');
+    const recapContent = document.getElementById('recap-content');
+    const recapArrow = document.getElementById('recap-arrow');
+    
+    // État initial : plié
+    let isRecapExpanded = false;
+    
+    // Fonction pour mettre à jour l'état visuel
+    const updateRecapState = () => {
+        if (isRecapExpanded) {
+            recapContent.style.maxHeight = recapContent.scrollHeight + 'px';
+            recapContent.style.opacity = '1';
+            recapArrow.style.transform = 'rotate(0deg)';
+        } else {
+            recapContent.style.maxHeight = '0';
+            recapContent.style.opacity = '0';
+            recapArrow.style.transform = 'rotate(180deg)';
+        }
+    };
+    
+    // Initialiser l'état
+    recapContent.style.transition = 'max-height 0.2s ease-in-out, opacity 0.2s ease-in-out';
+    updateRecapState();
+    
+    // Gérer le clic
+    recapToggle.addEventListener('click', () => {
+        isRecapExpanded = !isRecapExpanded;
+        updateRecapState();
+    });
 });
