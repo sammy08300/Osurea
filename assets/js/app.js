@@ -7,6 +7,7 @@ const appState = {
     tabletData: [],
     editingFavoriteId: null,
     currentRatio: 1.0,
+    debouncedUpdateRatio: null,
     
     /**
      * Load tablet data from JSON file
@@ -147,6 +148,18 @@ const appState = {
                 if (!isNaN(newHeight) && newHeight >= 0) {
                     areaHeightInput.value = formatNumber(newHeight);
                 }
+            } else if (lockRatioCheckbox.checked) {
+                // Recalculer et mettre à jour le ratio si le verrou est actif
+                const width = parseFloatSafe(areaWidthInput.value);
+                const height = parseFloatSafe(areaHeightInput.value);
+                
+                if (height > 0) {
+                    this.currentRatio = width / height;
+                    customRatioInput.value = formatNumber(this.currentRatio, 3);
+                }
+            } else {
+                // Appliquer la mise à jour du ratio avec délai quand le verrou n'est pas actif
+                this.debouncedUpdateRatio();
             }
             
             updateDisplay();
@@ -160,6 +173,18 @@ const appState = {
                 if (!isNaN(newWidth) && newWidth >= 0) {
                     areaWidthInput.value = formatNumber(newWidth);
                 }
+            } else if (lockRatioCheckbox.checked) {
+                // Recalculer et mettre à jour le ratio si le verrou est actif
+                const width = parseFloatSafe(areaWidthInput.value);
+                const height = parseFloatSafe(areaHeightInput.value);
+                
+                if (height > 0) {
+                    this.currentRatio = width / height;
+                    customRatioInput.value = formatNumber(this.currentRatio, 3);
+                }
+            } else {
+                // Appliquer la mise à jour du ratio avec délai quand le verrou n'est pas actif
+                this.debouncedUpdateRatio();
             }
             
             updateDisplay();
@@ -185,6 +210,19 @@ const appState = {
             }
             
             updateDisplay();
+        });
+        
+        // Ajouter un événement focus pour empêcher les mises à jour pendant l'édition directe
+        customRatioInput.addEventListener('focus', () => {
+            customRatioInput.dataset.editing = 'true';
+        });
+        
+        customRatioInput.addEventListener('blur', () => {
+            delete customRatioInput.dataset.editing;
+            // Recalculer le ratio en fonction des dimensions actuelles si nécessaire
+            if (!lockRatioCheckbox.checked) {
+                this.debouncedUpdateRatio();
+            }
         });
         
         lockRatioCheckbox.addEventListener('change', () => {
@@ -339,6 +377,26 @@ Centre Y: ${formatNumber(offsetY, 3)} mm`;
         // Initialize favorites
         Favorites.init();
         
+        // Création d'une fonction debounce pour mettre à jour le ratio
+        this.debouncedUpdateRatio = debounce(() => {
+            const areaWidthInput = document.getElementById('areaWidth');
+            const areaHeightInput = document.getElementById('areaHeight');
+            const customRatioInput = document.getElementById('customRatio');
+            const lockRatioCheckbox = document.getElementById('lockRatio');
+            
+            const width = parseFloatSafe(areaWidthInput.value);
+            const height = parseFloatSafe(areaHeightInput.value);
+            
+            if (height > 0 && width > 0) {
+                const calculatedRatio = width / height;
+                // Ne pas mettre à jour si le verrou est activé ou si l'utilisateur édite directement le champ
+                if (!lockRatioCheckbox.checked && !customRatioInput.dataset.editing && !customRatioInput.matches(':focus')) {
+                    customRatioInput.value = formatNumber(calculatedRatio, 3);
+                    this.currentRatio = calculatedRatio;
+                }
+            }
+        }, 300); // 300ms delay
+        
         // Start with default values
         updateDisplay();
     }
@@ -347,4 +405,16 @@ Centre Y: ${formatNumber(offsetY, 3)} mm`;
 // Initialize app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     appState.init();
+    
+    // Empêcher le menu contextuel du navigateur sur toute la page
+    document.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        return false;
+    });
+    
+    // S'assurer que le menu contextuel est initialisé après le visualiseur
+    setTimeout(() => {
+        ContextMenu.init();
+        console.log('Menu contextuel initialisé depuis le chargement du DOM');
+    }, 500);
 });

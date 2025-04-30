@@ -126,3 +126,62 @@ input[type="number"]::-webkit-outer-spin-button {
         background-color: rgba(55, 65, 81, 0.5);
     }
 }
+
+/* Styles pour le visualiseur de zone de tablette osu! */
+
+/* Menu contextuel */
+#context-menu {
+    transform-origin: top left;
+    animation: appear 0.15s ease-out;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+    user-select: none;
+    pointer-events: auto;
+}
+
+@keyframes appear {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Empêcher le menu contextuel du navigateur sur les éléments clés */
+#rectangle, #tablet-boundary, #visual-container {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Curseur pour indiquer qu'on peut déplacer le rectangle */
+#rectangle {
+    cursor: grab;
+}
+
+#rectangle:active {
+    cursor: grabbing;
+}
+
+/* Scrollbar personnalisée */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(75, 85, 99, 0.3);
+    border-radius: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.6);
+    border-radius: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.8);
+}

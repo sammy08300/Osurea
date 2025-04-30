@@ -100,9 +100,27 @@ function updateInfoDisplays(tabletWidth, tabletHeight, areaWidth, areaHeight, ar
     const areaInfo = document.getElementById('area-info');
     const ratioInfo = document.getElementById('ratio-info');
     const positionInfo = document.getElementById('position-info');
+    const customRatioInput = document.getElementById('customRatio');
+    const lockRatioCheckbox = document.getElementById('lockRatio');
     
     const areaRatio = calculateRatio(areaWidth, areaHeight);
     const areaSurface = formatNumber(areaWidth * areaHeight);
+    
+    // Mettre à jour le ratio dans le champ de saisie si le verrou est activé
+    if (lockRatioCheckbox.checked && areaHeight > 0) {
+        // Ne pas mettre à jour le customRatioInput si l'utilisateur est en train de l'éditer
+        if (!customRatioInput.matches(':focus') && !customRatioInput.dataset.editing) {
+            customRatioInput.value = formatNumber(areaWidth / areaHeight, 3);
+            
+            // Mettre à jour la variable currentRatio dans appState si elle existe
+            if (typeof appState !== 'undefined') {
+                appState.currentRatio = areaWidth / areaHeight;
+            }
+        }
+    } else if (typeof appState !== 'undefined' && typeof appState.debouncedUpdateRatio === 'function') {
+        // Pour le mode déverrouillé, utiliser la fonction debounced
+        appState.debouncedUpdateRatio();
+    }
     
     dimensionsInfo.textContent = `${formatNumber(areaWidth)} × ${formatNumber(areaHeight)} mm`;
     areaInfo.textContent = `${areaSurface} mm²`;
@@ -122,6 +140,8 @@ function setupDragFunctionality() {
     rectangle.addEventListener('touchstart', handleTouchStart);
     document.addEventListener('touchmove', handleTouchMove);
     document.addEventListener('touchend', handleDragEnd);
+    
+    // Noter: l'écouteur d'événement contextmenu a été déplacé vers le module ContextMenu
 }
 
 /**
