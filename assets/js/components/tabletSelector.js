@@ -39,6 +39,9 @@ const TabletSelector = {
             return;
         }
         
+        // Ajouter un attribut title au texte du sélecteur pour l'info-bulle
+        this.selectorText.title = this.selectorText.textContent;
+        
         // Stockage des données
         this.tabletData = tabletData;
         
@@ -199,6 +202,15 @@ const TabletSelector = {
         // Vider la liste actuelle
         this.brandsList.innerHTML = '';
         
+        // Si aucune donnée, afficher un message
+        if (!this.tabletData || this.tabletData.length === 0) {
+            const noData = document.createElement('div');
+            noData.className = 'p-4 text-gray-400 text-center italic';
+            noData.textContent = 'Aucune donnée de tablette disponible';
+            this.brandsList.appendChild(noData);
+            return;
+        }
+        
         // Obtenir les marques uniques
         const brands = [...new Set(this.tabletData.map(tablet => tablet.brand))].sort();
         
@@ -213,7 +225,7 @@ const TabletSelector = {
             brandItem.textContent = brand;
             brandItem.dataset.brand = brand;
             
-            // Événement au clic sur une marque
+            // Ajouter un écouteur d'événement
             brandItem.addEventListener('click', () => {
                 this.selectBrand(brand);
             });
@@ -221,7 +233,7 @@ const TabletSelector = {
             this.brandsList.appendChild(brandItem);
         });
         
-        // Sélectionner la première marque par défaut
+        // Par défaut, afficher la première marque si aucune n'est sélectionnée
         if (!this.selectedBrand && brands.length > 0) {
             this.selectBrand(brands[0]);
         } else if (this.selectedBrand) {
@@ -321,7 +333,9 @@ const TabletSelector = {
     selectModel(tablet) {
         // Mise à jour du texte du bouton avec une animation
         this.selectorButton.classList.add('updating');
-        this.selectorText.textContent = `${tablet.brand} ${tablet.model}`;
+        const displayText = `${tablet.brand} ${tablet.model}`;
+        this.selectorText.textContent = displayText;
+        this.selectorText.title = displayText; // Ajouter un title pour l'info-bulle
         setTimeout(() => {
             this.selectorButton.classList.remove('updating');
         }, 300);
@@ -373,6 +387,7 @@ const TabletSelector = {
         // Mise à jour du texte du bouton avec une animation
         this.selectorButton.classList.add('updating');
         this.selectorText.textContent = 'Dimensions personnalisées';
+        this.selectorText.title = 'Dimensions personnalisées'; // Ajouter un titre pour l'info-bulle
         setTimeout(() => {
             this.selectorButton.classList.remove('updating');
         }, 300);

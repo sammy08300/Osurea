@@ -68,8 +68,8 @@
                             </label>
                             <div class="tablet-selector-container relative">
                                 <button id="tabletSelectorButton" type="button" class="w-full bg-gray-800 border border-gray-700 rounded-md h-[38px] px-3 text-left text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition flex items-center justify-between">
-                                    <span id="tabletSelectorText">Sélectionner un modèle</span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <span id="tabletSelectorText" class="truncate block max-w-[calc(100%-24px)]">Sélectionner un modèle</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </button>
@@ -85,36 +85,43 @@
                                             </div>
                                         </div>
                                         
-                                        <!-- Conteneur principal -->
-                                        <div class="flex w-full h-full">
-                                            <!-- Colonne de gauche: Marques + Dimensions personnalisées -->
-                                            <div class="w-1/3 flex flex-col border-r border-gray-700">
-                                                <!-- Liste des marques -->
-                                                <div id="tabletBrandsList" class="flex-grow overflow-y-auto custom-scrollbar">
-                                                    <!-- Recherche pour desktop -->
-                                                    <div class="sticky top-0 p-2 border-b border-gray-700 bg-gray-800 z-10 hidden md:block">
-                                                        <div class="relative">
-                                                            <input type="text" id="tabletSearch" placeholder="Rechercher..." class="w-full bg-gray-700 border-0 rounded-md p-1.5 pl-7 text-sm text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gray-400 absolute left-2 top-1/2 transform -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                                            </svg>
+                                        <!-- Structure du menu déroulant -->
+                                        <div class="flex flex-col w-full h-full">
+                                            <!-- Conteneur principal des marques et modèles -->
+                                            <div class="flex flex-grow overflow-hidden">
+                                                <!-- Colonne de gauche: Marques -->
+                                                <div class="w-1/3 flex flex-col border-r border-gray-700">
+                                                    <!-- Liste des marques -->
+                                                    <div id="tabletBrandsList" class="flex-grow overflow-y-auto custom-scrollbar">
+                                                        <!-- Recherche pour desktop -->
+                                                        <div class="sticky top-0 p-2 border-b border-gray-700 bg-gray-800 z-10 hidden md:block">
+                                                            <div class="relative">
+                                                                <input type="text" id="tabletSearch" placeholder="Rechercher..." class="w-full bg-gray-700 border-0 rounded-md p-1.5 pl-7 text-sm text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gray-400 absolute left-2 top-1/2 transform -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                                                </svg>
+                                                            </div>
                                                         </div>
+                                                        <!-- Marques insérées dynamiquement -->
                                                     </div>
-                                                    <!-- Marques insérées dynamiquement -->
                                                 </div>
                                                 
-                                                <!-- Bouton dimensions personnalisées -->
-                                                <button id="customTabletButton" type="button" class="flex items-center gap-2 p-3 w-full bg-gray-900 border-t border-gray-700 hover:bg-gray-700">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                                    </svg>
-                                                    <span>Dimensions personnalisées</span>
-                                                </button>
+                                                <!-- Liste des modèles -->
+                                                <div id="tabletModelsList" class="w-2/3 overflow-y-auto custom-scrollbar">
+                                                    <!-- Modèles insérés dynamiquement -->
+                                                </div>
                                             </div>
                                             
-                                            <!-- Liste des modèles -->
-                                            <div id="tabletModelsList" class="w-2/3 overflow-y-auto custom-scrollbar">
-                                                <!-- Modèles insérés dynamiquement -->
+                                            <!-- Section dimensions personnalisées (en bas) -->
+                                            <div class="border-t border-gray-700 w-full">
+                                                <div id="customTabletSection">
+                                                    <button id="customTabletButton" type="button" class="flex items-center justify-center gap-3 py-4 px-4 w-full text-center hover:bg-gray-700 bg-gray-800/80">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                                        </svg>
+                                                        <span class="text-gray-100">Dimensions personnalisées</span>
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -274,13 +281,13 @@
                             </svg>
                         </div>
                         <div id="recap-content" class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm mt-4 transition-all duration-200 ease-in-out opacity-0" style="max-height: 0; overflow: hidden;">
-                            <p><strong>Dims Tablette:</strong></p>
+                            <p><strong>Dimensions Tablette:</strong></p>
                             <p class="text-gray-300 text-right" id="tablet-dimensions-info">... mm</p>
                             
                             <p><strong>Ratio Tablette:</strong></p>
                             <p class="text-gray-300 text-right" id="tablet-ratio-info">...</p>
                             
-                            <p class="mt-2"><strong>Dims Area:</strong></p>
+                            <p class="mt-2"><strong>Dimensions Surface:</strong></p>
                             <p class="text-gray-300 text-right" id="dimensions-info">... mm</p>
                             
                             <p><strong>Surface Area:</strong></p>
