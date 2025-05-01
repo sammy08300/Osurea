@@ -3,16 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Osu!rea - Area Visualizer for osu! players.">
+    <meta name="description" content="Osu!rea - Visualiseur d'area pour les joueurs d'osu! Configurez et visualisez votre zone active précisément, sauvegardez vos configurations dans des favoris et partagez-les.">
+    <meta name="keywords" content="osu, tablet, area, zone active, visualiseur, tablette graphique, wacom, xp-pen, huion, gaomon">
     <meta name="author" content="Yuzuctus">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Osu!rea">
+    <meta name="theme-color" content="#4287f5">
+    <meta property="og:title" content="Osu!rea - Area Visualizer">
+    <meta property="og:description" content="Visualiseur de zone active pour les joueurs d'osu!. Configurez et partagez vos zones actives facilement.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://areasu.netlify.app/">
+    
     <title>Osu!rea - Area Visualizer</title>
     <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
     <link rel="manifest" href="manifest.webmanifest">
-    <meta name="theme-color" content="#4287f5">
+    
     <link rel="preload" href="assets/css/main.css" as="style">
     <link rel="stylesheet" href="assets/css/main.css">
     <script>
@@ -21,6 +28,18 @@
             document.documentElement.style.backgroundColor = 'rgb(3, 7, 18)';
             document.documentElement.classList.add('loading');
         })();
+        
+        // Ajouter un script pour le nettoyage périodique du cache
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // Envoyer périodiquement un message pour nettoyer le cache
+                setInterval(() => {
+                    navigator.serviceWorker.ready.then(registration => {
+                        registration.active.postMessage({ type: 'CACHE_CLEANUP' });
+                    });
+                }, 24 * 60 * 60 * 1000); // 24 heures
+            });
+        }
         
         tailwind.config = {
             darkMode: 'class',
@@ -63,6 +82,15 @@
             background-color: #1F2937; /* bg-gray-800 - même couleur que les autres inputs */
             color: #E5E7EB;
         }
+        
+        /* Support pour le lazy loading */
+        .lazy-image {
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .lazy-image.loaded {
+            opacity: 1;
+        }
     </style>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -70,12 +98,47 @@
     <header class="py-4 bg-gray-900 shadow-xl mb-6 border-b border-gray-800">
         <div class="container max-w-7xl mx-auto px-4">
             <h1 class="text-2xl md:text-3xl font-bold text-white text-center sm:text-left flex items-center justify-center sm:justify-start gap-2">
-                <img src="assets/img/favicon.svg" alt="Osu!rea Logo" class="w-8 h-8 mr-1" />
+                <img src="assets/img/favicon.svg" alt="Osu!rea Logo" class="w-8 h-8 mr-1 lazy-image" loading="lazy" />
                 <span><span class="text-[#FF66AA]">Osu!</span>rea</span> - Area Visualizer
                 <span class="bg-osu-blue text-white text-xs px-2 py-0.5 rounded-md font-semibold ml-1">v2.0</span>
             </h1>
         </div>
     </header>
+
+    <!-- Script pour le lazy loading des images -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fonction pour charger les images lazy
+            function lazyLoadImages() {
+                const lazyImages = document.querySelectorAll('img.lazy-image:not(.loaded)');
+                
+                lazyImages.forEach(img => {
+                    if (isInViewport(img)) {
+                        img.classList.add('loaded');
+                    }
+                });
+            }
+            
+            // Vérifier si un élément est dans le viewport
+            function isInViewport(element) {
+                const rect = element.getBoundingClientRect();
+                return (
+                    rect.top <= (window.innerHeight || document.documentElement.clientHeight) &&
+                    rect.left <= (window.innerWidth || document.documentElement.clientWidth) &&
+                    rect.bottom >= 0 &&
+                    rect.right >= 0
+                );
+            }
+            
+            // Lancer le chargement initial
+            lazyLoadImages();
+            
+            // Ajouter des event listeners pour détecter le scroll
+            window.addEventListener('scroll', lazyLoadImages);
+            window.addEventListener('resize', lazyLoadImages);
+            window.addEventListener('orientationchange', lazyLoadImages);
+        });
+    </script>
 
     <main class="container max-w-7xl mx-auto px-4 pb-12">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -102,7 +165,7 @@
                                     </svg>
                                 </button>
                                 <div id="tabletSelectorPopup" class="absolute left-0 right-0 mt-1 bg-gray-800 border border-gray-700 rounded-md shadow-lg z-10 overflow-hidden hidden">
-                                    <div class="flex flex-col h-[450px]">
+                                    <div class="flex flex-col h-[500px]">
                                         <!-- En-tête de recherche pour mobile -->
                                         <div class="p-2 border-b border-gray-700 md:hidden">
                                             <div class="relative">
@@ -114,7 +177,7 @@
                                         </div>
                                         
                                         <!-- Conteneur principal des marques et modèles -->
-                                        <div class="flex h-[350px] overflow-hidden">
+                                        <div class="flex h-[400px] overflow-hidden">
                                             <!-- Colonne de gauche: Marques -->
                                             <div class="w-1/3 flex flex-col border-r border-gray-700">
                                                 <!-- Liste des marques -->
@@ -539,6 +602,7 @@
     <script src="assets/js/utils/helpers.js"></script>
     <script src="assets/js/utils/storage.js"></script>
     <script src="assets/js/utils/preferences.js"></script>
+    <script src="assets/js/utils/constraintHelpers.js"></script>
     <script src="assets/js/components/contextMenu.js"></script>
     <script src="assets/js/components/notifications.js"></script>
     <script src="assets/js/components/visualizer.js"></script>

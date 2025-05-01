@@ -58,12 +58,56 @@ function updateDisplay() {
     const tabletHeight = parseFloatSafe(cachedElements.tabletHeightInput.value);
     const areaWidth = parseFloatSafe(cachedElements.areaWidthInput.value);
     const areaHeight = parseFloatSafe(cachedElements.areaHeightInput.value);
-    const areaOffsetX = parseFloatSafe(cachedElements.areaOffsetXInput.value);
-    const areaOffsetY = parseFloatSafe(cachedElements.areaOffsetYInput.value);
+    
+    // Vérifier si les inputs d'offset sont en focus (édition manuelle)
+    const isOffsetXFocused = document.activeElement === cachedElements.areaOffsetXInput;
+    const isOffsetYFocused = document.activeElement === cachedElements.areaOffsetYInput;
+    
+    // Ne pas traiter les valeurs d'offset vides ou invalides si elles sont en cours d'édition
+    let areaOffsetX, areaOffsetY;
+    
+    if (isOffsetXFocused && cachedElements.areaOffsetXInput.value.trim() === '') {
+        // Utiliser une valeur temporaire au centre pour la visualisation
+        areaOffsetX = tabletWidth / 2;
+    } else {
+        areaOffsetX = parseFloatSafe(cachedElements.areaOffsetXInput.value);
+    }
+    
+    if (isOffsetYFocused && cachedElements.areaOffsetYInput.value.trim() === '') {
+        // Utiliser une valeur temporaire au centre pour la visualisation
+        areaOffsetY = tabletHeight / 2;
+    } else {
+        areaOffsetY = parseFloatSafe(cachedElements.areaOffsetYInput.value);
+    }
     
     if (!isValidNumber(tabletWidth, 10) || !isValidNumber(tabletHeight, 10)) {
         console.warn('Invalid tablet dimensions');
         return;
+    }
+    
+    // Ne pas contraindre les valeurs si les champs sont en cours d'édition
+    if (!isOffsetXFocused && !isOffsetYFocused) {
+        // Contraindre les offsets dans les limites de la tablette
+        const constrainedOffsets = constrainAreaOffset(
+            areaOffsetX, 
+            areaOffsetY, 
+            areaWidth, 
+            areaHeight, 
+            tabletWidth, 
+            tabletHeight
+        );
+        
+        areaOffsetX = constrainedOffsets.x;
+        areaOffsetY = constrainedOffsets.y;
+        
+        // Mettre à jour les valeurs si elles ont été contraintes
+        if (!isOffsetXFocused && areaOffsetX !== parseFloatSafe(cachedElements.areaOffsetXInput.value)) {
+            cachedElements.areaOffsetXInput.value = formatNumber(areaOffsetX, DECIMAL_PRECISION_POSITION);
+        }
+        
+        if (!isOffsetYFocused && areaOffsetY !== parseFloatSafe(cachedElements.areaOffsetYInput.value)) {
+            cachedElements.areaOffsetYInput.value = formatNumber(areaOffsetY, DECIMAL_PRECISION_POSITION);
+        }
     }
     
     // Déterminer si c'est le premier rendu
@@ -211,7 +255,7 @@ function updateInfoDisplays(tabletWidth, tabletHeight, areaWidth, areaHeight, ar
         ratioInfo.textContent = areaRatio;
     }
     
-    const newPosition = `X: ${formatNumber(areaOffsetX, 3)}, Y: ${formatNumber(areaOffsetY, 3)}`;
+    const newPosition = `X: ${formatNumber(areaOffsetX, DECIMAL_PRECISION_POSITION)}, Y: ${formatNumber(areaOffsetY, DECIMAL_PRECISION_POSITION)}`;
     if (positionInfo.textContent !== newPosition) {
         positionInfo.textContent = newPosition;
     }
@@ -228,12 +272,56 @@ function updateDisplayWithoutRatio() {
     const tabletHeight = parseFloatSafe(cachedElements.tabletHeightInput.value);
     const areaWidth = parseFloatSafe(cachedElements.areaWidthInput.value);
     const areaHeight = parseFloatSafe(cachedElements.areaHeightInput.value);
-    const areaOffsetX = parseFloatSafe(cachedElements.areaOffsetXInput.value);
-    const areaOffsetY = parseFloatSafe(cachedElements.areaOffsetYInput.value);
+    
+    // Vérifier si les inputs d'offset sont en focus (édition manuelle)
+    const isOffsetXFocused = document.activeElement === cachedElements.areaOffsetXInput;
+    const isOffsetYFocused = document.activeElement === cachedElements.areaOffsetYInput;
+    
+    // Ne pas traiter les valeurs d'offset vides ou invalides si elles sont en cours d'édition
+    let areaOffsetX, areaOffsetY;
+    
+    if (isOffsetXFocused && cachedElements.areaOffsetXInput.value.trim() === '') {
+        // Utiliser une valeur temporaire au centre pour la visualisation
+        areaOffsetX = tabletWidth / 2;
+    } else {
+        areaOffsetX = parseFloatSafe(cachedElements.areaOffsetXInput.value);
+    }
+    
+    if (isOffsetYFocused && cachedElements.areaOffsetYInput.value.trim() === '') {
+        // Utiliser une valeur temporaire au centre pour la visualisation
+        areaOffsetY = tabletHeight / 2;
+    } else {
+        areaOffsetY = parseFloatSafe(cachedElements.areaOffsetYInput.value);
+    }
     
     if (!isValidNumber(tabletWidth, 10) || !isValidNumber(tabletHeight, 10)) {
         console.warn('Invalid tablet dimensions');
         return;
+    }
+    
+    // Ne pas contraindre les valeurs si les champs sont en cours d'édition
+    if (!isOffsetXFocused && !isOffsetYFocused) {
+        // Contraindre les offsets dans les limites de la tablette
+        const constrainedOffsets = constrainAreaOffset(
+            areaOffsetX, 
+            areaOffsetY, 
+            areaWidth, 
+            areaHeight, 
+            tabletWidth, 
+            tabletHeight
+        );
+        
+        areaOffsetX = constrainedOffsets.x;
+        areaOffsetY = constrainedOffsets.y;
+        
+        // Mettre à jour les valeurs si elles ont été contraintes
+        if (!isOffsetXFocused && areaOffsetX !== parseFloatSafe(cachedElements.areaOffsetXInput.value)) {
+            cachedElements.areaOffsetXInput.value = formatNumber(areaOffsetX, DECIMAL_PRECISION_POSITION);
+        }
+        
+        if (!isOffsetYFocused && areaOffsetY !== parseFloatSafe(cachedElements.areaOffsetYInput.value)) {
+            cachedElements.areaOffsetYInput.value = formatNumber(areaOffsetY, DECIMAL_PRECISION_POSITION);
+        }
     }
     
     // Déterminer si c'est le premier rendu
@@ -362,7 +450,7 @@ function updateInfoDisplaysWithoutRatio(tabletWidth, tabletHeight, areaWidth, ar
         ratioInfo.textContent = areaRatio;
     }
     
-    const newPosition = `X: ${formatNumber(areaOffsetX, 3)}, Y: ${formatNumber(areaOffsetY, 3)}`;
+    const newPosition = `X: ${formatNumber(areaOffsetX, DECIMAL_PRECISION_POSITION)}, Y: ${formatNumber(areaOffsetY, DECIMAL_PRECISION_POSITION)}`;
     if (positionInfo.textContent !== newPosition) {
         positionInfo.textContent = newPosition;
     }
@@ -446,6 +534,10 @@ function handleDragMove(e) {
     const areaWidth = parseFloatSafe(cachedElements.areaWidthInput.value);
     const areaHeight = parseFloatSafe(cachedElements.areaHeightInput.value);
     
+    // Vérifier si les inputs sont en focus (édition manuelle)
+    const isOffsetXFocused = document.activeElement === cachedElements.areaOffsetXInput;
+    const isOffsetYFocused = document.activeElement === cachedElements.areaOffsetYInput;
+    
     // Calculate movement in millimeters
     const deltaXPx = e.clientX - dragStartX;
     const deltaYPx = e.clientY - dragStartY;
@@ -457,18 +549,24 @@ function handleDragMove(e) {
     let newOffsetX = dragStartOffsetX + deltaXMm;
     let newOffsetY = dragStartOffsetY + deltaYMm;
     
-    // Constrain to tablet boundaries
-    const minX = areaWidth / 2;
-    const maxX = tabletWidth - areaWidth / 2;
-    const minY = areaHeight / 2;
-    const maxY = tabletHeight - areaHeight / 2;
+    // Contraindre dans les limites de la tablette
+    const constrainedOffsets = constrainAreaOffset(
+        newOffsetX, 
+        newOffsetY, 
+        areaWidth, 
+        areaHeight, 
+        tabletWidth, 
+        tabletHeight
+    );
     
-    newOffsetX = clamp(newOffsetX, minX, maxX);
-    newOffsetY = clamp(newOffsetY, minY, maxY);
+    // Update inputs seulement si l'utilisateur n'est pas en train de les éditer
+    if (!isOffsetXFocused) {
+        cachedElements.areaOffsetXInput.value = formatNumber(constrainedOffsets.x, DECIMAL_PRECISION_POSITION);
+    }
     
-    // Update inputs
-    cachedElements.areaOffsetXInput.value = formatNumber(newOffsetX, 3);
-    cachedElements.areaOffsetYInput.value = formatNumber(newOffsetY, 3);
+    if (!isOffsetYFocused) {
+        cachedElements.areaOffsetYInput.value = formatNumber(constrainedOffsets.y, DECIMAL_PRECISION_POSITION);
+    }
     
     // Update display avec throttle pour limiter les appels
     throttledUpdateDisplay();
@@ -489,6 +587,10 @@ function handleTouchMove(e) {
     const areaWidth = parseFloatSafe(cachedElements.areaWidthInput.value);
     const areaHeight = parseFloatSafe(cachedElements.areaHeightInput.value);
     
+    // Vérifier si les inputs sont en focus (édition manuelle)
+    const isOffsetXFocused = document.activeElement === cachedElements.areaOffsetXInput;
+    const isOffsetYFocused = document.activeElement === cachedElements.areaOffsetYInput;
+    
     // Calculate movement in millimeters
     const deltaXPx = touch.clientX - dragStartX;
     const deltaYPx = touch.clientY - dragStartY;
@@ -500,18 +602,24 @@ function handleTouchMove(e) {
     let newOffsetX = dragStartOffsetX + deltaXMm;
     let newOffsetY = dragStartOffsetY + deltaYMm;
     
-    // Constrain to tablet boundaries
-    const minX = areaWidth / 2;
-    const maxX = tabletWidth - areaWidth / 2;
-    const minY = areaHeight / 2;
-    const maxY = tabletHeight - areaHeight / 2;
+    // Contraindre dans les limites de la tablette
+    const constrainedOffsets = constrainAreaOffset(
+        newOffsetX, 
+        newOffsetY, 
+        areaWidth, 
+        areaHeight, 
+        tabletWidth, 
+        tabletHeight
+    );
     
-    newOffsetX = clamp(newOffsetX, minX, maxX);
-    newOffsetY = clamp(newOffsetY, minY, maxY);
+    // Update inputs seulement si l'utilisateur n'est pas en train de les éditer
+    if (!isOffsetXFocused) {
+        cachedElements.areaOffsetXInput.value = formatNumber(constrainedOffsets.x, DECIMAL_PRECISION_POSITION);
+    }
     
-    // Update inputs
-    cachedElements.areaOffsetXInput.value = formatNumber(newOffsetX, 3);
-    cachedElements.areaOffsetYInput.value = formatNumber(newOffsetY, 3);
+    if (!isOffsetYFocused) {
+        cachedElements.areaOffsetYInput.value = formatNumber(constrainedOffsets.y, DECIMAL_PRECISION_POSITION);
+    }
     
     // Update display avec throttle pour limiter les appels
     throttledUpdateDisplay();
@@ -547,8 +655,18 @@ function centerArea() {
     // Avoid redundant calculations
     if (tabletWidth <= 0 || tabletHeight <= 0) return;
     
-    cachedElements.areaOffsetXInput.value = formatNumber(tabletWidth / 2, 3);
-    cachedElements.areaOffsetYInput.value = formatNumber(tabletHeight / 2, 3);
+    // Vérifier si les inputs sont en focus (édition manuelle)
+    const isOffsetXFocused = document.activeElement === cachedElements.areaOffsetXInput;
+    const isOffsetYFocused = document.activeElement === cachedElements.areaOffsetYInput;
+    
+    // Ne mettre à jour que les champs qui ne sont pas en cours d'édition
+    if (!isOffsetXFocused) {
+        cachedElements.areaOffsetXInput.value = formatNumber(tabletWidth / 2, DECIMAL_PRECISION_POSITION);
+    }
+    
+    if (!isOffsetYFocused) {
+        cachedElements.areaOffsetYInput.value = formatNumber(tabletHeight / 2, DECIMAL_PRECISION_POSITION);
+    }
     
     updateDisplay();
 }

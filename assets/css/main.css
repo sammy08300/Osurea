@@ -284,13 +284,13 @@ input[type="number"]::-webkit-outer-spin-button {
 #tabletSelectorPopup {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
     animation: fadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    max-height: 400px;
+    max-height: 450px;
     border-radius: 8px;
     overflow: hidden;
 }
 
 #tabletBrandsList, #tabletModelsList {
-    max-height: 350px;
+    max-height: 400px;
 }
 
 .brand-item {
@@ -323,12 +323,21 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .model-item {
     transition: all 0.2s ease;
-    padding: 10px 14px;
+    padding: 7px 14px;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
     cursor: pointer;
     border-left: 3px solid transparent;
+}
+
+.model-item > div:first-child {
+    font-size: 0.9rem;
+}
+
+.model-item > div:last-child {
+    font-size: 0.75rem;
+    color: rgba(156, 163, 175, 1);
 }
 
 .model-item:hover {

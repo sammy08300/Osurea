@@ -7,9 +7,15 @@
   },
   {
     "brand": "Wacom",
-    "model": "CTL-472 (One by Wacom S)",
+    "model": "CTL-472 Small (One by Wacom S)",
     "width": 152,
     "height": 95
+  },
+  {
+    "brand": "Wacom",
+    "model": "CTL-672 Medium (One by Wacom M)",
+    "width": 216,
+    "height": 135
   },
   {
     "brand": "Huion",

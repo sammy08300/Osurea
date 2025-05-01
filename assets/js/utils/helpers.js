@@ -2,6 +2,9 @@
  * Utility helper functions for the application
  */
 
+// Constants
+const DECIMAL_PRECISION_POSITION = 3; // Précision pour les positions (X/Y)
+
 /**
  * Throttle function to limit the rate at which a function can fire
  * @param {Function} func - The function to throttle
@@ -12,10 +15,11 @@ function throttle(func, delay) {
     let lastCall = 0;
     return function(...args) {
         const now = Date.now();
-        if (now - lastCall >= delay) {
-            lastCall = now;
-            return func.apply(this, args);
+        if (now - lastCall < delay) {
+            return;
         }
+        lastCall = now;
+        return func(...args);
     };
 }
 
@@ -27,73 +31,88 @@ function throttle(func, delay) {
  * @returns {number} - The clamped value
  */
 function clamp(value, min, max) {
-    return value < min ? min : value > max ? max : value;
+    return Math.max(min, Math.min(max, value));
 }
 
 /**
- * Format a number to a specific number of decimal places
- * @param {number} value - The number to format
- * @param {number} decimalPlaces - The number of decimal places to show
- * @returns {string} - The formatted number as a string
+ * Format a number to a specified number of decimal places
+ * @param {number} value - The value to format
+ * @param {number} decimalPlaces - The number of decimal places (default: 1)
+ * @returns {string} - The formatted value as a string
  */
 function formatNumber(value, decimalPlaces = 1) {
-    if (isNaN(value)) return "N/A";
+    if (typeof value !== 'number') {
+        value = parseFloat(value);
+    }
     
-    // Optimisation: utiliser une puissance pour arrondir au lieu de toFixed
-    const factor = 10 ** decimalPlaces;
-    return (Math.round(value * factor) / factor).toFixed(decimalPlaces);
+    if (isNaN(value)) {
+        return '0';
+    }
+    
+    // Optimiser pour les nombres entiers
+    if (Number.isInteger(value) && decimalPlaces === 0) {
+        return value.toString();
+    }
+    
+    return value.toFixed(decimalPlaces);
 }
 
 /**
- * Convert millimeters to pixels using the provided scale
- * @param {number} mm - Value in millimeters
- * @param {number} scale - Scale factor (pixels per millimeter)
- * @returns {number} - Value in pixels
+ * Convert millimeters to pixels based on the scaling factor
+ * @param {number} mm - The value in millimeters
+ * @param {number} scale - The scaling factor
+ * @returns {number} - The value in pixels
  */
 function mmToPx(mm, scale) {
+    if (typeof mm !== 'number') {
+        mm = parseFloat(mm);
+    }
+    
+    if (isNaN(mm) || scale <= 0) {
+        return 0;
+    }
+    
     return mm * scale;
 }
 
 /**
- * Convert pixels to millimeters using the provided scale
- * @param {number} px - Value in pixels
- * @param {number} scale - Scale factor (pixels per millimeter)
- * @returns {number} - Value in millimeters
+ * Convert pixels to millimeters based on the scaling factor
+ * @param {number} px - The value in pixels
+ * @param {number} scale - The scaling factor
+ * @returns {number} - The value in millimeters
  */
 function pxToMm(px, scale) {
+    if (typeof px !== 'number') {
+        px = parseFloat(px);
+    }
+    
+    if (isNaN(px) || scale <= 0) {
+        return 0;
+    }
+    
     return px / scale;
 }
 
-// Mise en cache pour améliorer les performances des calculs de ratio
-const ratioCache = new Map();
-
 /**
- * Calculate the aspect ratio (width/height) as a formatted string
+ * Calculate ratio from width and height
  * @param {number} width - The width value
  * @param {number} height - The height value
- * @returns {string} - The formatted ratio string
+ * @returns {number} - The calculated ratio (width/height)
  */
 function calculateRatio(width, height) {
-    if (height <= 0 || isNaN(height) || isNaN(width)) return "N/A";
-    
-    // Utilisation d'un cache pour éviter des calculs répétés
-    const cacheKey = `${width}-${height}`;
-    if (ratioCache.has(cacheKey)) {
-        return ratioCache.get(cacheKey);
+    if (typeof width !== 'number') {
+        width = parseFloat(width);
     }
     
-    const ratio = width / height;
-    const result = ratio.toFixed(3);
-    
-    // Limiter la taille du cache pour éviter les fuites mémoire
-    if (ratioCache.size > 100) {
-        // Supprimer la première entrée (la plus ancienne) si cache trop grand
-        const firstKey = ratioCache.keys().next().value;
-        ratioCache.delete(firstKey);
+    if (typeof height !== 'number') {
+        height = parseFloat(height);
     }
     
-    ratioCache.set(cacheKey, result);
-    return result;
+    if (isNaN(width) || isNaN(height) || height === 0) {
+        return 1.0;
+    }
+    
+    return width / height;
 }
 
 /**
@@ -105,36 +124,48 @@ function calculateRatio(width, height) {
 function debounce(func, delay) {
     let timeoutId;
     return function(...args) {
-        const context = this;
         clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => func.apply(context, args), delay);
+        timeoutId = setTimeout(() => {
+            func.apply(this, args);
+        }, delay);
     };
 }
 
 /**
- * Check if a value is a valid number within a range
- * @param {number} value - The value to check
- * @param {number} min - Minimum allowed value
- * @param {number} max - Maximum allowed value
- * @returns {boolean} - True if valid
+ * Check if a value is a valid number within specified range
+ * @param {any} value - The value to check
+ * @param {number} min - The minimum allowed value
+ * @param {number} max - The maximum allowed value
+ * @returns {boolean} - True if the value is a valid number in range
  */
 function isValidNumber(value, min = -Infinity, max = Infinity) {
-    if (typeof value !== 'number') {
-        value = parseFloat(value);
-    }
-    return !isNaN(value) && value >= min && value <= max;
+    const num = parseFloat(value);
+    return !isNaN(num) && isFinite(num) && num >= min && num <= max;
 }
 
 /**
- * Safely parse a float value, returning fallback if invalid
- * @param {string|number} value - Value to parse
- * @param {number} fallback - Fallback value if parsing fails
+ * Safely parse a float value with fallback
+ * @param {any} value - The value to parse
+ * @param {number} fallback - The fallback value if parsing fails
  * @returns {number} - The parsed number or fallback
  */
 function parseFloatSafe(value, fallback = 0) {
-    // Optimisation: vérifier si la valeur est déjà un nombre
-    if (typeof value === 'number') return value;
+    if (value === null || value === undefined || value === '') {
+        return fallback;
+    }
     
     const parsed = parseFloat(value);
     return isNaN(parsed) ? fallback : parsed;
 }
+
+// Export functions to the global scope for use in other modules
+window.throttle = throttle;
+window.clamp = clamp;
+window.formatNumber = formatNumber;
+window.mmToPx = mmToPx;
+window.pxToMm = pxToMm;
+window.calculateRatio = calculateRatio;
+window.debounce = debounce;
+window.isValidNumber = isValidNumber;
+window.parseFloatSafe = parseFloatSafe;
+window.DECIMAL_PRECISION_POSITION = DECIMAL_PRECISION_POSITION;

@@ -268,41 +268,109 @@ const appState = {
             }, 0);
         });
         
-        areaWidthInput.addEventListener('input', () => {
-            if (!appState.editingFavoriteId) {
-                this.cancelEditMode();
-            }
-            
-            // Uniquement mettre à jour la hauteur si le ratio est verrouillé
-            if (lockRatioButton.getAttribute('aria-pressed') === 'true' && this.currentRatio > 0 && !isNaN(this.currentRatio)) {
-                const newHeight = parseFloatSafe(areaWidthInput.value) / this.currentRatio;
-                if (!isNaN(newHeight) && newHeight >= 0) {
-                    areaHeightInput.value = formatNumber(newHeight);
+        if (areaWidthInput) {
+            areaWidthInput.addEventListener('input', () => {
+                if (!appState.editingFavoriteId) {
+                    this.cancelEditMode();
                 }
-            } else {
-                this.debouncedUpdateRatio();
-            }
-            
-            updateDisplayWithoutRatio();
-        });
+                
+                // Récupérer les dimensions de la tablette et de la zone active
+                const tabletWidth = parseFloatSafe(tabletWidthInput.value);
+                const tabletHeight = parseFloatSafe(tabletHeightInput.value);
+                const areaWidth = parseFloatSafe(areaWidthInput.value);
+                
+                // Contraindre la largeur de la zone active
+                const constrainedWidth = Math.min(areaWidth, tabletWidth);
+                if (constrainedWidth !== areaWidth) {
+                    areaWidthInput.value = formatNumber(constrainedWidth);
+                }
+                
+                // Uniquement mettre à jour la hauteur si le ratio est verrouillé
+                if (lockRatioButton.getAttribute('aria-pressed') === 'true' && this.currentRatio > 0 && !isNaN(this.currentRatio)) {
+                    let newHeight = constrainedWidth / this.currentRatio;
+                    
+                    // Contraindre également la hauteur
+                    newHeight = Math.min(newHeight, tabletHeight);
+                    
+                    if (!isNaN(newHeight) && newHeight >= 0) {
+                        areaHeightInput.value = formatNumber(newHeight);
+                    }
+                } else {
+                    this.debouncedUpdateRatio();
+                }
+                
+                // Contraindre également l'offset pour éviter que la zone ne dépasse
+                const areaHeight = parseFloatSafe(areaHeightInput.value);
+                const offsetX = parseFloatSafe(document.getElementById('areaOffsetX').value);
+                const offsetY = parseFloatSafe(document.getElementById('areaOffsetY').value);
+                
+                const constrainedOffsets = constrainAreaOffset(
+                    offsetX, 
+                    offsetY, 
+                    constrainedWidth, 
+                    areaHeight, 
+                    tabletWidth, 
+                    tabletHeight
+                );
+                
+                document.getElementById('areaOffsetX').value = formatNumber(constrainedOffsets.x, 3);
+                document.getElementById('areaOffsetY').value = formatNumber(constrainedOffsets.y, 3);
+                
+                updateDisplayWithoutRatio();
+            });
+        }
         
-        areaHeightInput.addEventListener('input', () => {
-            if (!appState.editingFavoriteId) {
-                this.cancelEditMode();
-            }
-            
-            // Uniquement mettre à jour la largeur si le ratio est verrouillé
-            if (lockRatioButton.getAttribute('aria-pressed') === 'true' && this.currentRatio > 0 && !isNaN(this.currentRatio)) {
-                const newWidth = parseFloatSafe(areaHeightInput.value) * this.currentRatio;
-                if (!isNaN(newWidth) && newWidth >= 0) {
-                    areaWidthInput.value = formatNumber(newWidth);
+        if (areaHeightInput) {
+            areaHeightInput.addEventListener('input', () => {
+                if (!appState.editingFavoriteId) {
+                    this.cancelEditMode();
                 }
-            } else {
-                this.debouncedUpdateRatio();
-            }
-            
-            updateDisplayWithoutRatio();
-        });
+                
+                // Récupérer les dimensions de la tablette et de la zone active
+                const tabletWidth = parseFloatSafe(tabletWidthInput.value);
+                const tabletHeight = parseFloatSafe(tabletHeightInput.value);
+                const areaHeight = parseFloatSafe(areaHeightInput.value);
+                
+                // Contraindre la hauteur de la zone active
+                const constrainedHeight = Math.min(areaHeight, tabletHeight);
+                if (constrainedHeight !== areaHeight) {
+                    areaHeightInput.value = formatNumber(constrainedHeight);
+                }
+                
+                // Uniquement mettre à jour la largeur si le ratio est verrouillé
+                if (lockRatioButton.getAttribute('aria-pressed') === 'true' && this.currentRatio > 0 && !isNaN(this.currentRatio)) {
+                    let newWidth = constrainedHeight * this.currentRatio;
+                    
+                    // Contraindre également la largeur
+                    newWidth = Math.min(newWidth, tabletWidth);
+                    
+                    if (!isNaN(newWidth) && newWidth >= 0) {
+                        areaWidthInput.value = formatNumber(newWidth);
+                    }
+                } else {
+                    this.debouncedUpdateRatio();
+                }
+                
+                // Contraindre également l'offset pour éviter que la zone ne dépasse
+                const areaWidth = parseFloatSafe(areaWidthInput.value);
+                const offsetX = parseFloatSafe(document.getElementById('areaOffsetX').value);
+                const offsetY = parseFloatSafe(document.getElementById('areaOffsetY').value);
+                
+                const constrainedOffsets = constrainAreaOffset(
+                    offsetX, 
+                    offsetY, 
+                    areaWidth, 
+                    constrainedHeight, 
+                    tabletWidth, 
+                    tabletHeight
+                );
+                
+                document.getElementById('areaOffsetX').value = formatNumber(constrainedOffsets.x, 3);
+                document.getElementById('areaOffsetY').value = formatNumber(constrainedOffsets.y, 3);
+                
+                updateDisplayWithoutRatio();
+            });
+        }
         
         customRatioInput.addEventListener('input', () => {
             if (!appState.editingFavoriteId) {
@@ -357,6 +425,46 @@ const appState = {
             if (!appState.editingFavoriteId) {
                 this.cancelEditMode();
             }
+            
+            // Récupérer les dimensions nécessaires
+            const tabletWidth = parseFloatSafe(tabletWidthInput.value);
+            const tabletHeight = parseFloatSafe(tabletHeightInput.value);
+            const areaWidth = parseFloatSafe(areaWidthInput.value);
+            const areaHeight = parseFloatSafe(areaHeightInput.value);
+            
+            // Récupérer la valeur de l'offset
+            let offsetX = areaOffsetXInput.value.trim();
+            const offsetY = parseFloatSafe(areaOffsetYInput.value);
+            
+            // Si le champ est vide, autoriser la saisie
+            if (offsetX === '') {
+                // Ne rien faire pour laisser l'utilisateur terminer sa saisie
+                return;
+            }
+            
+            // Sinon convertir en nombre et contraindre
+            offsetX = parseFloatSafe(offsetX);
+            
+            // Si la valeur est invalide, ne pas continuer
+            if (!isValidNumber(offsetX)) {
+                return;
+            }
+            
+            // Contraindre l'offset dans les limites de la tablette
+            const constrainedOffsets = constrainAreaOffset(
+                offsetX,
+                offsetY,
+                areaWidth,
+                areaHeight,
+                tabletWidth,
+                tabletHeight
+            );
+            
+            // Mettre à jour la valeur si elle a été contrainte
+            if (constrainedOffsets.x !== offsetX) {
+                areaOffsetXInput.value = formatNumber(constrainedOffsets.x, 3);
+            }
+            
             updateDisplay();
         });
         
@@ -364,6 +472,46 @@ const appState = {
             if (!appState.editingFavoriteId) {
                 this.cancelEditMode();
             }
+            
+            // Récupérer les dimensions nécessaires
+            const tabletWidth = parseFloatSafe(tabletWidthInput.value);
+            const tabletHeight = parseFloatSafe(tabletHeightInput.value);
+            const areaWidth = parseFloatSafe(areaWidthInput.value);
+            const areaHeight = parseFloatSafe(areaHeightInput.value);
+            const offsetX = parseFloatSafe(areaOffsetXInput.value);
+            
+            // Récupérer la valeur de l'offset
+            let offsetY = areaOffsetYInput.value.trim();
+            
+            // Si le champ est vide, autoriser la saisie
+            if (offsetY === '') {
+                // Ne rien faire pour laisser l'utilisateur terminer sa saisie
+                return;
+            }
+            
+            // Sinon convertir en nombre et contraindre
+            offsetY = parseFloatSafe(offsetY);
+            
+            // Si la valeur est invalide, ne pas continuer
+            if (!isValidNumber(offsetY)) {
+                return;
+            }
+            
+            // Contraindre l'offset dans les limites de la tablette
+            const constrainedOffsets = constrainAreaOffset(
+                offsetX,
+                offsetY,
+                areaWidth,
+                areaHeight,
+                tabletWidth,
+                tabletHeight
+            );
+            
+            // Mettre à jour la valeur si elle a été contrainte
+            if (constrainedOffsets.y !== offsetY) {
+                areaOffsetYInput.value = formatNumber(constrainedOffsets.y, 3);
+            }
+            
             updateDisplay();
         });
         

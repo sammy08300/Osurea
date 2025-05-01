@@ -330,6 +330,16 @@ const TabletSelector = {
      * @param {Object} tablet - Objet tablette avec brand, model, width, height
      */
     selectModel(tablet) {
+        // Récupérer les dimensions actuelles de la tablette
+        const currentTabletWidth = parseFloatSafe(document.getElementById('tabletWidth')?.value);
+        const currentTabletHeight = parseFloatSafe(document.getElementById('tabletHeight')?.value);
+        
+        // Récupérer les dimensions actuelles de la zone active
+        const currentAreaWidth = parseFloatSafe(document.getElementById('areaWidth')?.value);
+        const currentAreaHeight = parseFloatSafe(document.getElementById('areaHeight')?.value);
+        const currentOffsetX = parseFloatSafe(document.getElementById('areaOffsetX')?.value);
+        const currentOffsetY = parseFloatSafe(document.getElementById('areaOffsetY')?.value);
+        
         // Mise à jour du texte du bouton avec une animation
         this.selectorButton.classList.add('updating');
         const displayText = `${tablet.brand} ${tablet.model}`;
@@ -345,6 +355,48 @@ const TabletSelector = {
         const tabletDimensionsContainer = document.getElementById('tablet-dimensions-container');
         
         if (tabletWidthInput && tabletHeightInput) {
+            // Adapter la zone active si c'est un changement de modèle de tablette
+            if (isValidNumber(currentTabletWidth) && isValidNumber(currentTabletHeight) &&
+                isValidNumber(currentAreaWidth) && isValidNumber(currentAreaHeight) &&
+                isValidNumber(currentOffsetX) && isValidNumber(currentOffsetY) &&
+                (currentTabletWidth !== tablet.width || currentTabletHeight !== tablet.height)) {
+                
+                // Log pour déboguer
+                console.log("Changement de tablette:", {
+                    ancienneTaille: { width: currentTabletWidth, height: currentTabletHeight },
+                    nouvelleTaille: { width: tablet.width, height: tablet.height },
+                    zoneActive: { 
+                        width: currentAreaWidth, 
+                        height: currentAreaHeight,
+                        offsetX: currentOffsetX,
+                        offsetY: currentOffsetY
+                    }
+                });
+                
+                // Ajuster intelligemment la zone active pour le nouveau modèle
+                const oldTablet = { width: currentTabletWidth, height: currentTabletHeight };
+                const newTablet = { width: tablet.width, height: tablet.height };
+                const currentState = { 
+                    areaWidth: currentAreaWidth, 
+                    areaHeight: currentAreaHeight, 
+                    offsetX: currentOffsetX, 
+                    offsetY: currentOffsetY 
+                };
+                
+                // Adapter la zone active au nouveau modèle
+                const adaptedState = adaptAreaToNewTablet(currentState, oldTablet, newTablet);
+                
+                // Log pour déboguer
+                console.log("Nouvelle zone active adaptée:", adaptedState);
+                
+                // Mettre à jour les champs avec les nouvelles valeurs
+                document.getElementById('areaWidth').value = formatNumber(adaptedState.areaWidth);
+                document.getElementById('areaHeight').value = formatNumber(adaptedState.areaHeight);
+                document.getElementById('areaOffsetX').value = formatNumber(adaptedState.offsetX, 3);
+                document.getElementById('areaOffsetY').value = formatNumber(adaptedState.offsetY, 3);
+            }
+            
+            // Mettre à jour les dimensions de la tablette
             tabletWidthInput.value = formatNumber(tablet.width);
             tabletHeightInput.value = formatNumber(tablet.height);
             
