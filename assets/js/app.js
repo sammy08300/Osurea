@@ -157,16 +157,13 @@ const appState = {
                 const selectorText = document.getElementById('tabletSelectorText');
                 if (selectorText) {
                     selectorText.textContent = 'Dimensions personnalisées';
+                    selectorText.title = 'Dimensions personnalisées';
                 }
                 
-                const tabletWidthGroup = document.getElementById('tablet-width-group');
-                const tabletHeightGroup = document.getElementById('tablet-height-group');
-                const tabletManualHr = document.getElementById('tablet-manual-hr');
-                
-                if (tabletWidthGroup && tabletHeightGroup && tabletManualHr) {
-                    tabletWidthGroup.classList.remove('hidden');
-                    tabletHeightGroup.classList.remove('hidden');
-                    tabletManualHr.classList.remove('hidden');
+                // S'assurer que le conteneur de dimensions est visible
+                const tabletDimensionsContainer = document.getElementById('tablet-dimensions-container');
+                if (tabletDimensionsContainer) {
+                    tabletDimensionsContainer.classList.remove('hidden');
                 }
                 
                 this.cancelEditMode();
@@ -185,16 +182,13 @@ const appState = {
                 const selectorText = document.getElementById('tabletSelectorText');
                 if (selectorText) {
                     selectorText.textContent = 'Dimensions personnalisées';
+                    selectorText.title = 'Dimensions personnalisées';
                 }
                 
-                const tabletWidthGroup = document.getElementById('tablet-width-group');
-                const tabletHeightGroup = document.getElementById('tablet-height-group');
-                const tabletManualHr = document.getElementById('tablet-manual-hr');
-                
-                if (tabletWidthGroup && tabletHeightGroup && tabletManualHr) {
-                    tabletWidthGroup.classList.remove('hidden');
-                    tabletHeightGroup.classList.remove('hidden');
-                    tabletManualHr.classList.remove('hidden');
+                // S'assurer que le conteneur de dimensions est visible
+                const tabletDimensionsContainer = document.getElementById('tablet-dimensions-container');
+                if (tabletDimensionsContainer) {
+                    tabletDimensionsContainer.classList.remove('hidden');
                 }
                 
                 this.cancelEditMode();

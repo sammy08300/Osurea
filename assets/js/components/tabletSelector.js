@@ -343,23 +343,15 @@ const TabletSelector = {
         // Mise à jour des champs de dimensions
         const tabletWidthInput = document.getElementById('tabletWidth');
         const tabletHeightInput = document.getElementById('tabletHeight');
-        const tabletWidthGroup = document.getElementById('tablet-width-group');
-        const tabletHeightGroup = document.getElementById('tablet-height-group');
-        const tabletManualHr = document.getElementById('tablet-manual-hr');
+        const tabletDimensionsContainer = document.getElementById('tablet-dimensions-container');
         
         if (tabletWidthInput && tabletHeightInput) {
             tabletWidthInput.value = formatNumber(tablet.width);
             tabletHeightInput.value = formatNumber(tablet.height);
             
-            // Cacher les champs manuels avec animation
-            if (tabletWidthGroup && tabletHeightGroup && tabletManualHr) {
-                [tabletWidthGroup, tabletHeightGroup, tabletManualHr].forEach(el => {
-                    el.style.opacity = '0';
-                    setTimeout(() => {
-                        el.classList.add('hidden');
-                        el.style.opacity = '1';
-                    }, 200);
-                });
+            // Cacher les champs manuels
+            if (tabletDimensionsContainer) {
+                tabletDimensionsContainer.classList.add('hidden');
             }
             
             // Cancel edit mode if needed
@@ -393,18 +385,14 @@ const TabletSelector = {
         }, 300);
         
         // Afficher les champs manuels avec animation
-        const tabletWidthGroup = document.getElementById('tablet-width-group');
-        const tabletHeightGroup = document.getElementById('tablet-height-group');
-        const tabletManualHr = document.getElementById('tablet-manual-hr');
+        const tabletDimensionsContainer = document.getElementById('tablet-dimensions-container');
         
-        if (tabletWidthGroup && tabletHeightGroup && tabletManualHr) {
-            [tabletWidthGroup, tabletHeightGroup, tabletManualHr].forEach(el => {
-                el.classList.remove('hidden');
-                el.style.opacity = '0';
-                requestAnimationFrame(() => {
-                    el.style.transition = 'opacity 0.2s ease';
-                    el.style.opacity = '1';
-                });
+        if (tabletDimensionsContainer) {
+            tabletDimensionsContainer.classList.remove('hidden');
+            tabletDimensionsContainer.style.opacity = '0';
+            requestAnimationFrame(() => {
+                tabletDimensionsContainer.style.transition = 'opacity 0.2s ease';
+                tabletDimensionsContainer.style.opacity = '1';
             });
         }
         

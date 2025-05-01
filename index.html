@@ -129,175 +129,179 @@
                             </div>
                         </div>
 
-                        <div id="tablet-width-group" class="input-group hidden">
-                            <label for="tabletWidth" class="block text-sm font-medium text-gray-400 mb-1.5">
-                                Largeur Tablette
-                            </label>
-                            <div class="relative">
-                                <input type="number" id="tabletWidth" value="152.0" min="10" max="2000" step="0.1" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2 pl-3 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
-                                <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">mm</span>
-                            </div>
-                        </div>
-
-                        <div id="tablet-height-group" class="input-group hidden">
-                            <label for="tabletHeight" class="block text-sm font-medium text-gray-400 mb-1.5">
-                                Hauteur Tablette
-                            </label>
-                            <div class="relative">
-                                <input type="number" id="tabletHeight" value="95.0" min="10" max="2000" step="0.1" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2 pl-3 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
-                                <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">mm</span>
-                            </div>
-                        </div>
-                        <hr id="tablet-manual-hr" class="border-gray-800 hidden">
-                    </div>
-                </div>
-
-                <!-- Paramètres Area -->
-                <div class="card bg-gray-900 p-5 rounded-xl shadow-lg border border-gray-800">
-                    <h2 class="text-xl font-semibold text-white mb-4 pb-3 border-b border-gray-800 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                        </svg>
-                        Paramètres Zone Active
-                    </h2>
-                    <div class="space-y-4">
-                        <!-- Ratio -->
-                        <div class="flex items-end gap-3">
-                            <div class="flex-grow">
-                                <label for="customRatio" class="block text-sm font-medium text-gray-400 mb-1.5">
-                                    Ratio (Largeur/Hauteur)
-                                </label>
-                                <div class="relative">
-                                    <input type="number" id="customRatio" value="1.000" min="0.001" max="10" step="0.001" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2 pl-3 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                        <!-- Dimensions Tablette (côte à côte) -->
+                        <div id="tablet-dimensions-container" class="hidden space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div id="tablet-width-group">
+                                    <label for="tabletWidth" class="block text-sm font-medium text-gray-400 mb-1.5">
+                                        Largeur Tablette
+                                    </label>
+                                    <div class="relative">
+                                        <input type="number" id="tabletWidth" value="152.0" min="10" max="2000" step="0.1" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2 pl-3 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                        <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">mm</span>
+                                    </div>
+                                </div>
+                                <div id="tablet-height-group">
+                                    <label for="tabletHeight" class="block text-sm font-medium text-gray-400 mb-1.5">
+                                        Hauteur Tablette
+                                    </label>
+                                    <div class="relative">
+                                        <input type="number" id="tabletHeight" value="95.0" min="10" max="2000" step="0.1" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2 pl-3 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                        <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">mm</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="flex-shrink-0 mb-2 ml-2">
-                                <label for="lockRatio" class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" id="lockRatio" checked class="sr-only peer">
-                                    <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-blue-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                                    <span class="ml-2 text-sm font-medium text-gray-300">Lock</span>
-                                </label>
-                            </div>
+                            <hr id="tablet-manual-hr" class="border-gray-800">
                         </div>
 
-                        <!-- Dimensions -->
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label for="areaWidth" class="block text-sm font-medium text-gray-400 mb-1.5">
-                                    Largeur de l'area
-                                </label>
-                                <div class="relative">
-                                    <input type="number" id="areaWidth" value="75.0" min="1" max="1000" step="0.1" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2 pl-3 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
-                                    <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">mm</span>
-                                </div>
-                            </div>
-                            <div>
-                                <label for="areaHeight" class="block text-sm font-medium text-gray-400 mb-1.5">
-                                    Hauteur de l'area
-                                </label>
-                                <div class="relative">
-                                    <input type="number" id="areaHeight" value="75.0" min="1" max="1000" step="0.1" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2 pl-3 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
-                                    <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">mm</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Position -->
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label for="areaOffsetX" class="block text-sm font-medium text-gray-400 mb-1.5">
-                                    Offset X
-                                </label>
-                                <div class="relative">
-                                    <input type="number" id="areaOffsetX" value="76.000" step="0.001" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2 pl-3 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
-                                    <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">mm</span>
-                                </div>
-                            </div>
-                            
-                            <div>
-                                <label for="areaOffsetY" class="block text-sm font-medium text-gray-400 mb-1.5">
-                                    Offset Y
-                                </label>
-                                <div class="relative">
-                                    <input type="number" id="areaOffsetY" value="47.500" step="0.001" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2 pl-3 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
-                                    <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">mm</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Actions -->
-                        <div class="grid grid-cols-2 gap-3 mt-2">
-                            <button id="swap-btn" class="bg-amber-600 hover:bg-amber-700 text-sm font-medium rounded-md py-2 px-4 text-white flex justify-center items-center transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
-                                </svg>
-                                Inverser
-                            </button>
-                            <button id="center-btn" class="bg-indigo-600 hover:bg-indigo-700 text-sm font-medium rounded-md py-2 px-4 text-white flex justify-center items-center transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-                                </svg>
-                                Centrer
-                            </button>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <button id="copy-btn" class="bg-cyan-600 hover:bg-cyan-700 text-sm font-medium rounded-md py-2 px-4 text-white flex justify-center items-center transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                                </svg>
-                                Copier Infos
-                            </button>
-                            <button id="save-btn" class="bg-emerald-600 hover:bg-emerald-700 text-sm font-medium rounded-md py-2 px-4 text-white flex justify-center items-center transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                                </svg>
-                                Sauvegarder
-                            </button>
-                        </div>
-                        
-                        <button id="cancel-edit-btn" class="hidden w-full bg-rose-600 hover:bg-rose-700 text-sm font-medium rounded-md py-2 px-4 text-white flex justify-center items-center transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                            Annuler l'édition
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Actions et Récapitulatif -->
-                <div class="grid grid-cols-1 gap-6">
-                    <!-- Récapitulatif -->
-                    <div class="card bg-gray-900 p-5 rounded-xl shadow-lg border border-gray-800">
-                        <div class="flex justify-between items-center cursor-pointer hover:bg-gray-800/50 p-2 rounded-lg transition-colors" id="recap-toggle">
-                            <h2 class="text-xl font-semibold text-white flex items-center">
+                        <!-- Paramètres Area -->
+                        <div class="card bg-gray-900 p-5 rounded-xl shadow-lg border border-gray-800">
+                            <h2 class="text-xl font-semibold text-white mb-4 pb-3 border-b border-gray-800 flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                                 </svg>
-                                Récapitulatif
+                                Paramètres Zone Active
                             </h2>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 transition-transform duration-200 rotate-180" id="recap-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
+                            <div class="space-y-4">
+                                <!-- Ratio -->
+                                <div class="flex items-end gap-3">
+                                    <div class="flex-grow">
+                                        <label for="customRatio" class="block text-sm font-medium text-gray-400 mb-1.5">
+                                            Ratio (Largeur/Hauteur)
+                                        </label>
+                                        <div class="relative">
+                                            <input type="number" id="customRatio" value="1.000" min="0.001" max="10" step="0.001" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2 pl-3 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                        </div>
+                                    </div>
+                                    <div class="flex-shrink-0 mb-2 ml-2">
+                                        <label for="lockRatio" class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" id="lockRatio" checked class="sr-only peer">
+                                            <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-blue-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                            <span class="ml-2 text-sm font-medium text-gray-300">Lock</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Dimensions -->
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="areaWidth" class="block text-sm font-medium text-gray-400 mb-1.5">
+                                            Largeur de l'area
+                                        </label>
+                                        <div class="relative">
+                                            <input type="number" id="areaWidth" value="75.0" min="1" max="1000" step="0.1" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2 pl-3 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                            <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">mm</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label for="areaHeight" class="block text-sm font-medium text-gray-400 mb-1.5">
+                                            Hauteur de l'area
+                                        </label>
+                                        <div class="relative">
+                                            <input type="number" id="areaHeight" value="75.0" min="1" max="1000" step="0.1" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2 pl-3 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                            <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">mm</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Position -->
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="areaOffsetX" class="block text-sm font-medium text-gray-400 mb-1.5">
+                                            Offset X
+                                        </label>
+                                        <div class="relative">
+                                            <input type="number" id="areaOffsetX" value="76.000" step="0.001" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2 pl-3 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                            <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">mm</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="areaOffsetY" class="block text-sm font-medium text-gray-400 mb-1.5">
+                                            Offset Y
+                                        </label>
+                                        <div class="relative">
+                                            <input type="number" id="areaOffsetY" value="47.500" step="0.001" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2 pl-3 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                            <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">mm</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Actions -->
+                                <div class="grid grid-cols-2 gap-3 mt-2">
+                                    <button id="swap-btn" class="bg-amber-600 hover:bg-amber-700 text-sm font-medium rounded-md py-2 px-4 text-white flex justify-center items-center transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                                        </svg>
+                                        Inverser
+                                    </button>
+                                    <button id="center-btn" class="bg-indigo-600 hover:bg-indigo-700 text-sm font-medium rounded-md py-2 px-4 text-white flex justify-center items-center transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                                        </svg>
+                                        Centrer
+                                    </button>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <button id="copy-btn" class="bg-cyan-600 hover:bg-cyan-700 text-sm font-medium rounded-md py-2 px-4 text-white flex justify-center items-center transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                                        </svg>
+                                        Copier Infos
+                                    </button>
+                                    <button id="save-btn" class="bg-emerald-600 hover:bg-emerald-700 text-sm font-medium rounded-md py-2 px-4 text-white flex justify-center items-center transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                                        </svg>
+                                        Sauvegarder
+                                    </button>
+                                </div>
+                                
+                                <button id="cancel-edit-btn" class="hidden w-full bg-rose-600 hover:bg-rose-700 text-sm font-medium rounded-md py-2 px-4 text-white flex justify-center items-center transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                    Annuler l'édition
+                                </button>
+                            </div>
                         </div>
-                        <div id="recap-content" class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm mt-4 transition-all duration-200 ease-in-out opacity-0" style="max-height: 0; overflow: hidden;">
-                            <p><strong>Dimensions Tablette:</strong></p>
-                            <p class="text-gray-300 text-right" id="tablet-dimensions-info">... mm</p>
-                            
-                            <p><strong>Ratio Tablette:</strong></p>
-                            <p class="text-gray-300 text-right" id="tablet-ratio-info">...</p>
-                            
-                            <p class="mt-2"><strong>Dimensions Surface:</strong></p>
-                            <p class="text-gray-300 text-right" id="dimensions-info">... mm</p>
-                            
-                            <p><strong>Surface Area:</strong></p>
-                            <p class="text-gray-300 text-right" id="area-info">... mm²</p>
-                            
-                            <p><strong>Ratio Area:</strong></p>
-                            <p class="text-gray-300 text-right" id="ratio-info">...</p>
-                            
-                            <p><strong>Position Area:</strong></p>
-                            <p class="text-gray-300 text-right" id="position-info">... mm</p>
+
+                        <!-- Actions et Récapitulatif -->
+                        <div class="grid grid-cols-1 gap-6">
+                            <!-- Récapitulatif -->
+                            <div class="card bg-gray-900 p-5 rounded-xl shadow-lg border border-gray-800">
+                                <div class="flex justify-between items-center cursor-pointer hover:bg-gray-800/50 p-2 rounded-lg transition-colors" id="recap-toggle">
+                                    <h2 class="text-xl font-semibold text-white flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                        </svg>
+                                        Récapitulatif
+                                    </h2>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 transition-transform duration-200 rotate-180" id="recap-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
+                                <div id="recap-content" class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm mt-4 transition-all duration-200 ease-in-out opacity-0" style="max-height: 0; overflow: hidden;">
+                                    <p><strong>Dimensions Tablette:</strong></p>
+                                    <p class="text-gray-300 text-right" id="tablet-dimensions-info">... mm</p>
+                                    
+                                    <p><strong>Ratio Tablette:</strong></p>
+                                    <p class="text-gray-300 text-right" id="tablet-ratio-info">...</p>
+                                    
+                                    <p class="mt-2"><strong>Dimensions zone active:</strong></p>
+                                    <p class="text-gray-300 text-right" id="dimensions-info">... mm</p>
+                                    
+                                    <p><strong>Surface Area:</strong></p>
+                                    <p class="text-gray-300 text-right" id="area-info">... mm²</p>
+                                    
+                                    <p><strong>Ratio Area:</strong></p>
+                                    <p class="text-gray-300 text-right" id="ratio-info">...</p>
+                                    
+                                    <p><strong>Position Area:</strong></p>
+                                    <p class="text-gray-300 text-right" id="position-info">... mm</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
