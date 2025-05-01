@@ -208,7 +208,7 @@ const PreferencesManager = {
                 offsetX: parseFloatSafe(document.getElementById('areaOffsetX')?.value),
                 offsetY: parseFloatSafe(document.getElementById('areaOffsetY')?.value),
                 ratio: parseFloatSafe(document.getElementById('customRatio')?.value),
-                lockRatio: document.getElementById('lockRatio')?.checked || false
+                lockRatio: document.getElementById('lockRatio')?.getAttribute('aria-pressed') === 'true' || false
             },
             
             // Timestamp
@@ -268,9 +268,15 @@ const PreferencesManager = {
                 if (isValidNumber(area.ratio)) document.getElementById('customRatio').value = formatNumber(area.ratio, 3);
                 
                 // Régler le verrou de ratio
-                const lockRatioCheckbox = document.getElementById('lockRatio');
-                if (lockRatioCheckbox) {
-                    lockRatioCheckbox.checked = area.lockRatio;
+                const lockRatioButton = document.getElementById('lockRatio');
+                if (lockRatioButton) {
+                    lockRatioButton.setAttribute('aria-pressed', area.lockRatio.toString());
+                    
+                    // Mettre à jour visuellement l'indicateur
+                    const indicator = document.getElementById('lockRatioIndicator')?.firstElementChild;
+                    if (indicator) {
+                        indicator.style.transform = area.lockRatio ? 'scale(1)' : 'scale(0)';
+                    }
                 }
             }
             

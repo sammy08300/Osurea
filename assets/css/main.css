@@ -533,6 +533,21 @@ input[type="number"]::-webkit-outer-spin-button {
 
 /* Loading overlay */
 #loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgb(3, 7, 18);
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.3s ease;
+}
+
+/* Loading overlay */
+#loading-overlay {
     background-color: rgba(17, 24, 39, 0.98);
     z-index: 100;
     transition: opacity 0.4s ease;
@@ -591,4 +606,89 @@ input[type="number"]::-webkit-outer-spin-button {
 /* Rectangle hidden visibility handling - using invisible instead of opacity */
 #rectangle.invisible {
     visibility: hidden;
+}
+
+/* Styles pour les dialogues modaux */
+#comment-dialog, #delete-dialog {
+    pointer-events: auto;
+    transition: opacity 0.2s ease-out;
+}
+
+#comment-dialog > div, #delete-dialog > div {
+    transition: transform 0.2s ease-out;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* Styles pour les compteurs de caractères */
+#title-counter, #description-counter {
+    transition: color 0.2s ease;
+}
+
+/* Styles pour les inputs et textarea avec focus visuel amélioré */
+#comment-input:focus, #description-input:focus {
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5), 0 0 0 4px rgba(59, 130, 246, 0.1);
+    background-color: rgba(30, 41, 59, 0.8); /* légèrement plus clair pour indiquer le focus */
+}
+/* Style pour les inputs et textarea avec focus visuel amélioré - sans effet de rebond */
+#comment-input:focus, #description-input:focus {
+    border-color: #4287f5;
+    background-color: rgba(30, 41, 59, 0.8); 
+    box-shadow: none;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+/* Styles pour les dialogues modaux */
+#comment-dialog, #delete-dialog {
+    pointer-events: auto;
+    transition: opacity 0.2s ease-out;
+}
+
+#comment-dialog > div, #delete-dialog > div {
+    transition: transform 0.2s ease-out;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* Styles pour les compteurs de caractères */
+#title-counter, #description-counter {
+    transition: all 0.2s ease;
+}
+
+#title-counter.near-limit, #description-counter.near-limit {
+    color: #f59e0b; /* amber-500 */
+}
+
+#title-counter.at-limit, #description-counter.at-limit {
+    color: #ef4444; /* red-500 */
+    animation: pulse 1s infinite;
+}
+
+/* Animation de pulse pour les compteurs à la limite */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+/* Améliorations des champs de saisie */
+#comment-input, #description-input {
+    transition: all 0.2s ease;
+}
+
+#comment-input:focus, #description-input:focus {
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5), 0 0 0 4px rgba(59, 130, 246, 0.1);
+    background-color: rgba(30, 41, 59, 0.8); /* légèrement plus clair pour indiquer le focus */
+}
+
+/* Style pour les titres des dialogues */
+#comment-dialog h3, #delete-dialog h3 {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Style amélioré pour les boutons d'action */
+#save-comment-btn, #confirm-delete-btn {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    font-weight: 500;
 }

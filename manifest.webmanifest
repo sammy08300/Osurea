@@ -1,6 +1,6 @@
 {
   "name": "Osu!rea - Area Visualizer",
-  "short_name": "OSU Area",
+  "short_name": "Osu!rea",
   "description": "Visualisez et configurez votre zone active de tablette pour osu!",
   "start_url": "/index.html",
   "display": "standalone",

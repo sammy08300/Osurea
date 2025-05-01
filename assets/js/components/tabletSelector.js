@@ -286,44 +286,43 @@ const TabletSelector = {
             noModels.className = 'p-4 text-gray-400 text-center italic';
             noModels.textContent = 'Aucun modèle disponible';
             this.modelsList.appendChild(noModels);
-            return;
-        }
-        
-        // Créer un élément pour chaque modèle
-        models.forEach(tablet => {
-            const modelItem = document.createElement('div');
-            modelItem.className = 'model-item';
-            
-            // Création du contenu avec nom et dimensions
-            const modelName = document.createElement('div');
-            modelName.className = 'text-gray-100';
-            modelName.textContent = tablet.model;
-            
-            const modelDimensions = document.createElement('div');
-            modelDimensions.className = 'text-sm text-gray-400';
-            modelDimensions.textContent = `${tablet.width} × ${tablet.height} mm`;
-            
-            modelItem.appendChild(modelName);
-            modelItem.appendChild(modelDimensions);
-            
-            // Stockage des données du modèle
-            modelItem.dataset.brand = tablet.brand;
-            modelItem.dataset.model = tablet.model;
-            modelItem.dataset.width = tablet.width;
-            modelItem.dataset.height = tablet.height;
-            
-            // Événement au clic sur un modèle
-            modelItem.addEventListener('click', () => {
-                // Ajouter une classe active temporairement
-                modelItem.classList.add('active');
-                setTimeout(() => {
-                    this.selectModel(tablet);
-                    this.hidePopup();
-                }, 150);
+        } else {
+            // Créer un élément pour chaque modèle
+            models.forEach(tablet => {
+                const modelItem = document.createElement('div');
+                modelItem.className = 'model-item';
+                
+                // Création du contenu avec nom et dimensions
+                const modelName = document.createElement('div');
+                modelName.className = 'text-gray-100';
+                modelName.textContent = tablet.model;
+                
+                const modelDimensions = document.createElement('div');
+                modelDimensions.className = 'text-sm text-gray-400';
+                modelDimensions.textContent = `${tablet.width} × ${tablet.height} mm`;
+                
+                modelItem.appendChild(modelName);
+                modelItem.appendChild(modelDimensions);
+                
+                // Stockage des données du modèle
+                modelItem.dataset.brand = tablet.brand;
+                modelItem.dataset.model = tablet.model;
+                modelItem.dataset.width = tablet.width;
+                modelItem.dataset.height = tablet.height;
+                
+                // Événement au clic sur un modèle
+                modelItem.addEventListener('click', () => {
+                    // Ajouter une classe active temporairement
+                    modelItem.classList.add('active');
+                    setTimeout(() => {
+                        this.selectModel(tablet);
+                        this.hidePopup();
+                    }, 150);
+                });
+                
+                this.modelsList.appendChild(modelItem);
             });
-            
-            this.modelsList.appendChild(modelItem);
-        });
+        }
     },
     
     /**

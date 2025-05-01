@@ -118,5 +118,65 @@
     "model": "Inspiroy H640P",
     "width": 160,
     "height": 100
+  },
+  {
+    "brand": "Parblo",
+    "model": "A640",
+    "width": 152.4,
+    "height": 101.6
+  },
+  {
+    "brand": "Gaomon",
+    "model": "S56K",
+    "width": 152.4,
+    "height": 127.0
+  },
+  {
+    "brand": "Huion",
+    "model": "H950P",
+    "width": 221.0,
+    "height": 138.0
+  },
+  {
+    "brand": "Huion",
+    "model": "Inspiroy H1060P",
+    "width": 254.0,
+    "height": 158.8
+  },
+  {
+    "brand": "Huion",
+    "model": "H610 Pro",
+    "width": 254.0,
+    "height": 158.8
+  },
+  {
+    "brand": "XP-Pen",
+    "model": "Deco 01 V2",
+    "width": 254.0,
+    "height": 159.0
+  },
+  {
+    "brand": "XP-Pen",
+    "model": "Star 06C",
+    "width": 254.0,
+    "height": 152.0
+  },
+  {
+    "brand": "XP-Pen",
+    "model": "Star 05 Wireless",
+    "width": 203.0,
+    "height": 127.0
+  },
+  {
+    "brand": "XP-Pen",
+    "model": "Deco L",
+    "width": 254.0,
+    "height": 152.0
+  },
+  {
+    "brand": "XP-Pen",
+    "model": "Deco M",
+    "width": 203.0,
+    "height": 127.0
   }
 ]

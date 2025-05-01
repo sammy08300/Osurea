@@ -176,8 +176,10 @@ function updateInfoDisplays(tabletWidth, tabletHeight, areaWidth, areaHeight, ar
     const areaRatio = calculateRatio(areaWidth, areaHeight);
     const areaSurface = formatNumber(areaWidth * areaHeight);
     
-    // Mettre à jour le ratio dans le champ de saisie si le verrou est activé
-    if (lockRatioCheckbox.checked && areaHeight > 0) {
+    // Mettre à jour le ratio seulement si le verrou est activé (pour éviter les mises à jour trop fréquentes)
+    const isLocked = lockRatioCheckbox.getAttribute('aria-pressed') === 'true';
+    
+    if (isLocked) {
         // Ne pas mettre à jour le customRatioInput si l'utilisateur est en train de l'éditer
         if (!customRatioInput.matches(':focus') && !customRatioInput.dataset.editing) {
             const newRatio = formatNumber(areaWidth / areaHeight, 3);
@@ -191,9 +193,160 @@ function updateInfoDisplays(tabletWidth, tabletHeight, areaWidth, areaHeight, ar
             }
         }
     } else if (typeof appState !== 'undefined' && typeof appState.debouncedUpdateRatio === 'function') {
-        // Pour le mode déverrouillé, utiliser la fonction debounced
+        // Pour le mode déverrouillé, utiliser la fonction debounced uniquement
         appState.debouncedUpdateRatio();
     }
+    
+    // Éviter les réécritures DOM inutiles
+    const newDimensions = `${formatNumber(areaWidth)} × ${formatNumber(areaHeight)} mm`;
+    if (dimensionsInfo.textContent !== newDimensions) {
+        dimensionsInfo.textContent = newDimensions;
+    }
+    
+    if (areaInfo.textContent !== `${areaSurface} mm²`) {
+        areaInfo.textContent = `${areaSurface} mm²`;
+    }
+    
+    if (ratioInfo.textContent !== areaRatio) {
+        ratioInfo.textContent = areaRatio;
+    }
+    
+    const newPosition = `X: ${formatNumber(areaOffsetX, 3)}, Y: ${formatNumber(areaOffsetY, 3)}`;
+    if (positionInfo.textContent !== newPosition) {
+        positionInfo.textContent = newPosition;
+    }
+}
+
+/**
+ * Updates the visual display of the tablet and area without updating the ratio
+ * Cette fonction est utilisée lors des modifications en cours pour éviter les mises à jour
+ * trop fréquentes du ratio.
+ */
+function updateDisplayWithoutRatio() {
+    // Utiliser les éléments en cache et parseFloatSafe qui est optimisé
+    const tabletWidth = parseFloatSafe(cachedElements.tabletWidthInput.value);
+    const tabletHeight = parseFloatSafe(cachedElements.tabletHeightInput.value);
+    const areaWidth = parseFloatSafe(cachedElements.areaWidthInput.value);
+    const areaHeight = parseFloatSafe(cachedElements.areaHeightInput.value);
+    const areaOffsetX = parseFloatSafe(cachedElements.areaOffsetXInput.value);
+    const areaOffsetY = parseFloatSafe(cachedElements.areaOffsetYInput.value);
+    
+    if (!isValidNumber(tabletWidth, 10) || !isValidNumber(tabletHeight, 10)) {
+        console.warn('Invalid tablet dimensions');
+        return;
+    }
+    
+    // Déterminer si c'est le premier rendu
+    const isFirstRender = tabletSize.width === 0 && tabletSize.height === 0;
+    
+    // Mettre à jour les dimensions de la tablette si elles ont changé
+    if (tabletSize.width !== tabletWidth || tabletSize.height !== tabletHeight) {
+        tabletSize.width = tabletWidth;
+        tabletSize.height = tabletHeight;
+    }
+    
+    // Mettre à jour la taille du conteneur si nécessaire
+    if (containerSize.width === 0) {
+        updateContainerSize();
+    }
+    
+    const tabletRatio = tabletWidth / tabletHeight;
+    
+    let displayWidth, displayHeight;
+    
+    if (containerSize.width / tabletRatio <= containerSize.height) {
+        // Width constrained
+        displayWidth = containerSize.width;
+        displayHeight = displayWidth / tabletRatio;
+    } else {
+        // Height constrained
+        displayHeight = containerSize.height;
+        displayWidth = displayHeight * tabletRatio;
+    }
+    
+    // Update scale for converting mm to px
+    currentScale = displayWidth / tabletWidth;
+    
+    // Update tablet boundary display with transform pour meilleures performances
+    tabletBoundary.style.width = `${displayWidth}px`;
+    tabletBoundary.style.height = `${displayHeight}px`;
+    
+    // Get area rectangle dimensions and position in pixels
+    const rectWidth = mmToPx(areaWidth, currentScale);
+    const rectHeight = mmToPx(areaHeight, currentScale);
+    
+    // Get center position and convert to top-left for CSS
+    const rectCenterX = mmToPx(areaOffsetX, currentScale);
+    const rectCenterY = mmToPx(areaOffsetY, currentScale);
+    
+    const rectLeft = rectCenterX - rectWidth / 2;
+    const rectTop = rectCenterY - rectHeight / 2;
+    
+    // Update rectangle display immédiatement sans transition au chargement initial
+    rectangle.style.width = `${rectWidth}px`;
+    rectangle.style.height = `${rectHeight}px`;
+    rectangle.style.transform = `translate(${rectLeft}px, ${rectTop}px)`;
+    
+    // Update info displays sans mettre à jour le ratio
+    updateInfoDisplaysWithoutRatio(tabletWidth, tabletHeight, areaWidth, areaHeight, areaOffsetX, areaOffsetY);
+    
+    // Update grid visibility sans recalcul si l'état n'a pas changé
+    const showGrid = toggleGridCheckbox.checked;
+    if (backgroundGrid.classList.contains('hidden') === showGrid) {
+        backgroundGrid.classList.toggle('hidden', !showGrid);
+    }
+    
+    // Si c'est le premier rendu, attendre un tick pour s'assurer que toutes les mises à jour ont été appliquées
+    // puis révéler le rectangle et masquer l'overlay de chargement
+    if (isFirstRender) {
+        requestAnimationFrame(() => {
+            // Retirer l'overlay de chargement
+            const loadingOverlay = document.getElementById('loading-overlay');
+            if (loadingOverlay) {
+                loadingOverlay.style.opacity = '0';
+                loadingOverlay.style.transition = 'opacity 0.3s ease';
+                setTimeout(() => {
+                    loadingOverlay.style.display = 'none';
+                }, 300);
+            }
+            
+            // Rendre le rectangle visible
+            if (rectangle.classList.contains('invisible')) {
+                rectangle.classList.remove('invisible');
+            }
+        });
+    }
+}
+
+/**
+ * Update information displays with current dimensions without updating the ratio input
+ */
+function updateInfoDisplaysWithoutRatio(tabletWidth, tabletHeight, areaWidth, areaHeight, areaOffsetX, areaOffsetY) {
+    // Récupérer les éléments depuis le cache
+    const { 
+        tabletDimensionsInfo, tabletRatioInfo, 
+        dimensionsInfo, areaInfo, ratioInfo, positionInfo
+    } = cachedElements;
+    
+    // Tablet info
+    const tabletRatio = calculateRatio(tabletWidth, tabletHeight);
+    
+    // Éviter les réécritures DOM inutiles en vérifiant les changements
+    const newTabletDimensions = `${formatNumber(tabletWidth)} × ${formatNumber(tabletHeight)} mm`;
+    if (tabletDimensionsInfo.textContent !== newTabletDimensions) {
+        tabletDimensionsInfo.textContent = newTabletDimensions;
+    }
+    
+    if (tabletRatioInfo.textContent !== tabletRatio) {
+        tabletRatioInfo.textContent = tabletRatio;
+    }
+    
+    // Area info
+    const areaRatio = calculateRatio(areaWidth, areaHeight);
+    const areaSurface = formatNumber(areaWidth * areaHeight);
+    
+    // Ne pas mettre à jour le champ de saisie du ratio ici
+    // Le ratio sera mis à jour après le délai via la fonction debouncedUpdateRatio
     
     // Éviter les réécritures DOM inutiles
     const newDimensions = `${formatNumber(areaWidth)} × ${formatNumber(areaHeight)} mm`;
@@ -484,3 +637,6 @@ function initVisualizer() {
 
 // Call init when window loads
 window.addEventListener('load', initVisualizer);
+
+// Exposer updateDisplayWithoutRatio globalement
+window.updateDisplayWithoutRatio = updateDisplayWithoutRatio;

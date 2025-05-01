@@ -200,66 +200,122 @@ const appState = {
         const areaWidthInput = document.getElementById('areaWidth');
         const areaHeightInput = document.getElementById('areaHeight');
         const customRatioInput = document.getElementById('customRatio');
-        const lockRatioCheckbox = document.getElementById('lockRatio');
+        const lockRatioButton = document.getElementById('lockRatio');
         
-        areaWidthInput.addEventListener('input', () => {
-            this.cancelEditMode();
+        // Fonction pour mettre à jour l'état du champ ratio en fonction de l'état du verrou
+        const updateRatioFieldState = () => {
+            const isLocked = lockRatioButton.getAttribute('aria-pressed') === 'true';
+            customRatioInput.readOnly = !isLocked;
             
-            if (lockRatioCheckbox.checked && this.currentRatio > 0 && !isNaN(this.currentRatio)) {
-                const newHeight = parseFloatSafe(areaWidthInput.value) / this.currentRatio;
-                if (!isNaN(newHeight) && newHeight >= 0) {
-                    areaHeightInput.value = formatNumber(newHeight);
-                }
-            } else if (lockRatioCheckbox.checked) {
-                // Recalculer et mettre à jour le ratio si le verrou est actif
+            // Appliquer les styles appropriés en fonction de l'état
+            if (isLocked) {
+                // Si verrouillé, l'input est modifiable et garde la même apparence que les autres inputs
+                customRatioInput.classList.remove('ratio-editable');
+                customRatioInput.classList.add('ratio-locked');
+                // Réinitialiser les styles inline
+                customRatioInput.style.backgroundColor = "";
+                customRatioInput.style.color = "";
+                customRatioInput.style.pointerEvents = ""; // Permettre l'interaction
+                customRatioInput.title = "Ratio personnalisé (modifiable)";
+            } else {
+                // Si déverrouillé, l'input n'est pas modifiable et a une apparence plus sombre
+                customRatioInput.classList.remove('ratio-locked');
+                customRatioInput.classList.add('ratio-editable');
+                customRatioInput.style.backgroundColor = "#111827"; // bg-gray-900 - plus foncé
+                customRatioInput.style.color = "#9CA3AF"; // text-gray-400 - plus clair
+                customRatioInput.style.pointerEvents = "none"; // Empêcher l'interaction
+                customRatioInput.title = "Ratio calculé automatiquement (non modifiable)";
+            }
+        };
+        
+        // Rendre la fonction accessible globalement
+        window.updateRatioFieldState = updateRatioFieldState;
+        
+        // Initialiser l'état du champ ratio
+        updateRatioFieldState();
+        
+        // Appliquer le style initial si déverrouillé
+        if (lockRatioButton.getAttribute('aria-pressed') !== 'true') {
+            customRatioInput.style.backgroundColor = "#111827"; // bg-gray-900 - plus foncé
+            customRatioInput.style.color = "#9CA3AF"; // text-gray-400 - plus clair
+            customRatioInput.style.pointerEvents = "none"; // Empêcher l'interaction
+        }
+        
+        // Ajouter un écouteur d'événement au bouton de verrouillage pour mettre à jour l'état du champ
+        lockRatioButton.addEventListener('click', () => {
+            // L'état du bouton va changer après l'exécution de cet événement
+            const willBeLocked = lockRatioButton.getAttribute('aria-pressed') !== 'true';
+            
+            if (willBeLocked) {
+                // Si on va verrouiller, on prend le ratio actuel des dimensions
                 const width = parseFloatSafe(areaWidthInput.value);
                 const height = parseFloatSafe(areaHeightInput.value);
                 
-                if (height > 0) {
+                if (height > 0 && width > 0) {
                     this.currentRatio = width / height;
                     customRatioInput.value = formatNumber(this.currentRatio, 3);
                 }
             } else {
-                // Appliquer la mise à jour du ratio avec délai quand le verrou n'est pas actif
+                // Si on va déverrouiller, on recalcule le ratio à partir des dimensions
+                // (même si c'est le même, c'est pour la cohérence)
                 this.debouncedUpdateRatio();
             }
             
-            updateDisplay();
+            // Mettre à jour l'état du champ après le changement d'état du bouton
+            setTimeout(() => {
+                updateRatioFieldState();
+            }, 0);
+        });
+        
+        areaWidthInput.addEventListener('input', () => {
+            this.cancelEditMode();
+            
+            // Uniquement mettre à jour la hauteur si le ratio est verrouillé
+            if (lockRatioButton.getAttribute('aria-pressed') === 'true' && this.currentRatio > 0 && !isNaN(this.currentRatio)) {
+                const newHeight = parseFloatSafe(areaWidthInput.value) / this.currentRatio;
+                if (!isNaN(newHeight) && newHeight >= 0) {
+                    areaHeightInput.value = formatNumber(newHeight);
+                }
+            } else {
+                // Uniquement planifier la mise à jour différée sans aucune mise à jour immédiate
+                this.debouncedUpdateRatio();
+            }
+            
+            // Mettre à jour l'affichage sans modifier le ratio
+            updateDisplayWithoutRatio();
         });
         
         areaHeightInput.addEventListener('input', () => {
             this.cancelEditMode();
             
-            if (lockRatioCheckbox.checked && this.currentRatio > 0 && !isNaN(this.currentRatio)) {
+            // Uniquement mettre à jour la largeur si le ratio est verrouillé
+            if (lockRatioButton.getAttribute('aria-pressed') === 'true' && this.currentRatio > 0 && !isNaN(this.currentRatio)) {
                 const newWidth = parseFloatSafe(areaHeightInput.value) * this.currentRatio;
                 if (!isNaN(newWidth) && newWidth >= 0) {
                     areaWidthInput.value = formatNumber(newWidth);
                 }
-            } else if (lockRatioCheckbox.checked) {
-                // Recalculer et mettre à jour le ratio si le verrou est actif
-                const width = parseFloatSafe(areaWidthInput.value);
-                const height = parseFloatSafe(areaHeightInput.value);
-                
-                if (height > 0) {
-                    this.currentRatio = width / height;
-                    customRatioInput.value = formatNumber(this.currentRatio, 3);
-                }
             } else {
-                // Appliquer la mise à jour du ratio avec délai quand le verrou n'est pas actif
+                // Uniquement planifier la mise à jour différée sans aucune mise à jour immédiate
                 this.debouncedUpdateRatio();
             }
             
-            updateDisplay();
+            // Mettre à jour l'affichage sans modifier le ratio
+            updateDisplayWithoutRatio();
         });
         
         customRatioInput.addEventListener('input', () => {
+            // Si le champ est en lecture seule, ignorer la saisie
+            if (customRatioInput.readOnly) {
+                return;
+            }
+            
             this.cancelEditMode();
             
             const newRatio = parseFloatSafe(customRatioInput.value);
             if (!isNaN(newRatio) && newRatio > 0) {
                 this.currentRatio = newRatio;
                 
-                if (lockRatioCheckbox.checked) {
+                if (lockRatioButton.getAttribute('aria-pressed') === 'true') {
                     const currentWidth = parseFloatSafe(areaWidthInput.value);
                     const newHeight = currentWidth / this.currentRatio;
                     
@@ -276,37 +332,18 @@ const appState = {
         
         // Ajouter un événement focus pour empêcher les mises à jour pendant l'édition directe
         customRatioInput.addEventListener('focus', () => {
-            customRatioInput.dataset.editing = 'true';
+            // Ne permettre l'édition que si le ratio est verrouillé
+            if (!customRatioInput.readOnly) {
+                customRatioInput.dataset.editing = 'true';
+            }
         });
         
         customRatioInput.addEventListener('blur', () => {
             delete customRatioInput.dataset.editing;
             // Recalculer le ratio en fonction des dimensions actuelles si nécessaire
-            if (!lockRatioCheckbox.checked) {
+            if (lockRatioButton.getAttribute('aria-pressed') !== 'true') {
                 this.debouncedUpdateRatio();
             }
-        });
-        
-        lockRatioCheckbox.addEventListener('change', () => {
-            if (lockRatioCheckbox.checked) {
-                const width = parseFloatSafe(areaWidthInput.value);
-                const height = parseFloatSafe(areaHeightInput.value);
-                
-                if (height > 0) {
-                    this.currentRatio = width / height;
-                    customRatioInput.value = formatNumber(this.currentRatio, 3);
-                } else {
-                    const ratio = parseFloatSafe(customRatioInput.value);
-                    if (!isNaN(ratio) && ratio > 0) {
-                        this.currentRatio = ratio;
-                    } else {
-                        this.currentRatio = 1.0;
-                        customRatioInput.value = formatNumber(this.currentRatio, 3);
-                    }
-                }
-            }
-            
-            updateDisplay();
         });
         
         // Area position
@@ -337,17 +374,21 @@ const appState = {
             areaWidthInput.value = areaHeightInput.value;
             areaHeightInput.value = width;
             
-            if (lockRatioCheckbox.checked) {
+            // Si le verrou est activé, mettre à jour immédiatement le ratio
+            if (lockRatioButton.getAttribute('aria-pressed') === 'true') {
                 const newWidth = parseFloatSafe(areaWidthInput.value);
                 const newHeight = parseFloatSafe(areaHeightInput.value);
                 
-                if (newHeight > 0) {
+                if (newHeight > 0 && newWidth > 0) {
                     this.currentRatio = newWidth / newHeight;
                     customRatioInput.value = formatNumber(this.currentRatio, 3);
                 }
+                updateDisplay();
+            } else {
+                // Sinon utiliser la fonction debounced et mettre à jour l'affichage sans le ratio
+                this.debouncedUpdateRatio();
+                updateDisplayWithoutRatio();
             }
-            
-            updateDisplay();
         });
         
         centerButton.addEventListener('click', () => {
@@ -459,20 +500,27 @@ Centre Y: ${formatNumber(offsetY, 3)} mm`;
         // Setup input event listeners
         this.setupInputListeners();
         
+        // Appliquer l'état initial du champ de ratio
+        const lockRatioButton = document.getElementById('lockRatio');
+        const customRatioInput = document.getElementById('customRatio');
+        if (lockRatioButton && customRatioInput && typeof window.updateRatioFieldState === 'function') {
+            window.updateRatioFieldState();
+        }
+        
         // Création d'une fonction debounce pour mettre à jour le ratio
         this.debouncedUpdateRatio = debounce(() => {
             const areaWidthInput = document.getElementById('areaWidth');
             const areaHeightInput = document.getElementById('areaHeight');
             const customRatioInput = document.getElementById('customRatio');
-            const lockRatioCheckbox = document.getElementById('lockRatio');
+            const lockRatioButton = document.getElementById('lockRatio');
             
             const width = parseFloatSafe(areaWidthInput.value);
             const height = parseFloatSafe(areaHeightInput.value);
             
             if (height > 0 && width > 0) {
                 const calculatedRatio = width / height;
-                // Ne pas mettre à jour si le verrou est activé ou si l'utilisateur édite directement le champ
-                if (!lockRatioCheckbox.checked && !customRatioInput.dataset.editing && !customRatioInput.matches(':focus')) {
+                // Toujours mettre à jour le ratio, sauf si l'utilisateur édite directement le champ
+                if (!customRatioInput.dataset.editing && !customRatioInput.matches(':focus')) {
                     customRatioInput.value = formatNumber(calculatedRatio, 3);
                     this.currentRatio = calculatedRatio;
                 }
