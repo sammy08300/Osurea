@@ -386,6 +386,18 @@ Centre Y: ${formatNumber(offsetY, 3)} mm`;
         cancelEditBtn.addEventListener('click', () => {
             this.cancelEditMode();
         });
+        
+        // Bouton de réinitialisation des préférences
+        const resetPrefsBtn = document.getElementById('reset-prefs-btn');
+        if (resetPrefsBtn && typeof PreferencesManager !== 'undefined') {
+            resetPrefsBtn.addEventListener('click', () => {
+                PreferencesManager.showResetConfirmation((confirmed) => {
+                    if (confirmed) {
+                        PreferencesManager.resetPreferences();
+                    }
+                });
+            });
+        }
     },
     
     /**
@@ -434,6 +446,11 @@ Centre Y: ${formatNumber(offsetY, 3)} mm`;
         if (typeof Favorites !== 'undefined') {
             // Initialiser Favorites le plus tôt possible pour éviter le flash
             Favorites.init();
+        }
+        
+        // Initialiser le gestionnaire de préférences s'il existe
+        if (typeof PreferencesManager !== 'undefined') {
+            PreferencesManager.init();
         }
         
         // Load tablet data
