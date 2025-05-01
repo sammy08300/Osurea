@@ -20,7 +20,14 @@ const appState = {
                 throw new Error('Failed to load tablet data');
             }
             this.tabletData = await response.json();
-            this.populateTabletPresets();
+            
+            // Initialiser le nouveau sélecteur de tablettes
+            if (typeof TabletSelector !== 'undefined') {
+                TabletSelector.init(this.tabletData);
+            } else {
+                // Fallback vers l'ancienne méthode si nécessaire
+                this.populateTabletPresets();
+            }
         } catch (error) {
             console.error('Error loading tablet data:', error);
             Notifications.error('Erreur de chargement des données tablettes');
@@ -36,6 +43,8 @@ const appState = {
         if (!tabletPresetSelect || !this.tabletData.length) {
             return;
         }
+        
+        console.warn('Utilisation de la méthode populateTabletPresets obsolète. Utilisez TabletSelector si possible.');
         
         // Group tablets by brand
         const tabletsByBrand = this.tabletData.reduce((groups, tablet) => {
@@ -75,64 +84,123 @@ const appState = {
      * Setup all input listeners
      */
     setupInputListeners() {
-        // Tablet presets
+        // Tablet presets - ancienne méthode - gardée pour compatibilité
         const tabletPresetSelect = document.getElementById('tabletPresetSelect');
-        const tabletWidthInput = document.getElementById('tabletWidth');
-        const tabletHeightInput = document.getElementById('tabletHeight');
-        const tabletWidthGroup = document.getElementById('tablet-width-group');
-        const tabletHeightGroup = document.getElementById('tablet-height-group');
-        const tabletManualHr = document.getElementById('tablet-manual-hr');
-        
-        tabletPresetSelect.addEventListener('change', (e) => {
-            const selectedValue = e.target.value;
-            const selectedOption = e.target.selectedOptions[0];
-            
-            if (selectedValue === 'custom') {
-                tabletWidthGroup.classList.remove('hidden');
-                tabletHeightGroup.classList.remove('hidden');
-                tabletManualHr.classList.remove('hidden');
-                this.cancelEditMode();
-                return;
-            }
-            
-            if (selectedValue && selectedOption.dataset.width) {
-                const width = parseFloat(selectedOption.dataset.width);
-                const height = parseFloat(selectedOption.dataset.height);
+        if (tabletPresetSelect) {
+            tabletPresetSelect.addEventListener('change', (e) => {
+                const selectedValue = e.target.value;
+                const selectedOption = e.target.selectedOptions[0];
                 
-                if (!isNaN(width) && !isNaN(height)) {
-                    tabletWidthInput.value = formatNumber(width);
-                    tabletHeightInput.value = formatNumber(height);
-                    tabletWidthGroup.classList.add('hidden');
-                    tabletHeightGroup.classList.add('hidden');
-                    tabletManualHr.classList.add('hidden');
+                if (selectedValue === 'custom') {
+                    const tabletWidthGroup = document.getElementById('tablet-width-group');
+                    const tabletHeightGroup = document.getElementById('tablet-height-group');
+                    const tabletManualHr = document.getElementById('tablet-manual-hr');
+                    
+                    if (tabletWidthGroup && tabletHeightGroup && tabletManualHr) {
+                        tabletWidthGroup.classList.remove('hidden');
+                        tabletHeightGroup.classList.remove('hidden');
+                        tabletManualHr.classList.remove('hidden');
+                    }
+                    
                     this.cancelEditMode();
-                    updateDisplay();
+                    return;
                 }
-            } else {
-                tabletWidthGroup.classList.add('hidden');
-                tabletHeightGroup.classList.add('hidden');
-                tabletManualHr.classList.add('hidden');
-            }
-        });
+                
+                if (selectedValue && selectedOption.dataset.width) {
+                    const width = parseFloat(selectedOption.dataset.width);
+                    const height = parseFloat(selectedOption.dataset.height);
+                    const tabletWidthInput = document.getElementById('tabletWidth');
+                    const tabletHeightInput = document.getElementById('tabletHeight');
+                    const tabletWidthGroup = document.getElementById('tablet-width-group');
+                    const tabletHeightGroup = document.getElementById('tablet-height-group');
+                    const tabletManualHr = document.getElementById('tablet-manual-hr');
+                    
+                    if (!isNaN(width) && !isNaN(height) && tabletWidthInput && tabletHeightInput) {
+                        tabletWidthInput.value = formatNumber(width);
+                        tabletHeightInput.value = formatNumber(height);
+                        
+                        if (tabletWidthGroup && tabletHeightGroup && tabletManualHr) {
+                            tabletWidthGroup.classList.add('hidden');
+                            tabletHeightGroup.classList.add('hidden');
+                            tabletManualHr.classList.add('hidden');
+                        }
+                        
+                        this.cancelEditMode();
+                        updateDisplay();
+                    }
+                } else {
+                    const tabletWidthGroup = document.getElementById('tablet-width-group');
+                    const tabletHeightGroup = document.getElementById('tablet-height-group');
+                    const tabletManualHr = document.getElementById('tablet-manual-hr');
+                    
+                    if (tabletWidthGroup && tabletHeightGroup && tabletManualHr) {
+                        tabletWidthGroup.classList.add('hidden');
+                        tabletHeightGroup.classList.add('hidden');
+                        tabletManualHr.classList.add('hidden');
+                    }
+                }
+            });
+        }
         
         // Tablet dimensions
-        tabletWidthInput.addEventListener('input', () => {
-            tabletPresetSelect.value = 'custom';
-            tabletWidthGroup.classList.remove('hidden');
-            tabletHeightGroup.classList.remove('hidden');
-            tabletManualHr.classList.remove('hidden');
-            this.cancelEditMode();
-            updateDisplay();
-        });
+        const tabletWidthInput = document.getElementById('tabletWidth');
+        const tabletHeightInput = document.getElementById('tabletHeight');
         
-        tabletHeightInput.addEventListener('input', () => {
-            tabletPresetSelect.value = 'custom';
-            tabletWidthGroup.classList.remove('hidden');
-            tabletHeightGroup.classList.remove('hidden');
-            tabletManualHr.classList.remove('hidden');
-            this.cancelEditMode();
-            updateDisplay();
-        });
+        if (tabletWidthInput) {
+            tabletWidthInput.addEventListener('input', () => {
+                // Si l'ancien sélecteur existe, mettre à jour sa valeur
+                if (tabletPresetSelect) {
+                    tabletPresetSelect.value = 'custom';
+                }
+                
+                // Mettre à jour le texte du nouveau sélecteur
+                const selectorText = document.getElementById('tabletSelectorText');
+                if (selectorText) {
+                    selectorText.textContent = 'Dimensions personnalisées';
+                }
+                
+                const tabletWidthGroup = document.getElementById('tablet-width-group');
+                const tabletHeightGroup = document.getElementById('tablet-height-group');
+                const tabletManualHr = document.getElementById('tablet-manual-hr');
+                
+                if (tabletWidthGroup && tabletHeightGroup && tabletManualHr) {
+                    tabletWidthGroup.classList.remove('hidden');
+                    tabletHeightGroup.classList.remove('hidden');
+                    tabletManualHr.classList.remove('hidden');
+                }
+                
+                this.cancelEditMode();
+                updateDisplay();
+            });
+        }
+        
+        if (tabletHeightInput) {
+            tabletHeightInput.addEventListener('input', () => {
+                // Si l'ancien sélecteur existe, mettre à jour sa valeur
+                if (tabletPresetSelect) {
+                    tabletPresetSelect.value = 'custom';
+                }
+                
+                // Mettre à jour le texte du nouveau sélecteur
+                const selectorText = document.getElementById('tabletSelectorText');
+                if (selectorText) {
+                    selectorText.textContent = 'Dimensions personnalisées';
+                }
+                
+                const tabletWidthGroup = document.getElementById('tablet-width-group');
+                const tabletHeightGroup = document.getElementById('tablet-height-group');
+                const tabletManualHr = document.getElementById('tablet-manual-hr');
+                
+                if (tabletWidthGroup && tabletHeightGroup && tabletManualHr) {
+                    tabletWidthGroup.classList.remove('hidden');
+                    tabletHeightGroup.classList.remove('hidden');
+                    tabletManualHr.classList.remove('hidden');
+                }
+                
+                this.cancelEditMode();
+                updateDisplay();
+            });
+        }
         
         // Area dimensions
         const areaWidthInput = document.getElementById('areaWidth');

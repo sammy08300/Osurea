@@ -196,3 +196,254 @@ input[type="number"]::-webkit-outer-spin-button {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: rgba(59, 130, 246, 0.8);
 }
+
+/* Styles pour le sélecteur de tablette */
+.tablet-selector-container {
+    position: relative;
+}
+
+#tabletSelectorButton {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#tabletSelectorButton:hover {
+    background-color: rgb(55, 65, 81);
+}
+
+#tabletSelectorPopup {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    animation: fadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    max-height: 400px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#tabletBrandsList, #tabletModelsList {
+    max-height: 350px;
+}
+
+.brand-item {
+    transition: all 0.2s ease;
+    padding: 10px 14px;
+    cursor: pointer;
+    position: relative;
+    font-size: 0.95rem;
+}
+
+.brand-item:hover {
+    background-color: rgba(75, 85, 99, 0.5);
+}
+
+.brand-item.active {
+    background-color: rgba(59, 130, 246, 0.15);
+    color: rgba(59, 130, 246, 1);
+    font-weight: 500;
+}
+
+.brand-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background-color: rgba(59, 130, 246, 1);
+}
+
+.model-item {
+    transition: all 0.2s ease;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+}
+
+.model-item:hover {
+    background-color: rgba(75, 85, 99, 0.5);
+    border-left-color: rgba(59, 130, 246, 0.5);
+}
+
+/* Style pour le champ de recherche */
+#tabletSearch, #tabletSearchMobile {
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+
+#tabletSearch:focus, #tabletSearchMobile:focus {
+    background-color: rgba(55, 65, 81, 1);
+}
+
+/* Style pour le bouton de dimensions personnalisées */
+#customTabletButton {
+    width: 100%;
+    padding: 10px 14px;
+    background-color: rgba(31, 41, 55, 0.8);
+    border-top: 1px solid rgba(75, 85, 99, 0.5);
+    color: rgba(209, 213, 219, 1);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: sticky;
+    bottom: 0;
+    left: 0;
+}
+
+#customTabletButton svg {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    color: rgba(156, 163, 175, 1);
+    transition: color 0.2s ease;
+}
+
+#customTabletButton:hover {
+    background-color: rgba(55, 65, 81, 0.9);
+}
+
+#customTabletButton:hover svg {
+    color: rgba(209, 213, 219, 1);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Amélioration de la scrollbar personnalisée */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(75, 85, 99, 0.2);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.4);
+    border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.6);
+}
+
+/* Animations pour le sélecteur de tablette */
+#tabletSelectorButton.updating {
+    animation: buttonUpdate 0.3s ease;
+}
+
+.model-item.active {
+    background-color: rgba(59, 130, 246, 0.15);
+    border-left-color: rgba(59, 130, 246, 1);
+}
+
+@keyframes buttonUpdate {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(0.98);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Transitions pour les groupes de dimensions */
+#tablet-width-group,
+#tablet-height-group,
+#tablet-manual-hr {
+    transition: opacity 0.2s ease;
+}
+
+/* Animation du menu déroulant */
+#tabletSelectorPopup {
+    transform-origin: top;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#tabletSelectorPopup.hidden {
+    transform: scaleY(0.95);
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Amélioration de l'apparence des inputs */
+#tabletSearch,
+#tabletSearchMobile {
+    transition: all 0.2s ease;
+}
+
+#tabletSearch:focus,
+#tabletSearchMobile:focus {
+    background-color: rgba(55, 65, 81, 1);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+/* Effet de survol amélioré pour les éléments de liste */
+.brand-item,
+.model-item {
+    position: relative;
+    overflow: hidden;
+}
+
+.brand-item::after,
+.model-item::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.1);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.brand-item:hover::after,
+.model-item:hover::after {
+    opacity: 1;
+}
+
+/* État actif des éléments */
+.brand-item.active,
+.model-item.active {
+    position: relative;
+}
+
+.brand-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background-color: rgba(59, 130, 246, 1);
+    transform-origin: left;
+    animation: slideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideIn {
+    from {
+        transform: scaleY(0);
+    }
+    to {
+        transform: scaleY(1);
+    }
+}
