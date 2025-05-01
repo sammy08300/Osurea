@@ -115,7 +115,8 @@ const StorageManager = {
             favorites[index] = {
                 ...favorites[index],
                 ...updatedData,
-                id: favorites[index].id // Ensure ID doesn't change
+                id: favorites[index].id, // Ensure ID doesn't change
+                lastModified: Date.now() // Ajouter la date de dernière modification
             };
             
             this.saveFavorites(favorites);
