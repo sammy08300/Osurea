@@ -674,6 +674,13 @@ input[type="number"]::-webkit-outer-spin-button {
     transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
+/* Style pour les icônes SVG dans la popup de détails des favoris */
+#favorite-details-popup svg {
+    fill: none;
+    stroke: white;
+    color: white;
+}
+
 /* Styles pour les dialogues modaux */
 #comment-dialog, #delete-dialog {
     pointer-events: auto;
