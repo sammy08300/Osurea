@@ -1,7 +1,7 @@
 # <img src="assets/img/favicon.svg" alt="Osu!rea Logo" width="30" height="30" style="vertical-align: middle;"> Osu!rea - Area Visualizer v2.0
 
 
-[![Version](https://img.shields.io/badge/version-2.0-blue.svg)](https://github.com/yourusername/osurea)
+[![Version](https://img.shields.io/badge/version-2.0-blue.svg)](https://github.com/sammy08300/Areasu/tree/v2)
 
 ## 📋 Sommaire
 - [Présentation](#-présentation)
