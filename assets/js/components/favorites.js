@@ -6,6 +6,7 @@ const Favorites = {
     favoritesList: null,
     favoritesPlaceholder: null,
     currentSortCriteria: 'date',
+    isInitialized: false,
     
     /**
      * Initialize the favorites component
@@ -19,9 +20,118 @@ const Favorites = {
             return;
         }
         
+        // Ajouter classe pour cacher les favoris jusqu'à leur chargement complet
+        this.favoritesList.classList.add('favorites-loading');
+        
         this.setupSortButtons();
-        this.loadFavorites();
+        
+        // Précharger les favoris avant le rendu DOM
+        this.preloadFavorites();
+        
         this.createDialogs();
+    },
+    
+    /**
+     * Préchargement des favoris pour éviter le flash visuel
+     */
+    preloadFavorites() {
+        // Récupérer les favoris depuis le cache
+        const favorites = StorageManager.getFavorites();
+        
+        // Si aucun favori, on affiche simplement le placeholder
+        if (favorites.length === 0) {
+            this.favoritesPlaceholder.classList.remove('hidden');
+            this.favoritesList.classList.remove('favorites-loading');
+            return;
+        }
+        
+        // Préparer les favoris mais retarder l'affichage
+        this.favoritesPlaceholder.classList.add('hidden');
+        
+        // Trier les favoris
+        const sortedFavorites = this.sortFavorites(favorites, this.currentSortCriteria);
+        
+        // Préparer le contenu HTML en une seule fois (meilleure performance)
+        const fragment = document.createDocumentFragment();
+        
+        // Générer tous les éléments de favoris
+        sortedFavorites.forEach(favorite => {
+            const item = this.createFavoriteElement(favorite);
+            fragment.appendChild(item);
+        });
+        
+        // Ajouter tous les favoris en une seule opération DOM
+        this.favoritesList.appendChild(fragment);
+        
+        // Une fois que tout est prêt, afficher les favoris
+        requestAnimationFrame(() => {
+            this.favoritesList.classList.remove('favorites-loading');
+            this.isInitialized = true;
+        });
+    },
+    
+    /**
+     * Crée un élément de favori
+     * @param {Object} favorite - Objet favori à afficher
+     * @returns {HTMLElement} - Élément DOM du favori
+     */
+    createFavoriteElement(favorite) {
+        const date = new Date(favorite.id);
+        const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+        
+        const item = document.createElement('div');
+        item.classList.add('favorite-item', 'bg-gray-900', 'rounded-lg', 'p-3', 'mb-3', 'border', 'border-gray-800', 'hover:border-gray-700', 'shadow-md', 'transition-colors');
+        item.dataset.id = favorite.id;
+        
+        // Ajouter la classe d'animation mais ne l'activer que si déjà initialisé
+        if (this.isInitialized) {
+            item.classList.add('animate-fadeIn');
+        }
+        
+        const comment = favorite.comment || 'Configuration sauvegardée';
+        const areaWidth = formatNumber(favorite.areaWidth);
+        const areaHeight = formatNumber(favorite.areaHeight);
+        const areaRatio = calculateRatio(favorite.areaWidth, favorite.areaHeight);
+        
+        item.innerHTML = `
+            <div class="flex items-center justify-between mb-1">
+                <h3 class="font-medium text-white">${comment}</h3>
+                <div class="flex">
+                    <button class="edit-favorite-btn text-gray-400 hover:text-white p-1 mr-1 transition-colors" title="Modifier le nom" aria-label="Modifier le nom">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                    </button>
+                    <button class="delete-favorite-btn text-gray-400 hover:text-red-500 p-1 transition-colors" title="Supprimer" aria-label="Supprimer">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="text-sm text-gray-400">${areaWidth} × ${areaHeight} mm (${areaRatio})</div>
+            <div class="text-xs text-gray-500 mt-1">${formattedDate}</div>
+        `;
+        
+        // Ajouter les gestionnaires d'événements
+        const loadHandler = () => this.loadFavorite(favorite.id);
+        item.addEventListener('click', loadHandler);
+        
+        // Empêcher le chargement lors du clic sur les boutons
+        const editBtn = item.querySelector('.edit-favorite-btn');
+        const deleteBtn = item.querySelector('.delete-favorite-btn');
+        
+        editBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.editFavorite(favorite.id);
+        });
+        
+        deleteBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.deleteFavorite(favorite.id);
+        });
+        
+        return item;
     },
     
     /**
@@ -200,12 +310,13 @@ const Favorites = {
             return;
         }
         
-        // Sort favorites based on current criteria
+        // Sort favorites by selected criteria
         const sortedFavorites = this.sortFavorites(favorites, this.currentSortCriteria);
         
-        // Create favorite items
+        // Add each favorite to the list
         sortedFavorites.forEach(favorite => {
-            this.addFavoriteToList(favorite);
+            const item = this.createFavoriteElement(favorite);
+            this.favoritesList.appendChild(item);
         });
     },
     
@@ -229,89 +340,6 @@ const Favorites = {
                     return (b.id || 0) - (a.id || 0);
             }
         });
-    },
-    
-    /**
-     * Create and add a single favorite item to the list
-     * @param {Object} favorite - Favorite data
-     */
-    addFavoriteToList(favorite) {
-        const favoriteItem = document.createElement('div');
-        favoriteItem.className = 'favorite-item bg-gray-700/50 p-3 rounded-lg flex flex-col gap-2 text-sm hover:bg-gray-700 transition duration-150 ease-in-out border border-transparent';
-        favoriteItem.dataset.id = favorite.id;
-        
-        // Title/Comment
-        const commentText = favorite.comment ? 
-            `<span class="font-semibold text-white">${favorite.comment}</span>` : 
-            '<span class="italic text-gray-400">Sans nom</span>';
-        
-        // Dimensions and ratio
-        const dimensionsText = `${formatNumber(favorite.width)}x${formatNumber(favorite.height)}mm`;
-        const ratioText = favorite.ratio && favorite.ratio !== 'N/A' ? 
-            `<span title="Ratio largeur/hauteur">${parseFloatSafe(favorite.ratio, 0).toFixed(3)}</span>` : 
-            '';
-        
-        // Position
-        const positionText = (favorite.x !== undefined && favorite.y !== undefined) ? 
-            `<span title="Position du centre">@(${formatNumber(favorite.x, 3)}, ${formatNumber(favorite.y, 3)})</span>` : 
-            '';
-        
-        // Tablet info
-        const tabletText = (favorite.tabletW && favorite.tabletH) ? 
-            `<span class="text-xs text-gray-400" title="Dimensions de la tablette">Tablette: ${formatNumber(favorite.tabletW)}x${formatNumber(favorite.tabletH)}mm</span>` : 
-            '';
-            
-        // Tablet preset info
-        const presetText = favorite.presetInfo && favorite.presetInfo !== "Personnalisé" ? 
-            `<span class="text-xs text-cyan-400" title="Basé sur le preset tablette">${favorite.presetInfo}</span>` : 
-            `<span class="text-xs text-gray-400" title="Dimensions tablette personnalisées">Personnalisé</span>`;
-        
-        // Main content
-        favoriteItem.innerHTML = `
-            <div class="flex flex-col">
-                <div class="flex justify-between items-start">
-                    <div>${commentText}</div>
-                    <div class="flex gap-1">
-                        <button class="edit-favorite-btn p-1 text-blue-400 hover:text-blue-300" title="Modifier">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                        </button>
-                        <button class="delete-favorite-btn p-1 text-red-400 hover:text-red-300" title="Supprimer">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="flex items-center gap-2 mt-1">
-                    <span class="font-medium">${dimensionsText}</span>
-                    ${ratioText ? `<span class="text-gray-400">(${ratioText})</span>` : ''}
-                    ${positionText ? `<span class="text-gray-400 text-xs">${positionText}</span>` : ''}
-                </div>
-                
-                <div class="flex gap-2 text-xs mt-1">
-                    ${presetText}
-                    ${tabletText}
-                </div>
-            </div>
-            
-            <button class="load-favorite-btn w-full mt-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 rounded text-white font-medium transition-colors">
-                Charger Configuration
-            </button>
-        `;
-        
-        // Add event listeners
-        const loadBtn = favoriteItem.querySelector('.load-favorite-btn');
-        const editBtn = favoriteItem.querySelector('.edit-favorite-btn');
-        const deleteBtn = favoriteItem.querySelector('.delete-favorite-btn');
-        
-        loadBtn.addEventListener('click', () => this.loadFavorite(favorite.id));
-        editBtn.addEventListener('click', () => this.editFavorite(favorite.id));
-        deleteBtn.addEventListener('click', () => this.deleteFavorite(favorite.id));
-        
-        this.favoritesList.appendChild(favoriteItem);
     },
     
     /**
@@ -555,5 +583,36 @@ const Favorites = {
         }
         
         return true;
+    },
+    
+    /**
+     * Add a single favorite to the list (for new saves)
+     * @param {Object} favorite - Favorite object to add
+     */
+    addFavoriteToList(favorite) {
+        // Vérifier si le favori existe déjà
+        const existingItem = this.favoritesList.querySelector(`.favorite-item[data-id="${favorite.id}"]`);
+        if (existingItem) {
+            existingItem.remove();
+        }
+        
+        // Cacher le placeholder s'il est visible
+        if (!this.favoritesPlaceholder.classList.contains('hidden')) {
+            this.favoritesPlaceholder.classList.add('hidden');
+        }
+        
+        // Créer et ajouter le nouvel élément
+        const item = this.createFavoriteElement(favorite);
+        
+        // Ajouter au début ou à la fin selon le tri
+        if (this.currentSortCriteria === 'date') {
+            this.favoritesList.insertBefore(item, this.favoritesList.children[1]);
+        } else {
+            this.favoritesList.appendChild(item);
+            // Si trié par nom, recharger pour avoir le bon ordre
+            if (this.currentSortCriteria === 'name') {
+                this.loadFavorites();
+            }
+        }
     }
 };

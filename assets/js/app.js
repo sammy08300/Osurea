@@ -430,14 +430,17 @@ Centre Y: ${formatNumber(offsetY, 3)} mm`;
         // Initialize notification system
         Notifications.init();
         
+        // Précharger les favoris pendant le chargement des autres données
+        if (typeof Favorites !== 'undefined') {
+            // Initialiser Favorites le plus tôt possible pour éviter le flash
+            Favorites.init();
+        }
+        
         // Load tablet data
         await this.loadTabletData();
         
         // Setup input event listeners
         this.setupInputListeners();
-        
-        // Initialize favorites
-        Favorites.init();
         
         // Création d'une fonction debounce pour mettre à jour le ratio
         this.debouncedUpdateRatio = debounce(() => {

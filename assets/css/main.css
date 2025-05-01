@@ -37,12 +37,45 @@
 .rectangle {
     cursor: grab;
     user-select: none;
-    transition: width var(--transition-fast), height var(--transition-fast), transform var(--transition-fast);
     box-shadow: 0 0 15px var(--shadow-color);
+    visibility: visible;
+    /* Retirer toute transition initiale */
+    transition: none;
 }
 
-.rectangle:active {
+/* Appliquer les transitions seulement après le chargement initial */
+.page-loaded #rectangle {
+    transition: width var(--transition-fast), height var(--transition-fast), transform var(--transition-fast);
+}
+
+#rectangle:active {
     cursor: grabbing;
+}
+
+/* Prévention du rectangle "flash" pendant le chargement */
+[data-loading="true"] #rectangle,
+body:not(.page-loaded) #rectangle {
+    pointer-events: none !important;
+}
+
+/* Prévention des animations flash lors des rafraîchissements rapides */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+/* Éviter le flash blanc lors des rafraîchissements répétés */
+html, body {
+    background-color: rgb(3, 7, 18); /* bg-gray-950 en couleur fixe */
+    min-height: 100%;
+    height: 100%;
+}
+
+/* Désactiver le comportement de défilement pendant le chargement */
+html.loading, body.loading {
+    overflow: hidden !important;
 }
 
 /* Tablet preset select */
@@ -330,7 +363,7 @@ input[type="number"]::-webkit-outer-spin-button {
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(-8px);
+        transform: translateY(8px);
     }
     to {
         opacity: 1;
@@ -463,4 +496,99 @@ input[type="number"]::-webkit-outer-spin-button {
     to {
         transform: scaleY(1);
     }
+}
+
+/* Animation pour l'apparition des favoris */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Masquer les favoris pendant le chargement */
+.favorites-loading > .favorite-item {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* Animation séquentielle pour les favoris */
+.favorite-item:nth-child(2) { animation-delay: 0.05s; }
+.favorite-item:nth-child(3) { animation-delay: 0.1s; }
+.favorite-item:nth-child(4) { animation-delay: 0.15s; }
+.favorite-item:nth-child(5) { animation-delay: 0.2s; }
+.favorite-item:nth-child(6) { animation-delay: 0.25s; }
+.favorite-item:nth-child(7) { animation-delay: 0.3s; }
+.favorite-item:nth-child(8) { animation-delay: 0.35s; }
+.favorite-item:nth-child(9) { animation-delay: 0.4s; }
+.favorite-item:nth-child(10) { animation-delay: 0.45s; }
+
+/* Loading overlay */
+#loading-overlay {
+    background-color: rgba(17, 24, 39, 0.98);
+    z-index: 100;
+    transition: opacity 0.4s ease;
+    /* Empêcher le flash blanc lors des rafraîchissements répétés */
+    will-change: opacity;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* Animation du spinner de chargement élégant */
+.loading-spinner {
+    position: relative;
+    width: 50px;
+    height: 50px;
+}
+
+.spinner-track {
+    stroke: rgba(75, 85, 99, 0.3);
+    transform-origin: center;
+}
+
+.spinner-circle {
+    stroke: #3b82f6; /* Bleu */
+    stroke-linecap: round;
+    transform-origin: center;
+    stroke-dasharray: 125;
+    stroke-dashoffset: 125;
+    animation: spinner-sweep 1.4s ease-in-out infinite, spinner-rotate 2s linear infinite;
+}
+
+@keyframes spinner-rotate {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes spinner-sweep {
+    0% {
+        stroke-dashoffset: 125;
+    }
+    50% {
+        stroke-dashoffset: 0;
+    }
+    100% {
+        stroke-dashoffset: -125;
+    }
+}
+
+/* Rectangle hidden visibility handling - using invisible instead of opacity */
+#rectangle.invisible {
+    visibility: hidden;
 }

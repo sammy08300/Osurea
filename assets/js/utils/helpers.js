@@ -14,7 +14,7 @@ function throttle(func, delay) {
         const now = Date.now();
         if (now - lastCall >= delay) {
             lastCall = now;
-            func.apply(this, args);
+            return func.apply(this, args);
         }
     };
 }
@@ -27,7 +27,7 @@ function throttle(func, delay) {
  * @returns {number} - The clamped value
  */
 function clamp(value, min, max) {
-    return Math.min(Math.max(value, min), max);
+    return value < min ? min : value > max ? max : value;
 }
 
 /**
@@ -38,7 +38,10 @@ function clamp(value, min, max) {
  */
 function formatNumber(value, decimalPlaces = 1) {
     if (isNaN(value)) return "N/A";
-    return value.toFixed(decimalPlaces);
+    
+    // Optimisation: utiliser une puissance pour arrondir au lieu de toFixed
+    const factor = 10 ** decimalPlaces;
+    return (Math.round(value * factor) / factor).toFixed(decimalPlaces);
 }
 
 /**
@@ -61,6 +64,9 @@ function pxToMm(px, scale) {
     return px / scale;
 }
 
+// Mise en cache pour améliorer les performances des calculs de ratio
+const ratioCache = new Map();
+
 /**
  * Calculate the aspect ratio (width/height) as a formatted string
  * @param {number} width - The width value
@@ -69,8 +75,25 @@ function pxToMm(px, scale) {
  */
 function calculateRatio(width, height) {
     if (height <= 0 || isNaN(height) || isNaN(width)) return "N/A";
+    
+    // Utilisation d'un cache pour éviter des calculs répétés
+    const cacheKey = `${width}-${height}`;
+    if (ratioCache.has(cacheKey)) {
+        return ratioCache.get(cacheKey);
+    }
+    
     const ratio = width / height;
-    return ratio.toFixed(3);
+    const result = ratio.toFixed(3);
+    
+    // Limiter la taille du cache pour éviter les fuites mémoire
+    if (ratioCache.size > 100) {
+        // Supprimer la première entrée (la plus ancienne) si cache trop grand
+        const firstKey = ratioCache.keys().next().value;
+        ratioCache.delete(firstKey);
+    }
+    
+    ratioCache.set(cacheKey, result);
+    return result;
 }
 
 /**
@@ -82,10 +105,9 @@ function calculateRatio(width, height) {
 function debounce(func, delay) {
     let timeoutId;
     return function(...args) {
+        const context = this;
         clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {
-            func.apply(this, args);
-        }, delay);
+        timeoutId = setTimeout(() => func.apply(context, args), delay);
     };
 }
 
@@ -97,8 +119,10 @@ function debounce(func, delay) {
  * @returns {boolean} - True if valid
  */
 function isValidNumber(value, min = -Infinity, max = Infinity) {
-    const num = parseFloat(value);
-    return !isNaN(num) && num >= min && num <= max;
+    if (typeof value !== 'number') {
+        value = parseFloat(value);
+    }
+    return !isNaN(value) && value >= min && value <= max;
 }
 
 /**
@@ -108,6 +132,9 @@ function isValidNumber(value, min = -Infinity, max = Infinity) {
  * @returns {number} - The parsed number or fallback
  */
 function parseFloatSafe(value, fallback = 0) {
+    // Optimisation: vérifier si la valeur est déjà un nombre
+    if (typeof value === 'number') return value;
+    
     const parsed = parseFloat(value);
     return isNaN(parsed) ? fallback : parsed;
 }

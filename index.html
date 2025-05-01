@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="loading">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,6 +16,12 @@
     <link rel="preload" href="assets/css/main.css" as="style">
     <link rel="stylesheet" href="assets/css/main.css">
     <script>
+        // Appliquer immédiatement une couleur de fond pour éviter les flashs blancs
+        (function() {
+            document.documentElement.style.backgroundColor = 'rgb(3, 7, 18)';
+            document.documentElement.classList.add('loading');
+        })();
+        
         tailwind.config = {
             darkMode: 'class',
             theme: {
@@ -371,9 +377,18 @@
                     </div>
                     
                     <div id="visual-container" class="w-full h-[500px] bg-gray-950 rounded-lg border border-gray-800 flex items-center justify-center overflow-hidden relative">
+                        <!-- Overlay de chargement avec une animation plus élégante -->
+                        <div id="loading-overlay" class="absolute inset-0 z-10 bg-gray-950 flex items-center justify-center">
+                            <div class="loading-spinner">
+                                <svg class="w-10 h-10" viewBox="0 0 50 50">
+                                    <circle class="spinner-track" cx="25" cy="25" r="20" fill="none" stroke-width="3"></circle>
+                                    <circle class="spinner-circle" cx="25" cy="25" r="20" fill="none" stroke-width="3"></circle>
+                                </svg>
+                            </div>
+                        </div>
                         <div id="backgroundGrid" class="absolute inset-0 opacity-30" style="background-size: 20px 20px; background-image: linear-gradient(to right, rgb(75, 85, 99) 1px, transparent 1px), linear-gradient(to bottom, rgb(75, 85, 99) 1px, transparent 1px);"></div>
                         <div id="tablet-boundary" class="relative border-2 border-gray-600 rounded bg-gray-800/30 flex items-center justify-center">
-                            <div id="rectangle" class="absolute bg-blue-500/40 border-2 border-blue-500 rounded"></div>
+                            <div id="rectangle" class="absolute bg-blue-500/40 border-2 border-blue-500 rounded invisible" style="position: absolute; left: 0; top: 0;"></div>
                         </div>
                     </div>
                 </div>
@@ -482,6 +497,98 @@
     <script src="assets/js/components/favorites.js"></script>
     <script src="assets/js/components/tabletSelector.js"></script>
     <script src="assets/js/app.js"></script>
+    
+    <!-- Script de positionnement initial du rectangle -->
+    <script>
+        // Initialiser la position immédiatement pour éviter tout clignotement ou animation non désirée
+        (() => {
+            // Fonction de gestion des erreurs qui pourrait causer une page blanche
+            const safeInit = () => {
+                try {
+                    // Ajouter un indicateur pour prévenir les initialisations multiples sur les rafraîchissements rapides
+                    if (document.body.hasAttribute('data-initialized')) {
+                        return;
+                    }
+                    document.body.setAttribute('data-initialized', 'true');
+                    document.body.classList.add('loading');
+                    
+                    // Désactiver les animations CSS avant que le DOM soit complètement chargé
+                    document.documentElement.style.setProperty('--transition-fast', '0s');
+                    document.documentElement.style.setProperty('--transition-normal', '0s');
+                    
+                    // Accéder au rectangle et le configurer en une seule fois
+                    const rectangle = document.getElementById('rectangle');
+                    if (rectangle) {
+                        // Rendre le rectangle invisible immédiatement
+                        rectangle.classList.add('invisible');
+                        
+                        // Positionner le rectangle au centre par défaut pour éviter le déplacement
+                        const defaultStyles = {
+                            position: 'absolute',
+                            left: '0',
+                            top: '0',
+                            width: '75px',
+                            height: '75px',
+                            pointerEvents: 'none' // Désactiver les interactions pendant le chargement
+                        };
+                        
+                        // Appliquer tous les styles en une seule opération
+                        Object.assign(rectangle.style, defaultStyles);
+                    }
+                    
+                    // Retirer l'overlay de chargement correctement après le chargement complet de la page
+                    window.addEventListener('load', () => {
+                        setTimeout(() => {
+                            const loadingOverlay = document.getElementById('loading-overlay');
+                            if (loadingOverlay) {
+                                loadingOverlay.style.opacity = '0';
+                                loadingOverlay.style.transition = 'opacity 0.4s ease';
+                            }
+                            
+                            // Réactiver les transitions CSS quand tout est chargé
+                            setTimeout(() => {
+                                document.documentElement.style.removeProperty('--transition-fast');
+                                document.documentElement.style.removeProperty('--transition-normal');
+                                
+                                if (loadingOverlay) {
+                                    loadingOverlay.style.display = 'none';
+                                }
+                                
+                                // Retirer les classes de chargement
+                                document.documentElement.classList.remove('loading');
+                                document.body.classList.remove('loading');
+                            }, 400);
+                        }, 100);
+                    });
+                } catch (error) {
+                    console.error('Erreur lors de l\'initialisation:', error);
+                    // En cas d'erreur, s'assurer que l'interface utilisateur n'est pas bloquée
+                    const loadingOverlay = document.getElementById('loading-overlay');
+                    if (loadingOverlay) {
+                        loadingOverlay.style.display = 'none';
+                    }
+                    // Retirer les classes de chargement en cas d'erreur
+                    document.documentElement.classList.remove('loading');
+                    document.body.classList.remove('loading');
+                }
+            };
+            
+            // Exécuter l'initialisation en toute sécurité
+            safeInit();
+            
+            // Backup: Si la page reste bloquée, assurer que l'overlay disparaît
+            setTimeout(() => {
+                const loadingOverlay = document.getElementById('loading-overlay');
+                if (loadingOverlay && loadingOverlay.style.display !== 'none') {
+                    loadingOverlay.style.display = 'none';
+                }
+                // Toujours retirer les classes de chargement après le délai de sécurité
+                document.documentElement.classList.remove('loading');
+                document.body.classList.remove('loading');
+            }, 5000); // Délai de sécurité de 5 secondes
+        })();
+    </script>
+    
     <!-- Enregistrement du Service Worker -->
     <script>
         if ('serviceWorker' in navigator) {
