@@ -99,7 +99,12 @@ const Favorites = {
             <div class="flex items-center justify-between mb-1">
                 <h3 class="font-medium text-white">${title}</h3>
                 <div class="flex">
-                    <button class="edit-favorite-btn text-gray-400 hover:text-white p-1 mr-1 transition-colors" title="Modifier le nom" aria-label="Modifier le nom">
+                    <button class="load-favorite-btn text-gray-400 hover:text-blue-500 p-1 mr-1 transition-colors" title="Charger la configuration" aria-label="Charger la configuration">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                    </button>
+                    <button class="edit-favorite-btn text-gray-400 hover:text-white p-1 mr-1 transition-colors" title="Modifier" aria-label="Modifier">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
@@ -112,11 +117,6 @@ const Favorites = {
                 </div>
             </div>`;
             
-        // Ajouter la description si elle existe
-        if (favorite.description) {
-            innerHtml += `<div class="text-sm text-gray-400 mb-1 line-clamp-2">${favorite.description}</div>`;
-        }
-        
         // Ajouter les informations de dimensions et date
         innerHtml += `
             <div class="text-sm text-gray-400">${areaWidth} × ${areaHeight} mm (${areaRatio})</div>
@@ -126,12 +126,14 @@ const Favorites = {
         item.innerHTML = innerHtml;
         
         // Ajouter les gestionnaires d'événements
-        const loadHandler = () => this.loadFavorite(favorite.id);
-        item.addEventListener('click', loadHandler);
-        
-        // Empêcher le chargement lors du clic sur les boutons
+        const loadBtn = item.querySelector('.load-favorite-btn');
         const editBtn = item.querySelector('.edit-favorite-btn');
         const deleteBtn = item.querySelector('.delete-favorite-btn');
+        
+        loadBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.loadFavorite(favorite.id);
+        });
         
         editBtn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -142,6 +144,17 @@ const Favorites = {
             e.stopPropagation();
             this.deleteFavorite(favorite.id);
         });
+        
+        // Ajouter un gestionnaire pour afficher le commentaire au survol
+        if (favorite.description) {
+            item.addEventListener('mouseenter', () => {
+                this.showDescriptionPopup(favorite.description, item);
+            });
+            
+            item.addEventListener('mouseleave', () => {
+                this.hideDescriptionPopup();
+            });
+        }
         
         return item;
     },
@@ -525,44 +538,45 @@ const Favorites = {
                 appState.cancelEditMode();
             }
             
-            // Update inputs
+            // Mettre à jour les dimensions de la tablette
+            if (favorite.tabletW && favorite.tabletH) {
+                document.getElementById('tabletWidth').value = formatNumber(favorite.tabletW);
+                document.getElementById('tabletHeight').value = formatNumber(favorite.tabletH);
+            }
+            
+            // Mettre à jour les dimensions de l'area
             document.getElementById('areaWidth').value = formatNumber(favorite.width);
             document.getElementById('areaHeight').value = formatNumber(favorite.height);
-            document.getElementById('areaOffsetX').value = formatNumber(favorite.offsetX, 3);
-            document.getElementById('areaOffsetY').value = formatNumber(favorite.offsetY, 3);
             
-            // Update ratio if present
-            if (favorite.ratio && favorite.ratio !== 'N/A') {
-                const ratio = parseFloatSafe(favorite.ratio);
-                if (ratio > 0) {
-                    document.getElementById('customRatio').value = ratio.toFixed(3);
-                    document.getElementById('lockRatio').setAttribute('aria-pressed', 'true');
-                    // Mettre à jour visuellement l'indicateur
-                    const indicator = document.getElementById('lockRatioIndicator')?.firstElementChild;
-                    if (indicator) {
-                        indicator.style.transform = 'scale(1)';
-                    }
-                }
-            } else if (favorite.height > 0) {
-                document.getElementById('customRatio').value = (favorite.width / favorite.height).toFixed(3);
-                document.getElementById('lockRatio').setAttribute('aria-pressed', 'true');
-                // Mettre à jour visuellement l'indicateur
-                const indicator = document.getElementById('lockRatioIndicator')?.firstElementChild;
-                if (indicator) {
-                    indicator.style.transform = 'scale(1)';
+            // Mettre à jour les offsets
+            document.getElementById('areaOffsetX').value = formatNumber(favorite.x || favorite.offsetX, 3);
+            document.getElementById('areaOffsetY').value = formatNumber(favorite.y || favorite.offsetY, 3);
+            
+            // Mettre à jour le ratio
+            if (favorite.ratio) {
+                document.getElementById('customRatio').value = formatNumber(favorite.ratio, 3);
+            }
+            
+            // Mettre à jour le preset de la tablette si disponible
+            if (favorite.presetInfo) {
+                const tabletSelector = document.getElementById('tabletSelectorButton');
+                if (tabletSelector) {
+                    tabletSelector.querySelector('#tabletSelectorText').textContent = favorite.presetInfo;
                 }
             }
             
-            // Update display
-            updateDisplay();
+            // Mettre à jour l'affichage
+            if (typeof updateDisplay === 'function') {
+                updateDisplay();
+            }
             
-            // Highlight the loaded favorite
+            // Mettre en surbrillance le favori chargé
             this.highlightFavorite(id);
             
             Notifications.success('Configuration chargée');
         } catch (error) {
             console.error('Erreur lors du chargement du favori:', error);
-            Notifications.error('Erreur lors du chargement du favori');
+            Notifications.error('Erreur lors du chargement de la configuration');
         }
     },
     
@@ -586,101 +600,65 @@ const Favorites = {
      */
     editFavorite(id) {
         const favorite = StorageManager.getFavoriteById(id);
-        
         if (!favorite) {
-            Notifications.error('Favori introuvable pour édition');
+            Notifications.error('Favori introuvable');
             return;
         }
         
-        // Ouvrir la boîte de dialogue pour éditer le titre et la description
-        const commentDialog = document.getElementById('comment-dialog');
-        const commentInput = document.getElementById('comment-input');
-        const descriptionInput = document.getElementById('description-input');
-        const titleCounter = document.getElementById('title-counter');
-        const descriptionCounter = document.getElementById('description-counter');
-        
-        if (!commentDialog || !commentInput || !descriptionInput) {
-            Notifications.error('Éléments de dialogue introuvables');
-            return;
-        }
-        
-        // Remplir les champs avec les valeurs existantes
-        commentInput.value = favorite.title || favorite.comment || '';
-        descriptionInput.value = favorite.description || '';
-        
-        // Mettre à jour les compteurs
-        if (titleCounter) {
-            titleCounter.textContent = `${commentInput.value.length}/40`;
-            titleCounter.className = 'text-xs font-medium px-2 py-1 bg-gray-800 rounded-md text-gray-400';
-            if (commentInput.value.length >= 40) {
-                titleCounter.classList.add('at-limit');
-            } else if (commentInput.value.length > 30) {
-                titleCounter.classList.add('near-limit');
-            }
-        }
-        
-        if (descriptionCounter) {
-            descriptionCounter.textContent = `${descriptionInput.value.length}/144`;
-            descriptionCounter.className = 'text-xs font-medium px-2 py-1 bg-gray-800 rounded-md text-gray-400';
-            if (descriptionInput.value.length >= 144) {
-                descriptionCounter.classList.add('at-limit');
-            } else if (descriptionInput.value.length > 120) {
-                descriptionCounter.classList.add('near-limit');
-            }
-        }
-        
-        // Utiliser les mêmes animations que showCommentDialog
-        commentDialog.classList.remove('hidden');
-        commentDialog.style.opacity = '0';
-        
-        const dialogContent = commentDialog.querySelector('div');
-        if (dialogContent) {
-            dialogContent.style.transform = 'scale(0.95)';
-        }
-        
-        // Force reflow to ensure animation plays
-        void commentDialog.offsetWidth;
-        
-        // Start animation
-        commentDialog.style.opacity = '1';
-        if (dialogContent) {
-            dialogContent.style.transform = 'scale(1)';
-        }
-        
-        // Définir le callback pour la sauvegarde
-        this.commentDialogCallback = (commentData) => {
-            // Vérifier et tronquer si nécessaire
-            if (commentData.title && commentData.title.length > 40) {
-                Notifications.warning("Le titre a été tronqué à 40 caractères.");
-                commentData.title = commentData.title.substring(0, 40);
-            }
-            
-            if (commentData.description && commentData.description.length > 144) {
-                Notifications.warning("La description a été tronquée à 144 caractères.");
-                commentData.description = commentData.description.substring(0, 144);
-            }
-            
-            // Mettre à jour le favori
-            const updatedData = {
-                title: commentData.title,
-                description: commentData.description
+        // Sauvegarder les valeurs originales
+        if (typeof appState !== 'undefined') {
+            appState.editingFavoriteId = id;
+            appState.originalValues = {
+                width: favorite.width,
+                height: favorite.height,
+                x: favorite.x || favorite.offsetX,
+                y: favorite.y || favorite.offsetY,
+                ratio: favorite.ratio,
+                tabletW: favorite.tabletW,
+                tabletH: favorite.tabletH,
+                presetInfo: favorite.presetInfo,
+                title: favorite.title,
+                description: favorite.description
             };
-            
-            const success = StorageManager.updateFavorite(id, updatedData);
-            
-            if (success) {
-                this.loadFavorites();
-                this.highlightFavorite(id);
-                Notifications.success('Favori mis à jour');
-            } else {
-                Notifications.error('Erreur lors de la mise à jour du favori');
-            }
-        };
+        }
         
-        // Mettre le focus sur le champ de titre après l'animation
-        setTimeout(() => {
-            commentInput.focus();
-        }, 200);
+        // Afficher le bouton d'annulation
+        const cancelBtn = document.getElementById('cancel-edit-btn');
+        if (cancelBtn) {
+            cancelBtn.classList.remove('hidden');
+        }
+        
+        // Mettre à jour les champs avec les valeurs du favori
+        document.getElementById('areaWidth').value = formatNumber(favorite.width);
+        document.getElementById('areaHeight').value = formatNumber(favorite.height);
+        document.getElementById('areaOffsetX').value = formatNumber(favorite.x || favorite.offsetX, 3);
+        document.getElementById('areaOffsetY').value = formatNumber(favorite.y || favorite.offsetY, 3);
+        
+        if (favorite.ratio) {
+            document.getElementById('customRatio').value = formatNumber(favorite.ratio, 3);
+        }
+        
+        if (favorite.tabletW && favorite.tabletH) {
+            document.getElementById('tabletWidth').value = formatNumber(favorite.tabletW);
+            document.getElementById('tabletHeight').value = formatNumber(favorite.tabletH);
+        }
+        
+        if (favorite.presetInfo) {
+            const tabletSelector = document.getElementById('tabletSelectorButton');
+            if (tabletSelector) {
+                tabletSelector.querySelector('#tabletSelectorText').textContent = favorite.presetInfo;
+            }
+        }
+        
+        // Mettre à jour l'affichage
+        if (typeof updateDisplay === 'function') {
+            updateDisplay();
+        }
+        
+        // Mettre en surbrillance le favori en cours d'édition
+        this.highlightFavorite(id);
+        
+        Notifications.info('Mode édition activé - Modifiez les paramètres puis cliquez sur "Sauvegarder"');
     },
     
     /**
@@ -712,47 +690,25 @@ const Favorites = {
         const areaHeight = parseFloatSafe(document.getElementById('areaHeight').value);
         const areaOffsetX = parseFloatSafe(document.getElementById('areaOffsetX').value);
         const areaOffsetY = parseFloatSafe(document.getElementById('areaOffsetY').value);
-        const customRatio = document.getElementById('customRatio').value;
+        const customRatio = parseFloatSafe(document.getElementById('customRatio').value);
         
-        // Validate dimensions
-        if (!isValidNumber(areaWidth, 1) || !isValidNumber(areaHeight, 1) || 
-            !isValidNumber(tabletWidth, 10) || !isValidNumber(tabletHeight, 10)) {
-            Notifications.error('Dimensions invalides');
-            return false;
-        }
-        
-        // Get preset info
-        let presetInfo = "Personnalisé";
-        const tabletPresetSelect = document.getElementById('tabletPresetSelect');
-        
-        if (tabletPresetSelect && tabletPresetSelect.value !== 'custom' && tabletPresetSelect.value) {
-            const selectedOption = tabletPresetSelect.selectedOptions[0];
-            if (selectedOption) {
-                const brandPart = selectedOption.dataset.brand || '';
-                presetInfo = brandPart ? `${brandPart} - ${selectedOption.textContent}` : selectedOption.textContent;
-            }
-        } else {
-            // Vérifier le nouveau sélecteur
-            const selectorText = document.getElementById('tabletSelectorText');
-            if (selectorText) {
-                presetInfo = selectorText.textContent;
-            }
-        }
+        // Récupérer les informations du preset de tablette
+        const tabletSelector = document.getElementById('tabletSelectorButton');
+        const presetInfo = tabletSelector ? tabletSelector.querySelector('#tabletSelectorText').textContent : '';
         
         if (appState.editingFavoriteId) {
-            // Updating existing favorite - keep existing comment
-            const existingFavorite = StorageManager.getFavoriteById(appState.editingFavoriteId);
-            const comment = existingFavorite ? existingFavorite.comment || '' : '';
-            
+            // Mise à jour d'un favori existant
             const updatedData = {
-                width: areaWidth,
-                height: areaHeight,
-                x: areaOffsetX,
-                y: areaOffsetY,
-                ratio: customRatio,
-                tabletW: tabletWidth,
-                tabletH: tabletHeight,
-                presetInfo: presetInfo
+                width: !isNaN(areaWidth) ? areaWidth : appState.originalValues.width,
+                height: !isNaN(areaHeight) ? areaHeight : appState.originalValues.height,
+                x: !isNaN(areaOffsetX) ? areaOffsetX : appState.originalValues.x,
+                y: !isNaN(areaOffsetY) ? areaOffsetY : appState.originalValues.y,
+                ratio: !isNaN(customRatio) ? customRatio : appState.originalValues.ratio,
+                tabletW: !isNaN(tabletWidth) ? tabletWidth : appState.originalValues.tabletW,
+                tabletH: !isNaN(tabletHeight) ? tabletHeight : appState.originalValues.tabletH,
+                presetInfo: presetInfo || appState.originalValues.presetInfo,
+                title: appState.originalValues.title,
+                description: appState.originalValues.description
             };
             
             const success = StorageManager.updateFavorite(appState.editingFavoriteId, updatedData);
@@ -760,13 +716,12 @@ const Favorites = {
             if (success) {
                 this.loadFavorites();
                 appState.cancelEditMode();
-                Notifications.success('Favori mis à jour');
+                Notifications.success('Configuration mise à jour');
             } else {
-                Notifications.error('Erreur lors de la mise à jour du favori');
+                Notifications.error('Erreur lors de la mise à jour de la configuration');
             }
-            
         } else {
-            // New favorite - show comment dialog
+            // Nouveau favori - afficher la boîte de dialogue pour le titre et la description
             this.showCommentDialog((commentData) => {
                 if (commentData.title && commentData.title.length > 40) {
                     Notifications.warning("Le titre a été tronqué à 40 caractères.");
@@ -796,9 +751,9 @@ const Favorites = {
                 if (savedFavorite) {
                     this.loadFavorites();
                     this.highlightFavorite(savedFavorite.id);
-                    Notifications.success('Favori sauvegardé');
+                    Notifications.success('Configuration sauvegardée');
                 } else {
-                    Notifications.error('Erreur lors de la sauvegarde du favori');
+                    Notifications.error('Erreur lors de la sauvegarde de la configuration');
                 }
             });
         }
@@ -834,6 +789,53 @@ const Favorites = {
             if (this.currentSortCriteria === 'name') {
                 this.loadFavorites();
             }
+        }
+    },
+    
+    /**
+     * Affiche une popup avec la description du favori
+     * @param {string} description - Description à afficher
+     * @param {HTMLElement} targetElement - Élément cible pour le positionnement
+     */
+    showDescriptionPopup(description, targetElement) {
+        // Créer la popup si elle n'existe pas
+        if (!this.descriptionPopup) {
+            this.descriptionPopup = document.createElement('div');
+            this.descriptionPopup.classList.add('fixed', 'z-50', 'bg-gray-900', 'border', 'border-blue-500', 'rounded-lg', 'p-3', 'shadow-xl', 'max-w-xs', 'text-sm', 'text-gray-300');
+            document.body.appendChild(this.descriptionPopup);
+        }
+        
+        // Positionner la popup
+        const rect = targetElement.getBoundingClientRect();
+        this.descriptionPopup.style.left = `${rect.right + 10}px`;
+        this.descriptionPopup.style.top = `${rect.top}px`;
+        
+        // Mettre à jour le contenu
+        this.descriptionPopup.textContent = description;
+        
+        // Afficher la popup avec animation
+        this.descriptionPopup.style.opacity = '0';
+        this.descriptionPopup.style.transform = 'translateX(-10px)';
+        this.descriptionPopup.style.display = 'block';
+        
+        requestAnimationFrame(() => {
+            this.descriptionPopup.style.opacity = '1';
+            this.descriptionPopup.style.transform = 'translateX(0)';
+            this.descriptionPopup.style.transition = 'all 0.2s ease-out';
+        });
+    },
+    
+    /**
+     * Cache la popup de description
+     */
+    hideDescriptionPopup() {
+        if (this.descriptionPopup) {
+            this.descriptionPopup.style.opacity = '0';
+            this.descriptionPopup.style.transform = 'translateX(-10px)';
+            
+            setTimeout(() => {
+                this.descriptionPopup.style.display = 'none';
+            }, 200);
         }
     }
 };

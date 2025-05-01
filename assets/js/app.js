@@ -6,6 +6,7 @@
 const appState = {
     tabletData: [],
     editingFavoriteId: null,
+    originalValues: null,
     currentRatio: 1.0,
     debouncedUpdateRatio: null,
     
@@ -268,7 +269,9 @@ const appState = {
         });
         
         areaWidthInput.addEventListener('input', () => {
-            this.cancelEditMode();
+            if (!appState.editingFavoriteId) {
+                this.cancelEditMode();
+            }
             
             // Uniquement mettre à jour la hauteur si le ratio est verrouillé
             if (lockRatioButton.getAttribute('aria-pressed') === 'true' && this.currentRatio > 0 && !isNaN(this.currentRatio)) {
@@ -277,16 +280,16 @@ const appState = {
                     areaHeightInput.value = formatNumber(newHeight);
                 }
             } else {
-                // Uniquement planifier la mise à jour différée sans aucune mise à jour immédiate
                 this.debouncedUpdateRatio();
             }
             
-            // Mettre à jour l'affichage sans modifier le ratio
             updateDisplayWithoutRatio();
         });
         
         areaHeightInput.addEventListener('input', () => {
-            this.cancelEditMode();
+            if (!appState.editingFavoriteId) {
+                this.cancelEditMode();
+            }
             
             // Uniquement mettre à jour la largeur si le ratio est verrouillé
             if (lockRatioButton.getAttribute('aria-pressed') === 'true' && this.currentRatio > 0 && !isNaN(this.currentRatio)) {
@@ -295,21 +298,21 @@ const appState = {
                     areaWidthInput.value = formatNumber(newWidth);
                 }
             } else {
-                // Uniquement planifier la mise à jour différée sans aucune mise à jour immédiate
                 this.debouncedUpdateRatio();
             }
             
-            // Mettre à jour l'affichage sans modifier le ratio
             updateDisplayWithoutRatio();
         });
         
         customRatioInput.addEventListener('input', () => {
+            if (!appState.editingFavoriteId) {
+                this.cancelEditMode();
+            }
+            
             // Si le champ est en lecture seule, ignorer la saisie
             if (customRatioInput.readOnly) {
                 return;
             }
-            
-            this.cancelEditMode();
             
             const newRatio = parseFloatSafe(customRatioInput.value);
             if (!isNaN(newRatio) && newRatio > 0) {
@@ -351,12 +354,16 @@ const appState = {
         const areaOffsetYInput = document.getElementById('areaOffsetY');
         
         areaOffsetXInput.addEventListener('input', () => {
-            this.cancelEditMode();
+            if (!appState.editingFavoriteId) {
+                this.cancelEditMode();
+            }
             updateDisplay();
         });
         
         areaOffsetYInput.addEventListener('input', () => {
-            this.cancelEditMode();
+            if (!appState.editingFavoriteId) {
+                this.cancelEditMode();
+            }
             updateDisplay();
         });
         
@@ -392,7 +399,9 @@ const appState = {
         });
         
         centerButton.addEventListener('click', () => {
-            this.cancelEditMode();
+            if (!appState.editingFavoriteId) {
+                this.cancelEditMode();
+            }
             centerArea();
         });
         
@@ -462,18 +471,46 @@ Centre Y: ${formatNumber(offsetY, 3)} mm`;
      * Cancel edit mode
      */
     cancelEditMode() {
-        if (!this.editingFavoriteId) return;
-        
-        this.editingFavoriteId = null;
-        
-        const saveBtn = document.getElementById('save-btn');
-        const cancelEditBtn = document.getElementById('cancel-edit-btn');
-        
-        // Reset button styling
-        saveBtn.textContent = "Sauvegarder Area";
-        saveBtn.classList.remove('bg-yellow-600', 'hover:bg-yellow-700', 'focus:ring-yellow-500');
-        saveBtn.classList.add('bg-green-600', 'hover:bg-green-700', 'focus:ring-green-500');
-        cancelEditBtn.classList.add('hidden');
+        if (this.editingFavoriteId && this.originalValues) {
+            // Restaurer les valeurs originales
+            document.getElementById('areaWidth').value = formatNumber(this.originalValues.width);
+            document.getElementById('areaHeight').value = formatNumber(this.originalValues.height);
+            document.getElementById('areaOffsetX').value = formatNumber(this.originalValues.x, 3);
+            document.getElementById('areaOffsetY').value = formatNumber(this.originalValues.y, 3);
+            
+            if (this.originalValues.ratio) {
+                document.getElementById('customRatio').value = formatNumber(this.originalValues.ratio, 3);
+            }
+            
+            if (this.originalValues.tabletW && this.originalValues.tabletH) {
+                document.getElementById('tabletWidth').value = formatNumber(this.originalValues.tabletW);
+                document.getElementById('tabletHeight').value = formatNumber(this.originalValues.tabletH);
+            }
+            
+            if (this.originalValues.presetInfo) {
+                const tabletSelector = document.getElementById('tabletSelectorButton');
+                if (tabletSelector) {
+                    tabletSelector.querySelector('#tabletSelectorText').textContent = this.originalValues.presetInfo;
+                }
+            }
+            
+            // Mettre à jour l'affichage
+            if (typeof updateDisplay === 'function') {
+                updateDisplay();
+            }
+            
+            // Cacher le bouton d'annulation
+            const cancelBtn = document.getElementById('cancel-edit-btn');
+            if (cancelBtn) {
+                cancelBtn.classList.add('hidden');
+            }
+            
+            // Réinitialiser l'état
+            this.editingFavoriteId = null;
+            this.originalValues = null;
+            
+            Notifications.info('Modifications annulées');
+        }
     },
     
     /**

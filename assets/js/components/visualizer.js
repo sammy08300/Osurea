@@ -404,13 +404,9 @@ function setupDragFunctionality() {
 function handleDragStart(e) {
     e.preventDefault();
     
-    // Check if we're in edit mode
-    if (typeof appState !== 'undefined' && appState.editingFavoriteId) {
-        appState.cancelEditMode();
-    }
-    
     isDragging = true;
-    rectangle.style.cursor = 'grabbing';
+    // Ne pas changer le curseur
+    // rectangle.style.cursor = 'grabbing';
     
     dragStartX = e.clientX;
     dragStartY = e.clientY;
@@ -426,11 +422,6 @@ function handleDragStart(e) {
 function handleTouchStart(e) {
     if (e.touches.length === 1) {
         e.preventDefault();
-        
-        // Check if we're in edit mode
-        if (typeof appState !== 'undefined' && appState.editingFavoriteId) {
-            appState.cancelEditMode();
-        }
         
         isDragging = true;
         const touch = e.touches[0];
@@ -533,7 +524,8 @@ function handleDragEnd() {
     if (!isDragging) return;
     
     isDragging = false;
-    rectangle.style.cursor = 'grab';
+    // Ne pas changer le curseur
+    // rectangle.style.cursor = 'grab';
     
     // S'assurer que le body a la classe page-loaded pour activer les transitions
     // après le premier interaction utilisateur
@@ -601,6 +593,9 @@ function initVisualizer() {
         // Réactiver les interactions avec le rectangle
         rectangle.style.pointerEvents = 'auto';
         
+        // Définir le curseur normal sur le rectangle (au lieu de grab)
+        rectangle.style.cursor = 'default';
+        
         // Indiquer que le chargement est terminé
         document.body.removeAttribute('data-loading');
         document.documentElement.classList.remove('loading');
@@ -640,3 +635,6 @@ window.addEventListener('load', initVisualizer);
 
 // Exposer updateDisplayWithoutRatio globalement
 window.updateDisplayWithoutRatio = updateDisplayWithoutRatio;
+
+// Exposer centerArea globalement
+window.centerArea = centerArea;

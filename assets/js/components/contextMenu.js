@@ -6,6 +6,7 @@ const ContextMenu = {
     menu: null,
     rectangle: null,
     tabletBoundary: null,
+    isVisible: false,
 
     /**
      * Initialise le menu contextuel
@@ -13,95 +14,146 @@ const ContextMenu = {
     init() {
         console.log('Initialisation du menu contextuel...');
         
-        this.menu = document.getElementById('context-menu');
+        // Récupérer les éléments existants
         this.rectangle = document.getElementById('rectangle');
         this.tabletBoundary = document.getElementById('tablet-boundary');
+        this.menu = document.getElementById('context-menu');
         
-        if (!this.menu || !this.rectangle || !this.tabletBoundary) {
+        if (!this.rectangle || !this.tabletBoundary || !this.menu) {
             console.error('Menu contextuel: éléments introuvables', {
-                menu: !!this.menu,
                 rectangle: !!this.rectangle,
-                tabletBoundary: !!this.tabletBoundary
+                tabletBoundary: !!this.tabletBoundary,
+                menu: !!this.menu
             });
             return;
         }
         
-        this.addEventListeners();
-        
+        this.setupEventListeners();
         console.log('Menu contextuel initialisé avec succès');
     },
     
     /**
-     * Ajoute tous les écouteurs d'événements nécessaires
+     * Crée le menu contextuel
      */
-    addEventListeners() {
-        // Ajouter les écouteurs pour les boutons d'alignement (9 positions)
-        const alignButtons = {
-            'align-top-left': 'top-left',
-            'align-top': 'top',
-            'align-top-right': 'top-right',
-            'align-left': 'left',
-            'align-center': 'center',
-            'align-right': 'right',
-            'align-bottom-left': 'bottom-left',
-            'align-bottom': 'bottom',
-            'align-bottom-right': 'bottom-right'
-        };
+    createMenu() {
+        this.menu = document.createElement('div');
+        this.menu.id = 'context-menu';
+        this.menu.className = 'fixed z-50 bg-gray-900 border border-gray-700 rounded-lg shadow-xl p-4 hidden';
         
-        // Attacher les gestionnaires d'événements pour chaque bouton
-        Object.entries(alignButtons).forEach(([id, position]) => {
+        // Créer une grille 3x3 de boutons de positionnement
+        this.menu.innerHTML = `
+            <div class="text-center text-sm text-gray-300 mb-2">Position du rectangle</div>
+            <div class="grid grid-cols-3 gap-2">
+                <!-- Première ligne: Haut-gauche, Haut, Haut-droite -->
+                <button class="align-btn bg-gray-800 hover:bg-gray-700 p-2 rounded-md" title="Haut-gauche" data-position="top-left">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mx-auto" viewBox="0 0 20 20" fill="currentColor">
+                        <circle cx="5" cy="5" r="3" fill="currentColor" />
+                    </svg>
+                </button>
+                <button class="align-btn bg-gray-800 hover:bg-gray-700 p-2 rounded-md" title="Haut" data-position="top">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mx-auto" viewBox="0 0 20 20" fill="currentColor">
+                        <circle cx="10" cy="5" r="3" fill="currentColor" />
+                    </svg>
+                </button>
+                <button class="align-btn bg-gray-800 hover:bg-gray-700 p-2 rounded-md" title="Haut-droite" data-position="top-right">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mx-auto" viewBox="0 0 20 20" fill="currentColor">
+                        <circle cx="15" cy="5" r="3" fill="currentColor" />
+                    </svg>
+                </button>
+                
+                <!-- Deuxième ligne: Gauche, Centre, Droite -->
+                <button class="align-btn bg-gray-800 hover:bg-gray-700 p-2 rounded-md" title="Gauche" data-position="left">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mx-auto" viewBox="0 0 20 20" fill="currentColor">
+                        <circle cx="5" cy="10" r="3" fill="currentColor" />
+                    </svg>
+                </button>
+                <button class="align-btn bg-gray-800 hover:bg-gray-700 p-2 rounded-md" title="Centre" data-position="center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mx-auto" viewBox="0 0 20 20" fill="currentColor">
+                        <circle cx="10" cy="10" r="3" fill="currentColor" />
+                    </svg>
+                </button>
+                <button class="align-btn bg-gray-800 hover:bg-gray-700 p-2 rounded-md" title="Droite" data-position="right">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mx-auto" viewBox="0 0 20 20" fill="currentColor">
+                        <circle cx="15" cy="10" r="3" fill="currentColor" />
+                    </svg>
+                </button>
+                
+                <!-- Troisième ligne: Bas-gauche, Bas, Bas-droite -->
+                <button class="align-btn bg-gray-800 hover:bg-gray-700 p-2 rounded-md" title="Bas-gauche" data-position="bottom-left">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mx-auto" viewBox="0 0 20 20" fill="currentColor">
+                        <circle cx="5" cy="15" r="3" fill="currentColor" />
+                    </svg>
+                </button>
+                <button class="align-btn bg-gray-800 hover:bg-gray-700 p-2 rounded-md" title="Bas" data-position="bottom">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mx-auto" viewBox="0 0 20 20" fill="currentColor">
+                        <circle cx="10" cy="15" r="3" fill="currentColor" />
+                    </svg>
+                </button>
+                <button class="align-btn bg-gray-800 hover:bg-gray-700 p-2 rounded-md" title="Bas-droite" data-position="bottom-right">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mx-auto" viewBox="0 0 20 20" fill="currentColor">
+                        <circle cx="15" cy="15" r="3" fill="currentColor" />
+                    </svg>
+                </button>
+            </div>
+        `;
+        
+        document.body.appendChild(this.menu);
+    },
+    
+    /**
+     * Configure les écouteurs d'événements
+     */
+    setupEventListeners() {
+        // Gestionnaire pour le clic droit sur le rectangle
+        this.rectangle.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.show(e.clientX, e.clientY);
+        });
+        
+        // Gestionnaire pour les clics sur les boutons d'alignement avec ID
+        const alignmentButtons = [
+            { id: 'align-top-left', position: 'top-left' },
+            { id: 'align-top', position: 'top' },
+            { id: 'align-top-right', position: 'top-right' },
+            { id: 'align-left', position: 'left' },
+            { id: 'align-center', position: 'center' },
+            { id: 'align-right', position: 'right' },
+            { id: 'align-bottom-left', position: 'bottom-left' },
+            { id: 'align-bottom', position: 'bottom' },
+            { id: 'align-bottom-right', position: 'bottom-right' }
+        ];
+        
+        alignmentButtons.forEach(({ id, position }) => {
             const button = document.getElementById(id);
             if (button) {
                 button.addEventListener('click', () => {
                     this.alignArea(position);
-                    this.hideMenu();
+                    this.hide();
                 });
-            } else {
-                console.error(`Bouton ${id} introuvable`);
             }
         });
         
-        // Désactiver le clic droit par défaut sur toute la zone de visualisation
-        const visualContainer = document.getElementById('visual-container');
-        if (visualContainer) {
-            visualContainer.addEventListener('contextmenu', (e) => e.preventDefault());
-        }
-        
-        // Gestionnaire de clic droit sur le rectangle
-        this.rectangle.addEventListener('mousedown', (e) => {
-            // Seulement réagir au clic droit (bouton 2)
-            if (e.button === 2) {
-                e.preventDefault();
-                e.stopPropagation();
-                this.showMenu(e.clientX, e.clientY);
-                return false;
+        // Conserver également l'ancien gestionnaire pour compatibilité
+        this.menu.addEventListener('click', (e) => {
+            const alignBtn = e.target.closest('.align-btn');
+            if (alignBtn && alignBtn.dataset.position) {
+                const position = alignBtn.dataset.position;
+                this.alignArea(position);
+                this.hide();
             }
         });
         
-        // Méthode explicite pour le clic droit
-        this.rectangle.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.showMenu(e.clientX, e.clientY);
-            return false;
-        });
-        
-        // Masquer le menu lors d'un clic en-dehors
+        // Cacher le menu au clic en dehors
         document.addEventListener('click', (e) => {
-            if (this.menu && !this.menu.contains(e.target)) {
-                this.hideMenu();
+            if (this.isVisible && !this.menu.contains(e.target)) {
+                this.hide();
             }
         });
         
-        // Masquer le menu lors d'un défilement
-        document.addEventListener('scroll', () => {
-            this.hideMenu();
-        });
-        
-        // Masquer le menu lors d'un redimensionnement de fenêtre
-        window.addEventListener('resize', () => {
-            this.hideMenu();
-        });
+        // Cacher le menu lors du défilement ou du redimensionnement
+        window.addEventListener('scroll', () => this.hide());
+        window.addEventListener('resize', () => this.hide());
     },
     
     /**
@@ -109,42 +161,41 @@ const ContextMenu = {
      * @param {number} x - Position X en pixels
      * @param {number} y - Position Y en pixels
      */
-    showMenu(x, y) {
-        console.log('Affichage du menu contextuel à', x, y);
-        
+    show(x, y) {
         if (!this.menu) return;
         
-        // Rendre visible avant de calculer les dimensions
+        // Rendre le menu visible pour calculer ses dimensions
         this.menu.style.display = 'block';
+        this.menu.classList.remove('hidden');
         
-        // Calculer les dimensions du menu
-        const menuWidth = this.menu.offsetWidth;
-        const menuHeight = this.menu.offsetHeight;
-        
-        // Dimensions de la fenêtre
+        // Calculer les dimensions
+        const menuRect = this.menu.getBoundingClientRect();
         const windowWidth = window.innerWidth;
         const windowHeight = window.innerHeight;
         
-        // Ajuster la position pour éviter de sortir de l'écran
-        if (x + menuWidth > windowWidth) {
-            x = windowWidth - menuWidth - 10;
+        // Ajuster la position pour éviter les débordements
+        if (x + menuRect.width > windowWidth) {
+            x = windowWidth - menuRect.width - 5;
         }
         
-        if (y + menuHeight > windowHeight) {
-            y = windowHeight - menuHeight - 10;
+        if (y + menuRect.height > windowHeight) {
+            y = windowHeight - menuRect.height - 5;
         }
         
-        // Définir la position
+        // Positionner le menu
         this.menu.style.left = `${x}px`;
         this.menu.style.top = `${y}px`;
+        this.isVisible = true;
     },
     
     /**
      * Masque le menu contextuel
      */
-    hideMenu() {
+    hide() {
         if (this.menu) {
             this.menu.style.display = 'none';
+            this.menu.classList.add('hidden');
+            this.isVisible = false;
         }
     },
     
@@ -153,6 +204,8 @@ const ContextMenu = {
      * @param {string} position - Position d'alignement
      */
     alignArea(position) {
+        console.log("Alignement à la position:", position);
+        
         const tabletWidth = parseFloatSafe(document.getElementById('tabletWidth').value);
         const tabletHeight = parseFloatSafe(document.getElementById('tabletHeight').value);
         const areaWidth = parseFloatSafe(document.getElementById('areaWidth').value);
@@ -167,17 +220,11 @@ const ContextMenu = {
         const areaOffsetX = document.getElementById('areaOffsetX');
         const areaOffsetY = document.getElementById('areaOffsetY');
         
-        let newX = parseFloatSafe(areaOffsetX.value);
-        let newY = parseFloatSafe(areaOffsetY.value);
-        
-        // Annuler le mode édition si actif
-        if (typeof appState !== 'undefined' && appState.editingFavoriteId) {
-            appState.cancelEditMode();
-        }
-        
         // Demi-dimensions pour le calcul des bords
         const halfWidth = areaWidth / 2;
         const halfHeight = areaHeight / 2;
+        
+        let newX, newY;
         
         // Calculer la nouvelle position selon l'alignement demandé
         switch (position) {
@@ -222,6 +269,10 @@ const ContextMenu = {
                 newX = tabletWidth / 2;
                 newY = tabletHeight / 2;
                 break;
+                
+            default:
+                console.error('Position inconnue:', position);
+                return;
         }
         
         // Mettre à jour les champs de saisie
@@ -231,6 +282,8 @@ const ContextMenu = {
         // Mettre à jour l'affichage
         if (typeof updateDisplay === 'function') {
             updateDisplay();
+        } else if (typeof window.updateDisplay === 'function') {
+            window.updateDisplay();
         }
         
         // Notification de confirmation

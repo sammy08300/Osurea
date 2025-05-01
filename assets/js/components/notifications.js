@@ -4,7 +4,7 @@
 
 const Notifications = {
     container: null,
-    defaultDuration: 3000,
+    defaultDuration: 100,
     
     /**
      * Initialize the notifications system
