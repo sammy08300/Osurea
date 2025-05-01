@@ -481,6 +481,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 500);
 
     // Gestion du menu dépliant du récapitulatif
+    const recapCard = document.getElementById('recap-card');
     const recapToggle = document.getElementById('recap-toggle');
     const recapContent = document.getElementById('recap-content');
     const recapArrow = document.getElementById('recap-arrow');
@@ -491,23 +492,74 @@ document.addEventListener('DOMContentLoaded', () => {
     // Fonction pour mettre à jour l'état visuel
     const updateRecapState = () => {
         if (isRecapExpanded) {
-            recapContent.style.maxHeight = recapContent.scrollHeight + 'px';
+            // Déplier le contenu
+            const contentHeight = recapContent.scrollHeight;
+            recapContent.style.maxHeight = `${contentHeight}px`;
             recapContent.style.opacity = '1';
+            recapContent.classList.add('border-t', 'border-gray-800', 'mt-3', 'pt-3');
             recapArrow.style.transform = 'rotate(0deg)';
+            recapCard.classList.add('bg-gray-850');
+            recapCard.classList.remove('bg-gray-900');
+            recapCard.classList.remove('cursor-pointer');
+            
+            // Mettre à jour la hauteur après un court délai pour gérer les changements de contenu
+            setTimeout(() => {
+                recapContent.style.maxHeight = `${recapContent.scrollHeight}px`;
+            }, 50);
         } else {
+            // Replier le contenu
             recapContent.style.maxHeight = '0';
             recapContent.style.opacity = '0';
+            recapContent.classList.remove('border-t', 'border-gray-800', 'mt-3', 'pt-3');
             recapArrow.style.transform = 'rotate(180deg)';
+            recapCard.classList.remove('bg-gray-850');
+            recapCard.classList.add('bg-gray-900');
+            recapCard.classList.add('cursor-pointer');
         }
     };
     
     // Initialiser l'état
-    recapContent.style.transition = 'max-height 0.2s ease-in-out, opacity 0.2s ease-in-out';
+    recapContent.style.transition = 'max-height 0.3s ease-in-out, opacity 0.3s ease-in-out';
     updateRecapState();
     
-    // Gérer le clic
-    recapToggle.addEventListener('click', () => {
+    // Gérer le clic sur le titre
+    recapToggle.addEventListener('click', (e) => {
+        e.stopPropagation(); // Empêcher la propagation au parent
+        
+        // Basculer l'état
         isRecapExpanded = !isRecapExpanded;
         updateRecapState();
+        
+        // Effet visuel sur le clic
+        const ripple = document.createElement('div');
+        ripple.className = 'bg-gray-700/30 absolute rounded-full pointer-events-none';
+        ripple.style.width = '20px';
+        ripple.style.height = '20px';
+        ripple.style.left = (e.offsetX - 10) + 'px';
+        ripple.style.top = (e.offsetY - 10) + 'px';
+        ripple.style.transform = 'scale(0)';
+        ripple.style.transition = 'transform 0.6s, opacity 0.6s';
+        
+        recapToggle.style.position = 'relative';
+        recapToggle.style.overflow = 'hidden';
+        recapToggle.appendChild(ripple);
+        
+        setTimeout(() => {
+            ripple.style.transform = 'scale(40)';
+            ripple.style.opacity = '0';
+            
+            setTimeout(() => {
+                recapToggle.removeChild(ripple);
+            }, 600);
+        }, 10);
+    });
+    
+    // Gérer le clic sur la carte quand le menu est replié
+    recapCard.addEventListener('click', (e) => {
+        // Ne traiter que si le menu est replié et qu'on n'a pas cliqué sur le toggle
+        if (!isRecapExpanded && !recapToggle.contains(e.target)) {
+            isRecapExpanded = true;
+            updateRecapState();
+        }
     });
 });

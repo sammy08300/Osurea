@@ -21,6 +21,141 @@ const Favorites = {
         
         this.setupSortButtons();
         this.loadFavorites();
+        this.createDialogs();
+    },
+    
+    /**
+     * Create custom dialogs for favorites
+     */
+    createDialogs() {
+        // Create a custom dialog for comment input
+        const commentDialog = document.createElement('div');
+        commentDialog.id = 'comment-dialog';
+        commentDialog.className = 'fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden';
+        commentDialog.innerHTML = `
+            <div class="bg-gray-900 rounded-lg p-6 shadow-xl max-w-md w-full border border-gray-700">
+                <h3 class="text-lg font-medium text-white mb-4">Ajouter un commentaire</h3>
+                <p class="text-gray-300 text-sm mb-4">Donnez un nom à cette configuration (optionnel, max 40 caractères)</p>
+                <input type="text" id="comment-input" maxlength="40" placeholder="Nom de la configuration" 
+                       class="w-full bg-gray-800 border border-gray-700 rounded-md p-2 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 mb-4">
+                <div class="flex justify-end space-x-3">
+                    <button id="cancel-comment-btn" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md text-sm">Annuler</button>
+                    <button id="save-comment-btn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm">Sauvegarder</button>
+                </div>
+            </div>
+        `;
+        
+        // Create a custom dialog for deletion confirmation
+        const deleteDialog = document.createElement('div');
+        deleteDialog.id = 'delete-dialog';
+        deleteDialog.className = 'fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden';
+        deleteDialog.innerHTML = `
+            <div class="bg-gray-900 rounded-lg p-6 shadow-xl max-w-md w-full border border-gray-700">
+                <h3 class="text-lg font-medium text-white mb-4">Confirmation de suppression</h3>
+                <p class="text-gray-300 text-sm mb-4">Êtes-vous sûr de vouloir supprimer ce favori ?</p>
+                <div class="flex justify-end space-x-3">
+                    <button id="cancel-delete-btn" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md text-sm">Annuler</button>
+                    <button id="confirm-delete-btn" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm">Supprimer</button>
+                </div>
+            </div>
+        `;
+        
+        // Add dialogs to the document
+        document.body.appendChild(commentDialog);
+        document.body.appendChild(deleteDialog);
+        
+        // Comment dialog event listeners
+        const commentInput = document.getElementById('comment-input');
+        const saveCommentBtn = document.getElementById('save-comment-btn');
+        const cancelCommentBtn = document.getElementById('cancel-comment-btn');
+        
+        cancelCommentBtn.addEventListener('click', () => {
+            commentDialog.classList.add('hidden');
+            this.commentDialogCallback = null;
+        });
+        
+        saveCommentBtn.addEventListener('click', () => {
+            if (this.commentDialogCallback) {
+                this.commentDialogCallback(commentInput.value);
+                this.commentDialogCallback = null;
+            }
+            commentDialog.classList.add('hidden');
+        });
+        
+        // Enter key handling for comment input
+        commentInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                saveCommentBtn.click();
+            }
+        });
+        
+        // Delete dialog event listeners
+        const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+        const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+        
+        cancelDeleteBtn.addEventListener('click', () => {
+            deleteDialog.classList.add('hidden');
+            this.deleteDialogCallback = null;
+        });
+        
+        confirmDeleteBtn.addEventListener('click', () => {
+            if (this.deleteDialogCallback) {
+                this.deleteDialogCallback(true);
+                this.deleteDialogCallback = null;
+            }
+            deleteDialog.classList.add('hidden');
+        });
+    },
+    
+    /**
+     * Show comment input dialog
+     * @param {Function} callback - Function to call with comment value
+     */
+    showCommentDialog(callback) {
+        const commentDialog = document.getElementById('comment-dialog');
+        const commentInput = document.getElementById('comment-input');
+        
+        if (!commentDialog || !commentInput) {
+            console.error("Comment dialog elements not found");
+            callback("");
+            return;
+        }
+        
+        // Reset input
+        commentInput.value = '';
+        
+        // Store callback
+        this.commentDialogCallback = callback;
+        
+        // Show dialog
+        commentDialog.classList.remove('hidden');
+        
+        // Focus input
+        setTimeout(() => {
+            commentInput.focus();
+        }, 100);
+    },
+    
+    /**
+     * Show delete confirmation dialog
+     * @param {Function} callback - Function to call with confirmation result
+     */
+    showDeleteDialog(callback) {
+        const deleteDialog = document.getElementById('delete-dialog');
+        
+        if (!deleteDialog) {
+            console.error("Delete dialog element not found");
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce favori ?')) {
+                callback(true);
+            }
+            return;
+        }
+        
+        // Store callback
+        this.deleteDialogCallback = callback;
+        
+        // Show dialog
+        deleteDialog.classList.remove('hidden');
     },
     
     /**
@@ -310,16 +445,18 @@ const Favorites = {
      * @param {string|number} id - ID of the favorite to delete
      */
     deleteFavorite(id) {
-        if (confirm('Êtes-vous sûr de vouloir supprimer ce favori ?')) {
-            const success = StorageManager.removeFavorite(id);
-            
-            if (success) {
-                this.loadFavorites();
-                Notifications.success('Favori supprimé');
-            } else {
-                Notifications.error('Erreur lors de la suppression du favori');
+        this.showDeleteDialog((confirmed) => {
+            if (confirmed) {
+                const success = StorageManager.removeFavorite(id);
+                
+                if (success) {
+                    this.loadFavorites();
+                    Notifications.success('Favori supprimé');
+                } else {
+                    Notifications.error('Erreur lors de la suppression du favori');
+                }
             }
-        }
+        });
     },
     
     /**
@@ -341,24 +478,28 @@ const Favorites = {
             return false;
         }
         
-        let comment = '';
-        
         // Get preset info
         let presetInfo = "Personnalisé";
         const tabletPresetSelect = document.getElementById('tabletPresetSelect');
         
-        if (tabletPresetSelect.value !== 'custom' && tabletPresetSelect.value) {
+        if (tabletPresetSelect && tabletPresetSelect.value !== 'custom' && tabletPresetSelect.value) {
             const selectedOption = tabletPresetSelect.selectedOptions[0];
             if (selectedOption) {
                 const brandPart = selectedOption.dataset.brand || '';
                 presetInfo = brandPart ? `${brandPart} - ${selectedOption.textContent}` : selectedOption.textContent;
+            }
+        } else {
+            // Vérifier le nouveau sélecteur
+            const selectorText = document.getElementById('tabletSelectorText');
+            if (selectorText) {
+                presetInfo = selectorText.textContent;
             }
         }
         
         if (appState.editingFavoriteId) {
             // Updating existing favorite - keep existing comment
             const existingFavorite = StorageManager.getFavoriteById(appState.editingFavoriteId);
-            comment = existingFavorite ? existingFavorite.comment || '' : '';
+            const comment = existingFavorite ? existingFavorite.comment || '' : '';
             
             const updatedData = {
                 width: areaWidth,
@@ -382,40 +523,35 @@ const Favorites = {
             }
             
         } else {
-            // New favorite - ask for comment
-            comment = prompt("Ajouter un commentaire (optionnel, max 40 caractères):");
-            
-            if (comment === null) {
-                // User canceled
-                return false;
-            }
-            
-            if (comment && comment.length > 40) {
-                Notifications.warning("Le commentaire a été tronqué à 40 caractères.");
-                comment = comment.substring(0, 40);
-            }
-            
-            const newFavorite = {
-                width: areaWidth,
-                height: areaHeight,
-                x: areaOffsetX,
-                y: areaOffsetY,
-                ratio: customRatio,
-                comment: comment,
-                tabletW: tabletWidth,
-                tabletH: tabletHeight,
-                presetInfo: presetInfo
-            };
-            
-            const savedFavorite = StorageManager.addFavorite(newFavorite);
-            
-            if (savedFavorite) {
-                this.loadFavorites();
-                this.highlightFavorite(savedFavorite.id);
-                Notifications.success('Favori sauvegardé');
-            } else {
-                Notifications.error('Erreur lors de la sauvegarde du favori');
-            }
+            // New favorite - show comment dialog
+            this.showCommentDialog((comment) => {
+                if (comment && comment.length > 40) {
+                    Notifications.warning("Le commentaire a été tronqué à 40 caractères.");
+                    comment = comment.substring(0, 40);
+                }
+                
+                const newFavorite = {
+                    width: areaWidth,
+                    height: areaHeight,
+                    x: areaOffsetX,
+                    y: areaOffsetY,
+                    ratio: customRatio,
+                    comment: comment,
+                    tabletW: tabletWidth,
+                    tabletH: tabletHeight,
+                    presetInfo: presetInfo
+                };
+                
+                const savedFavorite = StorageManager.addFavorite(newFavorite);
+                
+                if (savedFavorite) {
+                    this.loadFavorites();
+                    this.highlightFavorite(savedFavorite.id);
+                    Notifications.success('Favori sauvegardé');
+                } else {
+                    Notifications.error('Erreur lors de la sauvegarde du favori');
+                }
+            });
         }
         
         return true;
