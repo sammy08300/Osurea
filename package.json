@@ -7,8 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:css": "postcss assets/css/main.css -o assets/css/styles.css",
     "watch:css": "postcss assets/css/main.css -o assets/css/styles.css --watch",
-    "build": "npm run build:css",
-    "build:prod": "cross-env NODE_ENV=production npm run build:css"
+    "build": "npm run build:css && node build.js",
+    "build:prod": "cross-env NODE_ENV=production npm run build:css && node build.js"
   },
   "repository": {
     "type": "git",
