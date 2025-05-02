@@ -1,0 +1,754 @@
+:root {
+    --scrollbar-width: 8px;
+    --scrollbar-track-bg: rgba(31, 41, 55, 0.3);
+    --scrollbar-thumb-bg: rgba(75, 85, 99, 0.8);
+    --scrollbar-thumb-hover: rgba(107, 114, 128, 0.9);
+    --transition-fast: 0.1s ease;
+    --transition-normal: 0.25s ease;
+    --shadow-color: rgba(59, 130, 246, 0.3);
+    --focus-ring: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+    width: var(--scrollbar-width);
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: var(--scrollbar-track-bg);
+    border-radius: var(--scrollbar-width);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb-bg);
+    border-radius: var(--scrollbar-width);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+}
+
+/* Tablet boundary styling */
+#tablet-boundary {
+    transition: width var(--transition-normal), height var(--transition-normal);
+}
+
+/* Rectangle styling for area */
+.rectangle {
+    cursor: grab;
+    user-select: none;
+    box-shadow: 0 0 15px var(--shadow-color);
+    visibility: visible;
+    /* Retirer toute transition initiale */
+    transition: none;
+}
+
+/* Appliquer les transitions seulement après le chargement initial */
+.page-loaded #rectangle {
+    transition: width var(--transition-fast), height var(--transition-fast), transform var(--transition-fast);
+}
+
+#rectangle:active {
+    cursor: grabbing;
+}
+
+/* Prévention du rectangle "flash" pendant le chargement */
+[data-loading="true"] #rectangle,
+body:not(.page-loaded) #rectangle {
+    pointer-events: none !important;
+}
+
+/* Prévention des animations flash lors des rafraîchissements rapides */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+/* Éviter le flash blanc lors des rafraîchissements répétés */
+html, body {
+    background-color: rgb(3, 7, 18); /* bg-gray-950 en couleur fixe */
+    min-height: 100%;
+    height: 100%;
+}
+
+/* Désactiver le comportement de défilement pendant le chargement */
+html.loading, body.loading {
+    overflow: hidden !important;
+}
+
+/* Tablet preset select */
+select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+select:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Context menu styles */
+#context-menu hr {
+    border-color: rgba(75, 85, 99, 0.6);
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+}
+
+/* Favorite items styles */
+.favorite-item {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.favorite-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Action buttons styles in favorite cards */
+.load-favorite-btn,
+.edit-favorite-btn,
+.delete-favorite-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.load-favorite-btn::before,
+.edit-favorite-btn::before,
+.delete-favorite-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.1);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    border-radius: 0.375rem;
+    z-index: 1;
+}
+
+.load-favorite-btn:hover::before,
+.edit-favorite-btn:hover::before,
+.delete-favorite-btn:hover::before {
+    opacity: 1;
+}
+
+.load-favorite-btn svg,
+.edit-favorite-btn svg,
+.delete-favorite-btn svg {
+    position: relative;
+    z-index: 2;
+}
+
+/* Notifications */
+.notification {
+    animation: slide-in 0.3s ease forwards, fade-out 0.3s ease 3s forwards;
+    max-width: 300px;
+    pointer-events: auto;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+@keyframes slide-in {
+    0% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fade-out {
+    0% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Focus styling improvements */
+input:focus, select:focus, button:focus {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+/* Number input arrows styling */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    opacity: 1;
+    background: rgba(31, 41, 55, 0.1);
+    border-left: 1px solid rgba(75, 85, 99, 0.4);
+    height: 100%;
+}
+
+/* Highlight effect for recently updated favorites */
+.highlight-effect {
+    animation: highlight-pulse 1.5s ease-in-out;
+}
+
+@keyframes highlight-pulse {
+    0% {
+        background-color: rgba(59, 130, 246, 0.3);
+    }
+    100% {
+        background-color: rgba(55, 65, 81, 0.5);
+    }
+}
+
+/* Styles pour le visualiseur de zone de tablette osu! */
+
+/* Menu contextuel */
+#context-menu {
+    transform-origin: top left;
+    animation: appear 0.15s ease-out;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+    user-select: none;
+    pointer-events: auto;
+}
+
+@keyframes appear {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Empêcher le menu contextuel du navigateur sur les éléments clés */
+#rectangle, #tablet-boundary, #visual-container {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Curseur pour indiquer qu'on peut déplacer le rectangle */
+#rectangle {
+    cursor: grab;
+}
+
+#rectangle:active {
+    cursor: grabbing;
+}
+
+/* Scrollbar personnalisée */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(75, 85, 99, 0.3);
+    border-radius: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.6);
+    border-radius: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.8);
+}
+
+/* Styles pour le sélecteur de tablette */
+.tablet-selector-container {
+    position: relative;
+}
+
+#tabletSelectorButton {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#tabletSelectorButton:hover {
+    background-color: rgb(55, 65, 81);
+}
+
+#tabletSelectorPopup {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    animation: fadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    max-height: 450px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#tabletBrandsList, #tabletModelsList {
+    max-height: 400px;
+}
+
+.brand-item {
+    transition: all 0.2s ease;
+    padding: 10px 14px;
+    cursor: pointer;
+    position: relative;
+    font-size: 0.95rem;
+}
+
+.brand-item:hover {
+    background-color: rgba(75, 85, 99, 0.5);
+}
+
+.brand-item.active {
+    background-color: rgba(59, 130, 246, 0.15);
+    color: rgba(59, 130, 246, 1);
+    font-weight: 500;
+}
+
+.brand-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background-color: rgba(59, 130, 246, 1);
+}
+
+.model-item {
+    transition: all 0.2s ease;
+    padding: 7px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+}
+
+.model-item > div:first-child {
+    font-size: 0.9rem;
+}
+
+.model-item > div:last-child {
+    font-size: 0.75rem;
+    color: rgba(156, 163, 175, 1);
+}
+
+.model-item:hover {
+    background-color: rgba(75, 85, 99, 0.5);
+    border-left-color: rgba(59, 130, 246, 0.5);
+}
+
+/* Style pour le champ de recherche */
+#tabletSearch, #tabletSearchMobile {
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+
+#tabletSearch:focus, #tabletSearchMobile:focus {
+    background-color: rgba(55, 65, 81, 1);
+}
+
+/* Style pour le bouton de dimensions personnalisées */
+#customTabletButton {
+    width: 100%;
+    color: rgba(209, 213, 219, 1);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 14px;
+    background-color: rgba(31, 41, 55, 0.5);
+}
+
+#customTabletButton span {
+    color: rgba(209, 213, 219, 1);
+    font-weight: 500;
+}
+
+#customTabletSection {
+    position: relative;
+    width: 100%;
+}
+
+#customTabletSection::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(59, 130, 246, 0.3), transparent);
+}
+
+#customTabletButton svg {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    color: rgba(156, 163, 175, 1);
+    transition: color 0.2s ease;
+}
+
+#customTabletButton:hover {
+    background-color: rgba(55, 65, 81, 0.9);
+}
+
+#customTabletButton:hover svg {
+    color: rgba(209, 213, 219, 1);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Amélioration de la scrollbar personnalisée */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(75, 85, 99, 0.2);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.4);
+    border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.6);
+}
+
+/* Animations pour le sélecteur de tablette */
+#tabletSelectorButton.updating {
+    animation: buttonUpdate 0.3s ease;
+}
+
+.model-item.active {
+    background-color: rgba(59, 130, 246, 0.15);
+    border-left-color: rgba(59, 130, 246, 1);
+}
+
+@keyframes buttonUpdate {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(0.98);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Transitions pour les groupes de dimensions */
+#tablet-width-group,
+#tablet-height-group,
+#tablet-manual-hr {
+    transition: opacity 0.2s ease;
+}
+
+/* Animation du menu déroulant */
+#tabletSelectorPopup {
+    transform-origin: top;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#tabletSelectorPopup.hidden {
+    transform: scaleY(0.95);
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Amélioration de l'apparence des inputs */
+#tabletSearch,
+#tabletSearchMobile {
+    transition: all 0.2s ease;
+}
+
+#tabletSearch:focus,
+#tabletSearchMobile:focus {
+    background-color: rgba(55, 65, 81, 1);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+/* Effet de survol amélioré pour les éléments de liste */
+.brand-item,
+.model-item {
+    position: relative;
+    overflow: hidden;
+}
+
+.brand-item::after,
+.model-item::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.1);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.brand-item:hover::after,
+.model-item:hover::after {
+    opacity: 1;
+}
+
+/* État actif des éléments */
+.brand-item.active,
+.model-item.active {
+    position: relative;
+}
+
+.brand-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background-color: rgba(59, 130, 246, 1);
+    transform-origin: left;
+    animation: slideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideIn {
+    from {
+        transform: scaleY(0);
+    }
+    to {
+        transform: scaleY(1);
+    }
+}
+
+/* Animation pour l'apparition des favoris */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Masquer les favoris pendant le chargement */
+.favorites-loading > .favorite-item {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* Animation séquentielle pour les favoris */
+.favorite-item:nth-child(2) { animation-delay: 0.05s; }
+.favorite-item:nth-child(3) { animation-delay: 0.1s; }
+.favorite-item:nth-child(4) { animation-delay: 0.15s; }
+.favorite-item:nth-child(5) { animation-delay: 0.2s; }
+.favorite-item:nth-child(6) { animation-delay: 0.25s; }
+.favorite-item:nth-child(7) { animation-delay: 0.3s; }
+.favorite-item:nth-child(8) { animation-delay: 0.35s; }
+.favorite-item:nth-child(9) { animation-delay: 0.4s; }
+.favorite-item:nth-child(10) { animation-delay: 0.45s; }
+
+/* Loading overlay */
+#loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgb(3, 7, 18);
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.3s ease;
+}
+
+/* Loading overlay */
+#loading-overlay {
+    background-color: rgba(17, 24, 39, 0.98);
+    z-index: 100;
+    transition: opacity 0.4s ease;
+    /* Empêcher le flash blanc lors des rafraîchissements répétés */
+    will-change: opacity;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* Animation du spinner de chargement élégant */
+.loading-spinner {
+    position: relative;
+    width: 50px;
+    height: 50px;
+}
+
+.spinner-track {
+    stroke: rgba(75, 85, 99, 0.3);
+    transform-origin: center;
+}
+
+.spinner-circle {
+    stroke: #3b82f6; /* Bleu */
+    stroke-linecap: round;
+    transform-origin: center;
+    stroke-dasharray: 125;
+    stroke-dashoffset: 125;
+    animation: spinner-sweep 1.4s ease-in-out infinite, spinner-rotate 2s linear infinite;
+}
+
+@keyframes spinner-rotate {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes spinner-sweep {
+    0% {
+        stroke-dashoffset: 125;
+    }
+    50% {
+        stroke-dashoffset: 0;
+    }
+    100% {
+        stroke-dashoffset: -125;
+    }
+}
+
+/* Rectangle hidden visibility handling - using invisible instead of opacity */
+#rectangle.invisible {
+    visibility: hidden;
+}
+
+/* Styles pour les dialogues modaux */
+#comment-dialog, #delete-dialog {
+    pointer-events: auto;
+    transition: opacity 0.2s ease-out;
+}
+
+#comment-dialog > div, #delete-dialog > div {
+    transition: transform 0.2s ease-out;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* Styles pour les compteurs de caractères */
+#title-counter, #description-counter {
+    transition: color 0.2s ease;
+}
+
+/* Styles pour les inputs et textarea avec focus visuel amélioré */
+#comment-input:focus, #description-input:focus {
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5), 0 0 0 4px rgba(59, 130, 246, 0.1);
+    background-color: rgba(30, 41, 59, 0.8); /* légèrement plus clair pour indiquer le focus */
+}
+/* Style pour les inputs et textarea avec focus visuel amélioré - sans effet de rebond */
+#comment-input:focus, #description-input:focus {
+    border-color: #4287f5;
+    background-color: rgba(30, 41, 59, 0.8); 
+    box-shadow: none;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+/* Style pour les icônes SVG dans la popup de détails des favoris */
+#favorite-details-popup svg {
+    fill: none;
+    stroke: white;
+    color: white;
+}
+
+/* Style pour les icônes SVG dans le récapitulatif */
+#recap-content svg, #recap-toggle svg:not(#recap-arrow) {
+    fill: none;
+    stroke: white;
+    color: white;
+}
+
+/* Styles pour les dialogues modaux */
+#comment-dialog, #delete-dialog {
+    pointer-events: auto;
+    transition: opacity 0.2s ease-out;
+}
+
+#comment-dialog > div, #delete-dialog > div {
+    transition: transform 0.2s ease-out;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* Styles pour les compteurs de caractères */
+#title-counter, #description-counter {
+    transition: all 0.2s ease;
+}
+
+#title-counter.near-limit, #description-counter.near-limit {
+    color: #f59e0b; /* amber-500 */
+}
+
+#title-counter.at-limit, #description-counter.at-limit {
+    color: #ef4444; /* red-500 */
+    animation: pulse 1s infinite;
+}
+
+/* Animation de pulse pour les compteurs à la limite */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+/* Améliorations des champs de saisie */
+#comment-input, #description-input {
+    transition: all 0.2s ease;
+}
+
+#comment-input:focus, #description-input:focus {
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5), 0 0 0 4px rgba(59, 130, 246, 0.1);
+    background-color: rgba(30, 41, 59, 0.8); /* légèrement plus clair pour indiquer le focus */
+}
+
+/* Style pour les titres des dialogues */
+#comment-dialog h3, #delete-dialog h3 {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Style amélioré pour les boutons d'action */
+#save-comment-btn, #confirm-delete-btn {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    font-weight: 500;
+}

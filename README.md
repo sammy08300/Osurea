@@ -1,42 +1,122 @@
-# Visualiseur d'Area pour osu!
+<div align="center">
+  <img src="assets/img/favicon.svg" alt="Osu!rea Logo" width="60" height="60" style="vertical-align: middle; margin-bottom: 10px;">
+  <h1>Osu!rea - Area Visualizer v2.0</h1>
+  <a href="https://github.com/sammy08300/Areasu/tree/v2git">
+    <img src="https://img.shields.io/badge/version-2.0-blue.svg" alt="Version">
+  </a>
+</div>
 
-! En cours de dev. Peut être jamais fini car la situation actuel me convient a moi ^^.
+---
 
-Ce projet est une application web conçue pour aider les joueurs d'osu! à visualiser, configurer et gérer les zones actives de leur tablette graphique. Il offre une interface interactive pour définir précisément la zone de jeu et sauvegarder les configurations préférées.
+## 📋 Sommaire
+- [Présentation](#-présentation)
+- [Fonctionnalités](#-fonctionnalités)
+- [Avantages](#-avantages)
+- [Guide d'utilisation](#-guide-dutilisation)
+- [FAQ](#-faq)
+- [Crédits](#-crédits)
 
-## Fonctionnalités Principales
+---
 
-*   **Visualisation Interactive :** Affiche la tablette et la zone active définie par l'utilisateur dans un conteneur visuel. La zone active peut être redimensionnée et déplacée (fonctionnalité de glisser-déposer probable, bien que non explicitement dans ces extraits).
-*   **Configuration de la Tablette :**
-    *   Choix parmi des préréglages de tablettes courantes.
-    *   Possibilité de saisir manuellement la largeur et la hauteur de la tablette.
-*   **Configuration de la Zone Active :**
-    *   Saisie précise de la largeur et de la hauteur de la zone active (en mm).
-    *   Saisie précise du décalage (offset X et Y) de la zone active par rapport au centre ou à un coin (le code suggère un offset par rapport au centre avec le bouton "Copier Infos").
-    *   Option pour verrouiller le ratio largeur/hauteur de la zone active.
-    *   Saisie d'un ratio personnalisé.
-*   **Outils Pratiques :**
-    *   **Inverser Dimensions :** Bouton pour échanger rapidement la largeur et la hauteur de la zone active.
-    *   **Centrer :** Bouton pour centrer automatiquement la zone active sur la tablette.
-    *   **Copier Infos :** Copie les détails de la zone active (largeur, hauteur, ratio, offset X/Y) dans le presse-papiers pour une utilisation facile ailleurs.
-    *   **Grille :** Option pour afficher/masquer une grille d'arrière-plan pour une meilleure perception des dimensions et de la position.
-    *   **(Probable) Menu Contextuel :** Un menu contextuel (clic droit sur la zone ?) offre des options d'alignement rapide (gauche, centre H, droite, haut, centre V, bas, centrer tout).
-*   **Gestion des Favoris :**
-    *   **Sauvegarder :** Enregistre la configuration actuelle (dimensions tablette, dimensions zone, offsets, ratio, nom/commentaire) comme favori dans le stockage local du navigateur.
-    *   **Charger :** Charge une configuration favorite sauvegardée dans les champs de saisie et met à jour la visualisation.
-    *   **Modifier :** Permet de modifier un favori existant (nom, et potentiellement les valeurs).
-    *   **Supprimer :** Supprime un favori de la liste.
-    *   **Trier :** Trie la liste des favoris par date d'ajout, nom ou taille (surface).
-*   **Récapitulatif :** Affiche un résumé des dimensions et ratios de la tablette et de la zone active, ainsi que la surface et la position de la zone.
-*   **Interface Utilisateur :**
-    *   Construite avec Tailwind CSS pour un design moderne et réactif.
-    *   Notifications pour informer l'utilisateur des actions (ex: copie réussie, favori sauvegardé/supprimé).
-    *   Interface en Français.
+## 🎮 Présentation
 
-## Technologies Utilisées
+Osu!rea est un visualiseur de zone active (area) pour les joueurs d'osu! qui utilisent une tablette graphique. Cet outil vous permet de configurer, visualiser et sauvegarder précisément votre zone active pour optimiser votre expérience de jeu.
 
-*   HTML
-*   CSS (Tailwind CSS)
-*   JavaScript (pour l'interactivité, les calculs, la manipulation du DOM et la gestion du stockage local)
+> 💾 Toutes vos configurations sont sauvegardées dans le stockage local de votre navigateur.
 
-Ce visualiseur vise à fournir un outil complet et facile à utiliser pour les joueurs d'osu! souhaitant optimiser et gérer leurs paramètres de tablette.
+---
+
+## 🔍 Fonctionnalités
+
+### 🖱️ Sélection de tablette
+- **Base de données de tablettes intégrée** : Plus de 50 modèles de tablettes (Wacom, XP-Pen, Huion, Gaomon, VEIKK, UGEE)
+- **Dimensions personnalisées** : Possibilité de définir manuellement les dimensions de votre tablette
+
+### 📐 Configuration de la zone active
+- **Dimensions précises** : Définition au dixième de millimètre près
+- **Positionnement exact** : Contrôle des coordonnées X et Y du centre de la zone
+- **Verrouillage du ratio** : Maintien automatique du rapport largeur/hauteur
+- **Prévisualisation en temps réel** : Visualisation immédiate des changements
+
+### 🖼️ Manipulation visuelle
+- **Glisser-déposer** : Déplacement direct de la zone active avec la souris
+- **Menu contextuel** : Accès rapide aux options d'alignement (clic droit)
+- **Grille de référence** : Activation/désactivation d'une grille pour faciliter le positionnement
+
+### 💾 Gestion des configurations
+- **Sauvegarde de favoris** : Enregistrement de configurations avec titre et description
+- **Tri des favoris** : Classement par date, nom ou taille
+- **Récapitulatif détaillé** : Affichage complet des paramètres actuels
+- **Partage facile** : Copie rapide des informations pour partage
+
+### 🖥️ Interface utilisateur
+- **Design moderne** : Interface sombre, élégante et intuitive
+- **Responsive** : Adaptation à tous les appareils (desktop, tablette, mobile)
+- **Animations fluides** : Transitions douces pour une expérience agréable
+
+---
+
+## 💡 Avantages
+
+- **Confidentialité** : Toutes les données sont stockées uniquement sur votre appareil
+- **Performance optimale** : Application légère et réactive
+- **Mises à jour automatiques** : Améliorations régulières sans intervention
+
+---
+
+## 📖 Guide d'utilisation
+
+### ⚙️ Configuration de base
+1. **Choisir votre tablette** : Sélectionnez votre modèle dans la liste déroulante ou entrez des dimensions personnalisées
+2. **Définir la zone active** : Ajustez la largeur et la hauteur selon vos préférences
+3. **Positionner la zone** : Définissez les coordonnées du centre ou utilisez le glisser-déposer
+4. **Verrouiller le ratio** : Activez cette option pour maintenir les proportions lors des ajustements
+
+### 🛠️ Techniques avancées
+- **Alignement précis** : Faites un clic droit sur la zone pour ouvrir le menu contextuel d'alignement
+- **Centrage rapide** : Utilisez le bouton "Centrer" pour placer la zone au milieu de la tablette
+- **Inversion des dimensions** : Le bouton "Inverser" permet de permuter largeur et hauteur
+- **Ajustement du ratio** : Modifiez directement le ratio pour des configurations spécifiques
+
+### ⭐ Gestion des favoris
+1. **Sauvegarder une configuration** : Cliquez sur "Sauvegarder" pour enregistrer vos paramètres actuels
+2. **Nommer votre configuration** : Donnez un titre et une description optionnelle
+3. **Charger un favori** : Cliquez sur un favori enregistré pour appliquer sa configuration
+4. **Supprimer ou modifier** : Utilisez les boutons dédiés pour gérer vos favoris
+
+---
+
+## ❓ FAQ
+
+<details>
+<summary><strong>Q: Mes configurations sont-elles sauvegardées automatiquement ?</strong></summary>
+R: Les paramètres actuels sont automatiquement conservés entre les sessions, mais vous devez cliquer sur "Sauvegarder" pour créer un favori permanent.
+</details>
+
+<details>
+<summary><strong>Q: Comment puis-je transférer mes favoris sur un autre appareil ?</strong></summary>
+R: Actuellement, vous devez copier manuellement les informations. Une fonction d'exportation/importation est prévue dans une future mise à jour.
+</details>
+
+<details>
+<summary><strong>Q: La zone active dans Osu!rea correspond-elle exactement à celle dans opentabletdriver ?</strong></summary>
+R: Oui, les dimensions et positions sont calculées selon les mêmes principes que dans le driver. Une fonction pour convertir les zones Wacom et autres est prévue dans une future mise à jour.
+</details>
+
+<details>
+<summary><strong>Q: Puis-je utiliser Osu!rea sans connexion internet ?</strong></summary>
+R: Oui, après le premier chargement, l'application peut fonctionner hors ligne grâce au Service Worker.
+</details>
+
+---
+
+## 👨‍💻 Crédits
+
+Développé par Yuzuctus. Avant tout pour Yuzuctus mais partagé à la communauté.
+
+---
+
+<div align="center">
+  <p><strong>Osu!rea - Area Visualizer v2.0</strong> | Conçu par moi, pour moi, mais partagé pour la communauté osu!</p>
+  <p>Utilisez cet outil pour visualiser et sauvegarder votre zone active de tablette graphique.</p>
+</div>
