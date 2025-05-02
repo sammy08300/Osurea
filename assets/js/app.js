@@ -727,15 +727,16 @@ Centre Y: ${formatNumber(offsetY, 3)} mm`;
                 updateDisplay();
             }
             
+            // Reset the edit mode
+            this.editingFavoriteId = null;
+            this.originalValues = null;
+            
             // Hide the cancel button
             const cancelBtn = document.getElementById('cancel-edit-btn');
             if (cancelBtn) {
                 cancelBtn.classList.add('hidden');
+                cancelBtn.classList.remove('flex');
             }
-            
-            // Reset the state
-            this.editingFavoriteId = null;
-            this.originalValues = null;
             
             Notifications.info('Modifications annulées');
         }

@@ -6,7 +6,7 @@ const fr = {
     // Tablet settings
     "tablet_settings": "Paramètres Tablette",
     "tablet_model": "Modèle de Tablette",
-    "select_model": "Sélectionner un modèle",
+
     "search_tablet": "Rechercher une tablette...",
     "search": "Rechercher...",
     "custom_tablet": "Tablette personnalisée",

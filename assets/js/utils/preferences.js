@@ -17,8 +17,11 @@ const PreferencesManager = {
      * Initialize the preferences manager
      */
     init() {
+        console.log('DEBUG: Initialisation du gestionnaire de préférences');
+        
         // Load existing preferences
         this._preferences = this.loadPreferences();
+        console.log('DEBUG: Préférences chargées depuis localStorage:', this._preferences);
         
         // Create the reset confirmation dialog
         this.createResetDialog();
@@ -44,7 +47,7 @@ const PreferencesManager = {
         // Create the dialog
         const resetDialog = document.createElement('div');
         resetDialog.id = 'reset-prefs-dialog';
-        resetDialog.className = 'fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden';
+        resetDialog.className = 'fixed inset-0 items-center justify-center bg-black bg-opacity-50 z-50 hidden';
         resetDialog.innerHTML = `
             <div class="bg-gray-900 rounded-lg p-6 shadow-xl max-w-md w-full border border-gray-700">
                 <h3 class="text-lg font-medium text-white mb-4">Confirmation de réinitialisation</h3>
@@ -101,6 +104,7 @@ const PreferencesManager = {
         
         // Show the dialog
         resetDialog.classList.remove('hidden');
+        resetDialog.classList.add('flex');
     },
     
     /**
@@ -198,7 +202,8 @@ const PreferencesManager = {
                 width: parseFloatSafe(document.getElementById('tabletWidth')?.value),
                 height: parseFloatSafe(document.getElementById('tabletHeight')?.value),
                 model: document.getElementById('tabletSelectorText')?.textContent || 'Sélectionner un modèle',
-                isCustom: document.getElementById('tablet-dimensions-container')?.classList.contains('hidden') === false
+                isCustom: document.getElementById('tablet-dimensions-container')?.classList.contains('hidden') === false,
+                brand: document.getElementById('tabletSelectorButton')?.dataset.tabletBrand || ''
             },
             
             // Active area
@@ -248,11 +253,25 @@ const PreferencesManager = {
                     }
                 }
                 
-                // Update the tablet selector
-                const selectorText = document.getElementById('tabletSelectorText');
-                if (selectorText && tablet.model) {
-                    selectorText.textContent = tablet.model;
-                    selectorText.title = tablet.model;
+                // Apply the saved tablet model if exists - avec un court délai pour s'assurer que TabletSelector est initialisé
+                if (tablet.model && tablet.brand) {
+                    // Données de tablette à envoyer
+                    const tabletData = { 
+                        model: tablet.model,
+                        brand: tablet.brand,
+                        width: tablet.width,
+                        height: tablet.height,
+                        isCustom: tablet.isCustom
+                    };
+                    
+                    // Émettre l'événement après un court délai pour s'assurer que TabletSelector est initialisé
+                    setTimeout(() => {
+                        if (typeof TabletSelector !== 'undefined') {
+                            document.dispatchEvent(new CustomEvent('preferences:loadTablet', { 
+                                detail: tabletData
+                            }));
+                        }
+                    }, 100); // Délai réduit à 100ms
                 }
             }
             

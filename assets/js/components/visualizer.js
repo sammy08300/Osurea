@@ -745,6 +745,11 @@ function initVisualizer() {
             }, 50));
         }
     }, 300);
+
+    // Ensure the flex class is applied to the container
+    if (visualContainer) {
+        visualContainer.classList.add('flex');
+    }
 }
 
 // Call init when window loads

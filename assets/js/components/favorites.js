@@ -363,7 +363,7 @@ const Favorites = {
         // Create a custom dialog for comment input
         const commentDialog = document.createElement('div');
         commentDialog.id = 'comment-dialog';
-        commentDialog.className = 'fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden opacity-0 transition-opacity duration-200';
+        commentDialog.className = 'fixed inset-0 items-center justify-center bg-black bg-opacity-50 z-50 hidden opacity-0 transition-opacity duration-200';
         commentDialog.innerHTML = `
             <div class="bg-gray-900 rounded-xl p-6 shadow-xl max-w-md w-full border border-gray-800 transform scale-95 transition-transform duration-200 mx-4">
                 <!-- En-tête avec titre -->
@@ -427,7 +427,7 @@ const Favorites = {
         // Create a custom dialog for deletion confirmation
         const deleteDialog = document.createElement('div');
         deleteDialog.id = 'delete-dialog';
-        deleteDialog.className = 'fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden opacity-0 transition-opacity duration-200';
+        deleteDialog.className = 'fixed inset-0 items-center justify-center bg-black bg-opacity-50 z-50 hidden opacity-0 transition-opacity duration-200';
         deleteDialog.innerHTML = `
             <div class="bg-gray-900 rounded-xl p-6 shadow-xl max-w-md w-full border border-gray-800 transform scale-95 transition-transform duration-200 mx-4">
                 <!-- En-tête avec titre -->
@@ -480,6 +480,8 @@ const Favorites = {
             const dialogContent = commentDialog.querySelector('div');
             
             // Start the closing animation
+            commentDialog.classList.add('hidden');
+            commentDialog.classList.remove('flex');
             commentDialog.style.opacity = '0';
             if (dialogContent) {
                 dialogContent.style.transform = 'scale(0.95)';
@@ -488,6 +490,7 @@ const Favorites = {
             // After the animation, hide the dialog and execute the callback
             setTimeout(() => {
                 commentDialog.classList.add('hidden');
+                commentDialog.classList.remove('flex');
                 if (typeof callback === 'function') {
                     callback();
                 }
@@ -541,6 +544,8 @@ const Favorites = {
             const dialogContent = deleteDialog.querySelector('div');
             
             // Start the closing animation
+            deleteDialog.classList.add('hidden');
+            deleteDialog.classList.remove('flex');
             deleteDialog.style.opacity = '0';
             if (dialogContent) {
                 dialogContent.style.transform = 'scale(0.95)';
@@ -549,6 +554,7 @@ const Favorites = {
             // After the animation, hide the dialog and execute the callback
             setTimeout(() => {
                 deleteDialog.classList.add('hidden');
+                deleteDialog.classList.remove('flex');
                 if (typeof callback === 'function') {
                     callback();
                 }
@@ -655,6 +661,7 @@ const Favorites = {
         
         // Show dialog with animation
         commentDialog.classList.remove('hidden');
+        commentDialog.classList.add('flex');
         commentDialog.style.opacity = '0';
         const dialogContent = commentDialog.querySelector('div');
         if (dialogContent) {
@@ -696,6 +703,7 @@ const Favorites = {
         
         // Show dialog with animation
         deleteDialog.classList.remove('hidden');
+        deleteDialog.classList.add('flex');
         deleteDialog.style.opacity = '0';
         const dialogContent = deleteDialog.querySelector('div');
         if (dialogContent) {
@@ -1011,6 +1019,7 @@ const Favorites = {
         const cancelBtn = document.getElementById('cancel-edit-btn');
         if (cancelBtn) {
             cancelBtn.classList.remove('hidden');
+            cancelBtn.classList.add('flex');
         }
         
         // Update the fields with the favorite values
@@ -1261,8 +1270,10 @@ const Favorites = {
             const formattedLastModified = lastModifiedDate.toLocaleDateString() + ' ' + lastModifiedDate.toLocaleTimeString();
             lastModifiedContent.textContent = formattedLastModified;
             lastModifiedContainer.classList.remove('hidden');
+            lastModifiedContainer.classList.add('flex');
         } else if (lastModifiedContainer) {
             lastModifiedContainer.classList.add('hidden');
+            lastModifiedContainer.classList.remove('flex');
         }
         
         // Update the description
@@ -1347,10 +1358,11 @@ const Favorites = {
         }
         
         // Ensure all classes are correct before displaying
-        this.detailsPopup.className = 'fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 transition-opacity duration-300 opacity-0';
+        this.detailsPopup.className = 'fixed inset-0 items-center justify-center bg-black bg-opacity-50 z-50 transition-opacity duration-300 opacity-0';
         
         // Make the popup visible - first remove hidden
         this.detailsPopup.classList.remove('hidden');
+        this.detailsPopup.classList.add('flex');
         
         // Force a reflow before adding the show class for the animation to work properly 
         void this.detailsPopup.offsetWidth;
@@ -1388,6 +1400,7 @@ const Favorites = {
             // Hide after the animation
             setTimeout(() => {
                 this.detailsPopup.classList.add('hidden');
+                this.detailsPopup.classList.remove('flex');
                 console.log("[DEBUG] Popup complètement fermé");
             }, 300);
         } else {
@@ -1502,7 +1515,7 @@ const Favorites = {
 
         const popup = document.createElement('div');
         popup.id = 'favorite-details-popup';
-        popup.className = 'fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden transition-opacity duration-300 opacity-0';
+        popup.className = 'fixed inset-0 items-center justify-center bg-black bg-opacity-50 z-50 hidden transition-opacity duration-300 opacity-0';
         
         popup.innerHTML = `
             <div class="bg-gray-900 rounded-xl p-6 shadow-xl max-w-md w-full border border-gray-800 transform transition-all duration-300 scale-95 mx-4 max-h-[90vh] overflow-y-auto">
@@ -1546,7 +1559,7 @@ const Favorites = {
                 </div>
                 
                 <!-- Date de dernière modification -->
-                <div id="details-last-modified-container" class="text-sm text-gray-300 mb-4 flex items-center hidden">
+                <div id="details-last-modified-container" class="text-sm text-gray-300 mb-4 items-center hidden">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 flex-shrink-0 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
