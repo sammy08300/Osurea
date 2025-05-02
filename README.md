@@ -118,6 +118,6 @@ Développé par Yuzuctus. Avant tout pour Yuzuctus mais partagé à la communaut
 ---
 
 <div align="center">
-  <p><strong>Osu!rea - Area Visualizer v2.0</strong> | Conçu par moi, pour moi, mais partagé pour la communauté osu!git </p>
+  <p><strong>Osu!rea - Area Visualizer v2.0</strong> | Conçu par moi, pour moi, mais partagé pour la communauté osu!</p>
   <p>Utilisez cet outil pour visualiser et sauvegarder votre zone active de tablette graphique.</p>
 </div>
