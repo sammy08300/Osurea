@@ -1,22 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <!-- Fond uni sombre avec coins arrondis -->
-  <rect width="64" height="64" rx="12" fill="#1a1f2e"/>
-
-  <!-- Anneau extérieur épais pour bien marquer le contour -->
-  <circle
-    cx="32" cy="32" r="26"
-    fill="none"
-    stroke="#ff69b4"
-    stroke-width="8"
-  />
-
-  <!-- Losange central (carré tourné) avec un léger contour blanc -->
-  <rect
-    x="20" y="20" width="24" height="24"
-    rx="4"
-    fill="#4a86e8"
-    stroke="##4a86e8"
-    stroke-width="6"
-    transform="rotate(45 32 32)"
-  />
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0)">
+<rect width="64" height="64" fill="#1A1F2E"/>
+<circle cx="32" cy="32" r="27.5" stroke="#FF69B4" stroke-width="9"/>
+<rect x="14.5" y="14.5" width="35" height="35" rx="6" transform="rotate(45 32 32)" fill="#4A86E8"/>
+</g>
+<defs>
+<clipPath id="clip0">
+<rect width="64" height="64" fill="#fff"/>
+</clipPath>
+</defs>
 </svg>

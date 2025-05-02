@@ -61,6 +61,7 @@ Osu!rea est un visualiseur de zone active (area) pour les joueurs d'osu! qui uti
 - **Confidentialité** : Toutes les données sont stockées uniquement sur votre appareil
 - **Performance optimale** : Application légère et réactive
 - **Mises à jour automatiques** : Améliorations régulières sans intervention
+- **Accessible hors-ligne** : Après un premier chargement, le site reste accessible à tout moment, même sans connexion internet, en utilisant la même URL
 
 ---
 
@@ -105,7 +106,7 @@ R: Oui, les dimensions et positions sont calculées selon les mêmes principes q
 
 <details>
 <summary><strong>Q: Puis-je utiliser Osu!rea sans connexion internet ?</strong></summary>
-R: Oui, après le premier chargement, l'application peut fonctionner hors ligne grâce au Service Worker.
+R: Oui, après le premier chargement, l'application peut fonctionner hors ligne grâce au Service Worker. <br><br>💡 Si vous avez déjà chargé le site une fois, vous pouvez y retourner à tout moment, même sans connexion internet, en utilisant exactement la même URL !
 </details>
 
 ---
