@@ -2,7 +2,6 @@
   "name": "areasu",
   "version": "1.0.0",
   "description": "Un outil interactif pour les joueurs d'osu! permettant de visualiser et configurer la zone active de leur tablette graphique.",
-  "main": "service-worker.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:css": "postcss assets/css/main.css -o assets/css/styles.css",
