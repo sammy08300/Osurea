@@ -677,9 +677,6 @@ video {
 .mt-3 {
   margin-top: 0.75rem;
 }
-.mt-4 {
-  margin-top: 1rem;
-}
 .mt-6 {
   margin-top: 1.5rem;
 }
@@ -876,6 +873,9 @@ video {
 }
 .flex-col {
   flex-direction: column;
+}
+.flex-wrap {
+  flex-wrap: wrap;
 }
 .flex-nowrap {
   flex-wrap: nowrap;
@@ -1197,9 +1197,6 @@ video {
 }
 .pb-1 {
   padding-bottom: 0.25rem;
-}
-.pb-12 {
-  padding-bottom: 3rem;
 }
 .pb-2 {
   padding-bottom: 0.5rem;
