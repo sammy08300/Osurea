@@ -9,7 +9,7 @@ const rectangle = document.getElementById('rectangle');
 const backgroundGrid = document.getElementById('backgroundGrid');
 const toggleGridCheckbox = document.getElementById('toggleGridCheckbox');
 const areaRadiusInput = document.getElementById('areaRadius');
-const radiusPercentage = document.getElementById('radius-percentage');
+const radiusInputField = document.getElementById('radius-input');
 const radiusControlGroup = document.getElementById('radius-control-group');
 
 // Cache of frequently used DOM elements 
@@ -800,11 +800,47 @@ function initVisualizer() {
         }
         
         // Setup border radius control
-        if (areaRadiusInput && radiusPercentage) {
+        if (areaRadiusInput && radiusInputField) {
+            // Slider change event
             areaRadiusInput.addEventListener('input', function() {
                 currentRadius = parseInt(this.value, 10);
                 window.currentRadius = currentRadius;
-                radiusPercentage.textContent = `${currentRadius}%`;
+                radiusInputField.value = currentRadius;
+                
+                // Update the radius info in the summary
+                const radiusInfo = document.getElementById('radius-info');
+                if (radiusInfo) {
+                    radiusInfo.textContent = `${currentRadius}%`;
+                }
+                
+                updateDisplay();
+            });
+
+            // Manual input change event
+            radiusInputField.addEventListener('input', function() {
+                let value = parseInt(this.value, 10);
+                
+                // Ensure value is within bounds
+                if (isNaN(value) || value < 0) value = 0;
+                if (value > 100) value = 100;
+                
+                // Update both the display value and the slider
+                currentRadius = value;
+                window.currentRadius = currentRadius;
+                areaRadiusInput.value = value;
+                
+                // Update the radius info in the summary
+                const radiusInfo = document.getElementById('radius-info');
+                if (radiusInfo) {
+                    radiusInfo.textContent = `${currentRadius}%`;
+                }
+                
+                // Only update the input value if it's different from what was entered
+                // This prevents cursor jumping during typing
+                if (parseInt(this.value, 10) !== value && !isNaN(parseInt(this.value, 10))) {
+                    this.value = value;
+                }
+                
                 updateDisplay();
             });
         }

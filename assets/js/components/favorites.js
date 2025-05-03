@@ -934,8 +934,8 @@ const Favorites = {
             if (typeof favorite.radius !== 'undefined') {
                 document.getElementById('areaRadius').value = favorite.radius;
                 window.currentRadius = favorite.radius;
-                const radiusPercentage = document.getElementById('radius-percentage');
-                if (radiusPercentage) radiusPercentage.textContent = `${favorite.radius}%`;
+                const radiusInput = document.getElementById('radius-input');
+                if (radiusInput) radiusInput.value = favorite.radius;
             }
             
             // Update the tablet preset if available
@@ -1092,8 +1092,8 @@ const Favorites = {
         if (typeof favorite.radius !== 'undefined') {
             document.getElementById('areaRadius').value = favorite.radius;
             window.currentRadius = favorite.radius;
-            const radiusPercentage = document.getElementById('radius-percentage');
-            if (radiusPercentage) radiusPercentage.textContent = `${favorite.radius}%`;
+            const radiusInput = document.getElementById('radius-input');
+            if (radiusInput) radiusInput.value = favorite.radius;
         }
     },
     

@@ -358,8 +358,8 @@ const PreferencesManager = {
                 if (typeof area.radius !== 'undefined' && document.getElementById('areaRadius')) {
                     document.getElementById('areaRadius').value = area.radius;
                     window.currentRadius = area.radius;
-                    const radiusPercentage = document.getElementById('radius-percentage');
-                    if (radiusPercentage) radiusPercentage.textContent = `${area.radius}%`;
+                    const radiusInput = document.getElementById('radius-input');
+                    if (radiusInput) radiusInput.value = area.radius;
                 }
             }
             

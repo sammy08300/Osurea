@@ -387,7 +387,10 @@
                                             </label>
                                             <div class="flex items-center gap-3">
                                                 <input type="range" id="areaRadius" min="0" max="100" value="0" class="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
-                                                <span id="radius-percentage" class="text-sm font-medium text-gray-300 min-w-[40px] text-right">0%</span>
+                                                <div class="relative w-[76px]">
+                                                    <input type="number" id="radius-input" value="0" min="0" max="100" class="w-full h-[38px] bg-gray-800 border border-gray-700 rounded-md p-2 pl-2 pr-9 text-right text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                                    <span class="absolute right-2.5 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">%</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
