@@ -1,14 +1,14 @@
 import localeManager from '../locales/index.js';
 
 /**
- * LocaleSwitcher - Module responsable de l'interface de changement de langue
+ * LocaleSwitcher - Module responsible for the language change interface
  */
 class LocaleSwitcher {
     constructor() {
-        // Cache des éléments DOM
+        // DOM elements cache
         this.elements = null;
         
-        // Référence aux écouteurs d'événements pour nettoyage
+        // Reference to event listeners for cleanup
         this.eventListeners = {
             documentClick: null,
             buttonClick: null,
@@ -16,13 +16,13 @@ class LocaleSwitcher {
             dropdownClick: null
         };
         
-        // État du composant
+        // Component state
         this.isInitialized = false;
     }
     
     /**
-     * Récupère et met en cache les éléments DOM nécessaires
-     * @returns {Object} Les éléments DOM
+     * Retrieves and caches necessary DOM elements
+     * @returns {Object} The DOM elements
      */
     getElements() {
         if (this.elements) return this.elements;
@@ -38,32 +38,32 @@ class LocaleSwitcher {
     }
     
     /**
-     * Initialise le sélecteur de langue
+     * Initializes the language selector
      */
     init() {
         if (this.isInitialized) return;
         
         const { selector } = this.getElements();
         
-        // Vérifier si les éléments nécessaires existent
+        // Check if necessary elements exist
         if (!this.validateElements()) {
-            console.warn('LocaleSwitcher: Certains éléments DOM requis sont manquants');
+            console.warn('LocaleSwitcher: Some required DOM elements are missing');
             return;
         }
         
-        // Cacher le sélecteur initialement
+        // Initially hide the selector
         if (selector) {
             selector.style.visibility = 'hidden';
             selector.style.opacity = '0';
         }
         
-        // Démarrer l'initialisation avec mécanisme de retry
+        // Start initialization with retry mechanism
         this.attemptInitialization();
     }
     
     /**
-     * Vérifie que tous les éléments DOM nécessaires sont présents
-     * @returns {boolean} True si tous les éléments sont présents
+     * Checks if all necessary DOM elements are present
+     * @returns {boolean} True if all elements are present
      */
     validateElements() {
         const { selector, button, dropdown, selectedText } = this.getElements();
@@ -71,16 +71,16 @@ class LocaleSwitcher {
     }
     
     /**
-     * Tente d'initialiser le sélecteur, avec retry si le localeManager n'est pas prêt
+     * Attempts to initialize the selector, with retry if localeManager is not ready
      */
     attemptInitialization() {
-        // Limiter le nombre de tentatives pour éviter les boucles infinies
+        // Limit the number of attempts to avoid infinite loops
         if (!this._initAttempts) this._initAttempts = 0;
         this._initAttempts++;
         
-        // Abandonner après 20 tentatives (1 seconde)
+        // Abandon after 20 attempts (1 second)
         if (this._initAttempts > 20) {
-            console.error('LocaleSwitcher: Impossible d\'initialiser après plusieurs tentatives');
+            console.error('LocaleSwitcher: Unable to initialize after multiple attempts');
             return;
         }
         
@@ -88,26 +88,26 @@ class LocaleSwitcher {
             if (localeManager.getCurrentLocale()) {
                 const { selector } = this.getElements();
                 
-                // Initialiser tous les composants
+                // Initialize all components
                 this.createDropdown();
                 this.setupEventListeners();
                 this.updateSelectedLocale();
                 
-                // Afficher le sélecteur avec animation de fondu
+                // Display the selector with fade-in animation
                 if (selector) {
                     selector.style.visibility = 'visible';
                     requestAnimationFrame(() => selector.style.opacity = '1');
                 }
                 
                 this.isInitialized = true;
-                this._initAttempts = 0; // Réinitialiser pour une utilisation future
+                this._initAttempts = 0; // Reset for future use
             } else {
-                // Réessayer après un court délai
+                // Retry after a short delay
                 setTimeout(() => this.attemptInitialization(), 50);
             }
         } catch (error) {
-            console.error('LocaleSwitcher: Erreur lors de l\'initialisation', error);
-            // Réessayer une dernière fois après un délai plus long
+            console.error('LocaleSwitcher: Error during initialization', error);
+            // Retry one last time after a longer delay
             if (this._initAttempts < 20) {
                 setTimeout(() => this.attemptInitialization(), 100);
             }
@@ -115,27 +115,27 @@ class LocaleSwitcher {
     }
     
     /**
-     * Crée le menu déroulant avec toutes les langues disponibles
+     * Creates the dropdown menu with all available languages
      */
     createDropdown() {
         const { dropdown } = this.getElements();
         
         if (!dropdown) return;
         
-        // Vider les options existantes
+        // Clear existing options
         dropdown.innerHTML = '';
         
-        // Créer les options avec un fragment pour de meilleures performances
+        // Create options with a fragment for better performance
         const fragment = document.createDocumentFragment();
         const currentLocale = localeManager.getCurrentLocale();
         const availableLocales = localeManager.getAvailableLocales();
         
         if (!availableLocales || availableLocales.length === 0) {
-            console.warn('LocaleSwitcher: Aucune langue disponible');
+            console.warn('LocaleSwitcher: No available languages');
             return;
         }
         
-        // Mémoriser les traductions pour éviter des appels répétés
+        // Cache translations to avoid repeated calls
         const translations = {};
         availableLocales.forEach(locale => {
             try {
@@ -145,7 +145,7 @@ class LocaleSwitcher {
             }
         });
         
-        // Créer les options pour chaque langue
+        // Create options for each language
         availableLocales.forEach(locale => {
             const option = document.createElement('div');
             option.className = 'locale-option cursor-pointer hover:bg-gray-750 p-2 rounded text-center';
@@ -153,10 +153,10 @@ class LocaleSwitcher {
             option.setAttribute('role', 'menuitem');
             option.setAttribute('tabindex', '0');
             
-            // Utiliser la traduction mémorisée
+            // Use cached translation
             option.textContent = translations[locale];
             
-            // Mettre en évidence la langue actuelle
+            // Highlight current language
             if (locale === currentLocale) {
                 option.classList.add('bg-gray-750', 'text-osu-blue');
             }
@@ -164,27 +164,27 @@ class LocaleSwitcher {
             fragment.appendChild(option);
         });
         
-        // Ajouter toutes les options au DOM en une seule opération
+        // Add all options to the DOM in a single operation
         dropdown.appendChild(fragment);
     }
     
     /**
-     * Configure tous les écouteurs d'événements pour le sélecteur de langue
+     * Sets up all event listeners for the language selector
      */
     setupEventListeners() {
         const { button, dropdown } = this.getElements();
         
         if (!button || !dropdown) return;
         
-        // Nettoyer les écouteurs existants si nécessaire
+        // Clean up existing listeners if necessary
         this.removeEventListeners();
         
-        // Améliorer l'accessibilité
+        // Improve accessibility
         button.setAttribute('aria-haspopup', 'true');
         button.setAttribute('aria-expanded', 'false');
         dropdown.setAttribute('role', 'menu');
         
-        // Basculer la visibilité du menu déroulant
+        // Toggle dropdown visibility
         this.eventListeners.buttonClick = (e) => {
             const isExpanded = dropdown.classList.toggle('hidden');
             button.setAttribute('aria-expanded', !isExpanded);
@@ -192,21 +192,21 @@ class LocaleSwitcher {
         };
         button.addEventListener('click', this.eventListeners.buttonClick);
         
-        // Support clavier pour l'accessibilité
+        // Keyboard support for accessibility
         this.eventListeners.buttonKeydown = (e) => {
             if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
                 e.preventDefault();
                 dropdown.classList.remove('hidden');
                 button.setAttribute('aria-expanded', 'true');
                 
-                // Focus sur la première option
+                // Focus on the first option
                 const firstOption = dropdown.querySelector('.locale-option');
                 if (firstOption) firstOption.focus();
             }
         };
         button.addEventListener('keydown', this.eventListeners.buttonKeydown);
         
-        // Utiliser la délégation d'événements pour les options de langue
+        // Use event delegation for language options
         this.eventListeners.dropdownClick = (e) => {
             const option = e.target.closest('.locale-option');
             if (!option) return;
@@ -218,15 +218,15 @@ class LocaleSwitcher {
                     this.updateSelectedLocale();
                     dropdown.classList.add('hidden');
                     button.setAttribute('aria-expanded', 'false');
-                    button.focus(); // Retourner le focus au bouton
+                    button.focus(); // Return focus to the button
                 } catch (error) {
-                    console.error(`LocaleSwitcher: Erreur lors du changement de langue vers ${locale}`, error);
+                    console.error(`LocaleSwitcher: Error changing language to ${locale}`, error);
                 }
             }
         };
         dropdown.addEventListener('click', this.eventListeners.dropdownClick);
         
-        // Fermer le menu déroulant en cliquant ailleurs
+        // Close dropdown when clicking elsewhere
         this.eventListeners.documentClick = () => {
             if (dropdown && !dropdown.classList.contains('hidden')) {
                 dropdown.classList.add('hidden');
@@ -237,7 +237,7 @@ class LocaleSwitcher {
     }
     
     /**
-     * Supprime les écouteurs d'événements pour éviter les fuites de mémoire
+     * Removes event listeners to prevent memory leaks
      */
     removeEventListeners() {
         const { button, dropdown } = this.getElements();
@@ -260,14 +260,14 @@ class LocaleSwitcher {
     }
     
     /**
-     * Met à jour l'affichage de la langue sélectionnée et met en évidence la locale actuelle
+     * Updates the display of the selected language and highlights the current locale
      */
     updateSelectedLocale() {
         const { selectedText } = this.getElements();
         const currentLocale = localeManager.getCurrentLocale();
         
         if (!currentLocale) {
-            console.warn('LocaleSwitcher: Aucune langue actuelle définie');
+            console.warn('LocaleSwitcher: No current language set');
             return;
         }
         
@@ -275,12 +275,12 @@ class LocaleSwitcher {
             try {
                 selectedText.textContent = localeManager.translate(`language_${currentLocale}`) || currentLocale;
             } catch (error) {
-                console.warn(`LocaleSwitcher: Impossible de traduire la langue ${currentLocale}`, error);
+                console.warn(`LocaleSwitcher: Unable to translate language ${currentLocale}`, error);
                 selectedText.textContent = currentLocale;
             }
         }
         
-        // Mettre à jour les classes pour toutes les options de langue
+        // Update classes for all language options
         document.querySelectorAll('.locale-option').forEach(option => {
             const locale = option.getAttribute('data-locale');
             const isSelected = locale === currentLocale;
@@ -291,8 +291,8 @@ class LocaleSwitcher {
     }
     
     /**
-     * Réinitialise complètement le sélecteur de langue
-     * Utile après des changements dynamiques dans l'application
+     * Completely resets the language selector
+     * Useful after dynamic changes in the application
      */
     reset() {
         this.destroy();
@@ -300,7 +300,7 @@ class LocaleSwitcher {
     }
     
     /**
-     * Nettoie les ressources lors de la destruction du composant
+     * Cleans up resources when destroying the component
      */
     destroy() {
         this.removeEventListeners();
@@ -309,30 +309,30 @@ class LocaleSwitcher {
     }
 }
 
-// Créer une instance unique du sélecteur de langue
+// Create a single instance of the language selector
 const localeSwitcher = new LocaleSwitcher();
 
-// Initialiser lorsque le DOM est prêt
+// Initialize when the DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     localeSwitcher.init();
 });
 
 /**
- * Fonction publique pour créer le sélecteur de langue
- * Maintenue pour compatibilité avec le code existant
+ * Public function to create the language selector
+ * Maintained for compatibility with existing code
  */
 function createLocaleSwitcher() {
     localeSwitcher.createDropdown();
 }
 
 /**
- * Fonction publique pour mettre à jour le sélecteur de langue
- * Maintenue pour compatibilité avec le code existant
+ * Public function to update the language selector
+ * Maintained for compatibility with existing code
  */
 function updateLocaleSwitcher() {
     localeSwitcher.updateSelectedLocale();
 }
 
-// Exporter les fonctions publiques et l'instance
+// Export public functions and instance
 export { createLocaleSwitcher, updateLocaleSwitcher };
 export default localeSwitcher;
