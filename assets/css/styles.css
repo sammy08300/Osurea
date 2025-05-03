@@ -1421,7 +1421,7 @@ video {
     --scrollbar-track-bg: rgba(31, 41, 55, 0.3);
     --scrollbar-thumb-bg: rgba(75, 85, 99, 0.8);
     --scrollbar-thumb-hover: rgba(107, 114, 128, 0.9);
-    --transition-fast: 0.1s ease;
+    --transition-fast: 0.05s ease;
     --transition-normal: 0.25s ease;
     --shadow-color: rgba(59, 130, 246, 0.3);
     --focus-ring: 0 0 0 2px rgba(59, 130, 246, 0.5);
@@ -1459,13 +1459,12 @@ video {
             user-select: none;
     box-shadow: 0 0 15px var(--shadow-color);
     visibility: visible;
-    /* Retirer toute transition initiale */
     transition: none;
 }
 
 /* Apply transitions only after initial loading */
 .page-loaded #rectangle {
-    transition: width var(--transition-fast), height var(--transition-fast), transform var(--transition-fast);
+    transition: none;
 }
 
 #rectangle:active {
