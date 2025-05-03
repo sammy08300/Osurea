@@ -7,6 +7,7 @@ const Favorites = {
     favoritesPlaceholder: null,
     currentSortCriteria: 'date',
     isInitialized: false,
+    cachedFavorites: null, // Ajout d'un cache pour les favoris
     
     /**
      * Initialize the favorites component
@@ -33,13 +34,18 @@ const Favorites = {
         
         this.setupSortButtons();
         
+        // Création anticipée des dialogues pour éviter la création pendant l'utilisation
+        this.createDialogs();
+        this.createDetailsPopup();
+        
         // Use requestAnimationFrame to report the loading
         // until the browser is ready to render the changes
         requestAnimationFrame(() => {
+            // Préchargement des favoris pour éviter des lectures multiples
+            this.cachedFavorites = StorageManager.getFavorites();
+            
             // Load favorites with animation instead of without animation
             this.loadFavoritesWithAnimation();
-            
-            this.createDialogs();
             
             // IMPORTANT: Listen for locale changes to refresh the favorites
             document.removeEventListener('localeChanged', this.handleLocaleChange);
@@ -71,7 +77,7 @@ const Favorites = {
                     this.favoritesList.style.opacity = '1';
                     this.favoritesList.classList.remove('favorites-loading');
                     document.body.classList.remove('loading-favorites');
-                }, 50);
+                }, 15); // Réduit de 20ms à 15ms
             });
         });
     },
@@ -85,6 +91,9 @@ const Favorites = {
             StorageManager.clearCache();
         }
         
+        // Purger notre cache local également
+        this.cachedFavorites = null;
+        
         // Add the exit animation before refreshing the favorites
         if (this.favoritesList) {
             this.favoritesList.classList.add('favorites-loading');
@@ -94,7 +103,7 @@ const Favorites = {
         // Rebuild the favorites completely
         setTimeout(() => {
             this.forceRefreshFavorites();
-        }, 200);
+        }, 120); // Réduit de 150ms à 120ms
     },
     
     // Force completely update the favorites on language change
@@ -104,6 +113,7 @@ const Favorites = {
         // 1. Force the cleanup of any potential cache
         if (typeof StorageManager !== 'undefined' && typeof StorageManager.clearCache === 'function') {
             StorageManager.clearCache();
+            this.cachedFavorites = null; // Purger notre cache local
             console.log("[DEBUG] StorageManager cache cleared");
         }
         
@@ -124,7 +134,7 @@ const Favorites = {
                 
                 // Reload the favorites with animation
                 this.loadFavoritesWithAnimation();
-            }, 200); // Correspond to the duration of the fadeOut animation
+            }, 120); // Réduit de 150ms à 120ms
         }
     },
     
@@ -140,9 +150,7 @@ const Favorites = {
             
             // 2. Completely clear the list (including the placeholder)
             if (this.favoritesList) {
-                while (this.favoritesList.lastChild) {
-                    this.favoritesList.removeChild(this.favoritesList.lastChild);
-                }
+                this.favoritesList.innerHTML = '';
                 
                 // 3. Reinsert the placeholder
                 if (this.favoritesPlaceholder) {
@@ -154,6 +162,7 @@ const Favorites = {
             setTimeout(() => {
                 // 5. Get the favorites directly (no cache)
                 const favorites = StorageManager.getFavorites();
+                this.cachedFavorites = favorites; // Mise à jour du cache local
                 console.log("[DEBUG] Favorites retrieved:", favorites.length);
                 
                 // 6. Log any favorites with i18n titles
@@ -169,7 +178,7 @@ const Favorites = {
                 // 7. Completely recreate all elements
                 this.loadFavoritesWithAnimation();
                 console.log("[DEBUG] Favorites reloaded with the new language");
-            }, 50);
+            }, 20); // Réduit de 30ms à 20ms
         } catch (error) {
             console.error("[ERROR] Error refreshing favorites:", error);
         }
@@ -224,24 +233,8 @@ const Favorites = {
         const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
         
         const item = document.createElement('div');
-        item.classList.add(
-            'favorite-item', 
-            'bg-gray-800', 
-            'rounded-xl', 
-            'p-3', 
-            'border', 
-            'border-gray-700', 
-            'hover:border-blue-500/30', 
-            'shadow-lg', 
-            'transition-all', 
-            'cursor-pointer', 
-            'hover:shadow-blue-500/10',
-            'hover:-translate-y-0.5',
-            'hover:shadow-xl',
-            'active:translate-y-0',
-            'active:shadow-md',
-            'duration-300'
-        );
+        // Utilisation de className au lieu d'ajouts multiples par classList pour des performances améliorées
+        item.className = 'favorite-item bg-gray-800 rounded-xl p-3 border border-gray-700 hover:border-blue-500/30 shadow-lg transition-all cursor-pointer hover:shadow-blue-500/10 hover:-translate-y-0.5 hover:shadow-xl active:translate-y-0 active:shadow-md duration-300';
         item.dataset.id = favorite.id;
         
         // Add the animation class but only if already initialized
@@ -267,8 +260,8 @@ const Favorites = {
         const areaHeight = formatNumber(favorite.areaHeight || favorite.height, 3);
         const areaRatio = formatNumber(calculateRatio(favorite.areaWidth || favorite.width, favorite.areaHeight || favorite.height), 3);
         
-        // Prepare the HTML with title and description
-        let innerHtml = `
+        // Création du HTML en un seul bloc pour de meilleures performances
+        item.innerHTML = `
             <div class="relative">
                 <div class="flex items-center mb-2">
                     <div class="flex-1">
@@ -294,7 +287,7 @@ const Favorites = {
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
-                        ${date.toLocaleDateString()}
+                        ${formattedDate}
                     </div>
                     <div class="flex gap-1.5">
                         <button class="load-favorite-btn bg-blue-600 hover:bg-blue-500 text-white rounded-md p-1 flex items-center justify-center transition-all duration-200 w-7 h-7 shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-sm" title="Charger la configuration" aria-label="Charger la configuration">
@@ -316,41 +309,26 @@ const Favorites = {
                 </div>
             </div>`;
         
-        item.innerHTML = innerHtml;
-        
-        // Add event handlers
-        const loadBtn = item.querySelector('.load-favorite-btn');
-        const editBtn = item.querySelector('.edit-favorite-btn');
-        const deleteBtn = item.querySelector('.delete-favorite-btn');
-        
-        loadBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.loadFavorite(favorite.id);
-        });
-        
-        editBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.editFavorite(favorite.id);
-        });
-        
-        deleteBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.deleteFavorite(favorite.id);
-        });
-        
-        // Add an event handler to display the detailed popup
+        // Utilisation de la délégation d'événements pour améliorer les performances
         item.addEventListener('click', (e) => {
-            // Empêcher la propagation aux boutons
-            if (e.target.closest('.load-favorite-btn') || 
-                e.target.closest('.edit-favorite-btn') || 
-                e.target.closest('.delete-favorite-btn')) {
-                return;
+            const target = e.target;
+            // Gérer les clics sur les boutons
+            if (target.closest('.load-favorite-btn')) {
+                e.stopPropagation();
+                this.loadFavorite(favorite.id);
+            } else if (target.closest('.edit-favorite-btn')) {
+                e.stopPropagation();
+                this.editFavorite(favorite.id);
+            } else if (target.closest('.delete-favorite-btn')) {
+                e.stopPropagation();
+                this.deleteFavorite(favorite.id);
+            } else {
+                // Clic sur la carte elle-même
+                console.log("[DEBUG] Clic sur favori détecté", favorite.id);
+                // Conserver le titre original non-traduit dans l'objet favori
+                favorite._originalTitle = title;
+                this.showFavoriteDetails(favorite);
             }
-            
-            console.log("[DEBUG] Clic sur favori détecté", favorite.id);
-            // Conserver le titre original non-traduit dans l'objet favori
-            favorite._originalTitle = title;
-            this.showFavoriteDetails(favorite);
         });
         
         return item;
@@ -494,7 +472,7 @@ const Favorites = {
                 if (typeof callback === 'function') {
                     callback();
                 }
-            }, 200);
+            }, 150); // Réduit de 200ms à 150ms
         };
         
         // Event handler for the cancel button
@@ -558,7 +536,7 @@ const Favorites = {
                 if (typeof callback === 'function') {
                     callback();
                 }
-            }, 200);
+            }, 150); // Réduit de 200ms à 150ms
         };
         
         cancelDeleteBtn.addEventListener('click', () => {
@@ -680,7 +658,7 @@ const Favorites = {
         // Focus input after animation
         setTimeout(() => {
             commentInput.focus();
-        }, 200);
+        }, 150); // Réduit de 200ms à 150ms
     },
     
     /**
@@ -798,12 +776,14 @@ const Favorites = {
      * Load favorites from storage and display them
      */
     loadFavorites() {
+        // Utiliser le cache si disponible pour éviter un appel coûteux
+        const favorites = this.cachedFavorites || StorageManager.getFavorites();
+        this.cachedFavorites = favorites; // Mettre à jour le cache
+        
         // Hide the list to prevent flash
         if (this.favoritesList) {
             this.favoritesList.style.visibility = 'hidden';
         }
-        
-        const favorites = StorageManager.getFavorites();
         
         if (favorites.length === 0) {
             // Ensure the placeholder remains visible and well positioned
@@ -829,22 +809,32 @@ const Favorites = {
             this.favoritesPlaceholder.classList.add('hidden');
         }
         
-        // Clear the existing list
+        // Clear the existing list more efficacement
         // Keep the placeholder instead of deleting it
         const placeholder = this.favoritesPlaceholder;
-        const otherElements = Array.from(this.favoritesList.children).filter(child => child !== placeholder);
         
-        // Remove only the other elements (not the placeholder)
-        otherElements.forEach(element => element.remove());
+        // Utiliser innerHTML pour un nettoyage plus rapide
+        this.favoritesList.innerHTML = '';
+        if (placeholder) {
+            this.favoritesList.appendChild(placeholder);
+        }
         
         // Load all sorted favorites
         const sortedFavorites = this.sortFavorites(favorites, this.currentSortCriteria);
+        
+        // Utiliser un DocumentFragment pour améliorer les performances de rendu
+        const fragment = document.createDocumentFragment();
+        
         sortedFavorites.forEach(favorite => {
             const cardElement = this.createFavoriteElement(favorite);
             // Ajouter la classe pour déclencher l'animation
-            cardElement.classList.add('animate-fadeIn');
-            this.favoritesList.appendChild(cardElement);
+            if (this.isInitialized) {
+                cardElement.classList.add('animate-fadeIn');
+            }
+            fragment.appendChild(cardElement);
         });
+        
+        this.favoritesList.appendChild(fragment);
         
         // Remove the loading class
         this.favoritesList.classList.remove('favorites-loading');
@@ -1136,6 +1126,8 @@ const Favorites = {
             const success = StorageManager.updateFavorite(appState.editingFavoriteId, updatedData);
             
             if (success) {
+                // Réinitialiser le cache pour forcer un rechargement
+                this.cachedFavorites = null;
                 this.loadFavorites();
                 appState.cancelEditMode();
                 Notifications.success('Configuration mise à jour');
@@ -1172,6 +1164,8 @@ const Favorites = {
                 };
                 const savedFavorite = StorageManager.addFavorite(newFavorite);
                 if (savedFavorite) {
+                    // Réinitialiser le cache pour forcer un rechargement
+                    this.cachedFavorites = null;
                     this.loadFavorites();
                     this.highlightFavorite(savedFavorite.id);
                     Notifications.success('Configuration sauvegardée');
@@ -1904,7 +1898,9 @@ const Favorites = {
      * Specifically designed for language changes
      */
     loadFavoritesWithAnimation() {
-        const favorites = StorageManager.getFavorites();
+        // Utiliser le cache
+        const favorites = this.cachedFavorites || StorageManager.getFavorites();
+        this.cachedFavorites = favorites;
         
         if (favorites.length === 0) {
             if (this.favoritesPlaceholder) {
@@ -1923,19 +1919,24 @@ const Favorites = {
             this.favoritesPlaceholder.classList.add('hidden');
         }
         
+        // Clear the existing list except the placeholder
+        const placeholder = this.favoritesPlaceholder;
+        this.favoritesList.innerHTML = '';
+        if (placeholder) {
+            this.favoritesList.appendChild(placeholder);
+        }
+        
         const sortedFavorites = this.sortFavorites(favorites, this.currentSortCriteria);
         const fragment = document.createDocumentFragment();
+        
+        // Réduire le délai d'animation entre les cartes
+        const animationDelayIncrement = 0.03; // Réduit de 0.05s à 0.03s
         
         sortedFavorites.forEach((favorite, index) => {
             const cardElement = this.createFavoriteElement(favorite);
             cardElement.style.opacity = '0';
             cardElement.classList.add('animate-fadeIn-smooth');
-            cardElement.style.animationDelay = `${index * 0.05}s`;
-            
-            // Ajouter un écouteur pour détecter la fin de l'animation
-            cardElement.addEventListener('animationend', () => {
-                cardElement.classList.add('animation-complete');
-            });
+            cardElement.style.animationDelay = `${index * animationDelayIncrement}s`;
             
             fragment.appendChild(cardElement);
         });
@@ -1947,6 +1948,7 @@ const Favorites = {
             this.favoritesList.classList.add('favorites-transition-in');
             this.favoritesList.classList.remove('favorites-transition-out');
             
+            // Réduire le délai avant affichage
             setTimeout(() => {
                 const cards = this.favoritesList.querySelectorAll('.animate-fadeIn-smooth');
                 cards.forEach(card => {
@@ -1955,8 +1957,8 @@ const Favorites = {
                 
                 setTimeout(() => {
                     this.favoritesList.classList.remove('favorites-transition-in');
-                }, 500);
-            }, 50);
+                }, 300); // Réduit de 500ms à 300ms
+            }, 30); // Réduit de 50ms à 30ms
         });
     },
 };

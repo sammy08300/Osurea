@@ -178,10 +178,10 @@ function updateDisplay() {
             const loadingOverlay = document.getElementById('loading-overlay');
             if (loadingOverlay) {
                 loadingOverlay.style.opacity = '0';
-                loadingOverlay.style.transition = 'opacity 0.3s ease';
+                loadingOverlay.style.transition = 'opacity 0.15s ease';
                 setTimeout(() => {
                     loadingOverlay.style.display = 'none';
-                }, 300);
+                }, 150);
             }
             
             // Make the rectangle visible
@@ -391,10 +391,10 @@ function updateDisplayWithoutRatio() {
             const loadingOverlay = document.getElementById('loading-overlay');
             if (loadingOverlay) {
                 loadingOverlay.style.opacity = '0';
-                loadingOverlay.style.transition = 'opacity 0.3s ease';
+                loadingOverlay.style.transition = 'opacity 0.15s ease';
                 setTimeout(() => {
                     loadingOverlay.style.display = 'none';
-                }, 300);
+                }, 150);
             }
             
             // Make the rectangle visible
@@ -722,10 +722,10 @@ function initVisualizer() {
         const loadingOverlay = document.getElementById('loading-overlay');
         if (loadingOverlay) {
             loadingOverlay.style.opacity = '0';
-            loadingOverlay.style.transition = 'opacity 0.3s ease';
+            loadingOverlay.style.transition = 'opacity 0.15s ease';
             setTimeout(() => {
                 loadingOverlay.style.display = 'none';
-            }, 300);
+            }, 150);
         }
         
         // Configure the event listeners only after everything is ready

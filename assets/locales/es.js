@@ -1,6 +1,6 @@
 const es = {
     // Elementos de navegación y encabezado
-    "app_title": "Osu!rea - Visualizador de Área",
+    "app_title": "Visualizador de Área",
     "app_description": "Visualizador de área para jugadores de osu! que usan tableta gráfica. Configura y visualiza tu área activa con precisión, guarda tus configuraciones como favoritos y compártelas.",
     
     // Configuración de la Tableta

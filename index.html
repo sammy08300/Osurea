@@ -21,7 +21,9 @@
     <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
     <link rel="manifest" href="manifest.webmanifest">
     
-    <link rel="preload" href="assets/css/styles.css" as="style">
+    <!-- Préchargement des ressources critiques -->
+    <link rel="preload" href="assets/img/favicon.svg" as="image" type="image/svg+xml" fetchpriority="high">
+    <link rel="preload" href="assets/css/styles.css" as="style" fetchpriority="high">
     <link rel="stylesheet" href="assets/css/styles.css">
     
     <script>
@@ -30,6 +32,25 @@
             try {
                 document.documentElement.style.backgroundColor = 'rgb(3, 7, 18)';
                 document.documentElement.classList.add('loading');
+                
+                // Optimisation: préparer visuellement la page le plus tôt possible
+                if ("requestIdleCallback" in window) {
+                    requestIdleCallback(() => {
+                        // Précharger les ressources critiques pendant les temps morts du navigateur
+                        const resourcesToPrefetch = [
+                            'assets/js/app.js',
+                            'assets/js/components/visualizer.js',
+                            'assets/js/components/favorites.js'
+                        ];
+                        
+                        resourcesToPrefetch.forEach(url => {
+                            const link = document.createElement('link');
+                            link.rel = 'prefetch';
+                            link.href = url;
+                            document.head.appendChild(link);
+                        });
+                    });
+                }
             } catch (e) {
                 console.warn('Error during style initialization:', e);
             }
@@ -87,14 +108,39 @@
         .locale-option {
             transition: background-color 0.2s ease-in-out;
         }
+        
+        /* Style pour l'apparition du contenu principal - OPTIMISÉ */
+        main {
+            opacity: 0;
+            transition: opacity 0.25s ease-out; /* Transition plus rapide */
+        }
+        
+        body.page-loaded main {
+            opacity: 1;
+        }
+        
+        /* Optimiser l'effet de fondu des éléments avec une séquence d'apparition */
+        body.page-loaded .fade-in-sequence > * {
+            opacity: 0;
+            transform: translateY(4px); /* Déplacement plus subtil */
+            animation: fadeInUp 0.25s forwards; /* Animation plus rapide */
+        }
+        
+        /* Décalage progressif de l'animation pour chaque élément */
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
-<body class="dark bg-gray-950 text-gray-200 font-sans antialiased min-h-screen">
+<body class="dark bg-gray-950 text-gray-200 font-sans antialiased min-h-screen loading">
     <header class="py-4 bg-gray-900 shadow-xl mb-6 border-b border-gray-800">
         <div class="container max-w-7xl mx-auto px-4">
             <div class="flex justify-between items-center">
                 <h1 class="text-2xl md:text-3xl font-bold text-white text-center sm:text-left flex items-center justify-center sm:justify-start gap-2">
-                    <img src="assets/img/favicon.svg" alt="Osu!rea Logo" class="w-8 h-8 mr-1 lazy-image" loading="lazy" />
+                    <img src="assets/img/favicon.svg" alt="Osu!rea Logo" class="w-8 h-8 mr-1" />
                     <span><span class="text-[#FF66AA]">Osu!</span>rea</span> - <span data-i18n="app_title">Area Visualizer</span>
                     <span class="bg-osu-blue text-white text-xs px-2 py-0.5 rounded-md font-semibold ml-1">v2.0</span>
                 </h1>
@@ -150,393 +196,426 @@
         });
     </script>
 
-    <main class="container max-w-7xl mx-auto px-4 pb-12">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Left column: Configuration -->
-            <div class="lg:col-span-1 space-y-6">
-                <!-- Tablet Settings -->
-                <div class="card bg-gray-900 p-5 rounded-xl shadow-lg border border-gray-800">
-                    <h2 class="text-xl font-semibold text-white mb-4 pb-3 border-b border-gray-800 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7" />
-                        </svg>
-                        <span data-i18n="tablet_settings">Paramètres Tablette</span>
-                    </h2>
-                    <div class="space-y-4">
-                        <div class="input-group">
-                            <label for="tabletPresetSelect" class="block text-sm font-medium text-gray-400 mb-1.5" data-i18n="tablet_model">
-                                Modèle de Tablette
-                            </label>
-                            <div class="tablet-selector-container relative">
-                                <button id="tabletSelectorButton" type="button" class="w-full bg-gray-800 border border-gray-700 rounded-md h-[38px] px-3 text-left text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition flex items-center justify-between">
-                                    <span id="tabletSelectorText" class="truncate block max-w-[calc(100%-24px)]"
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </button>
-                                <div id="tabletSelectorPopup" class="absolute left-0 right-0 mt-1 bg-gray-800 border border-gray-700 rounded-md shadow-lg z-10 overflow-hidden hidden">
-                                    <div class="flex flex-col h-[500px]">
-                                        <!-- Mobile search header -->
-                                        <div class="p-2 border-b border-gray-700 md:hidden">
-                                            <div class="relative">
-                                                <input type="text" id="tabletSearchMobile" placeholder="Rechercher une tablette..." class="w-full bg-gray-700 border-0 rounded-md p-2 pl-8 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500" data-i18n="search_tablet">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 absolute left-2 top-1/2 transform -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                                </svg>
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- Main container for brands and models -->
-                                        <div class="flex h-[400px] overflow-hidden">
-                                            <!-- Left column: Brands -->
-                                            <div class="w-1/3 flex flex-col border-r border-gray-700">
-                                                <!-- List of brands -->
-                                                <div id="tabletBrandsList" class="flex-grow overflow-y-auto custom-scrollbar">
-                                                    <!-- Desktop search -->
-                                                    <div class="sticky top-0 p-2 border-b border-gray-700 bg-gray-800 z-10 hidden md:block">
-                                                        <div class="relative">
-                                                            <input type="text" id="tabletSearch" placeholder="Rechercher..." class="w-full bg-gray-700 border-0 rounded-md p-1.5 pl-7 text-sm text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500" data-i18n="search">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gray-400 absolute left-2 top-1/2 transform -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                                            </svg>
-                                                        </div>
-                                                    </div>
-                                                    <!-- Brands inserted dynamically -->
+    <main class="py-4 mb-6">
+        <div class="container mx-auto px-4 fade-in-sequence">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Left column: Configuration -->
+                <div class="lg:col-span-1 space-y-6">
+                    <!-- Tablet Settings -->
+                    <div class="card bg-gray-900 p-5 rounded-xl shadow-lg border border-gray-800">
+                        <h2 class="text-xl font-semibold text-white mb-4 pb-3 border-b border-gray-800 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7" />
+                            </svg>
+                            <span data-i18n="tablet_settings">Paramètres Tablette</span>
+                        </h2>
+                        <div class="space-y-4">
+                            <div class="input-group">
+                                <label for="tabletPresetSelect" class="block text-sm font-medium text-gray-400 mb-1.5" data-i18n="tablet_model">
+                                    Modèle de Tablette
+                                </label>
+                                <div class="tablet-selector-container relative">
+                                    <button id="tabletSelectorButton" type="button" class="w-full bg-gray-800 border border-gray-700 rounded-md h-[38px] px-3 text-left text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition flex items-center justify-between">
+                                        <span id="tabletSelectorText" class="truncate block max-w-[calc(100%-24px)]"
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </button>
+                                    <div id="tabletSelectorPopup" class="absolute left-0 right-0 mt-1 bg-gray-800 border border-gray-700 rounded-md shadow-lg z-10 overflow-hidden hidden">
+                                        <div class="flex flex-col h-[500px]">
+                                            <!-- Mobile search header -->
+                                            <div class="p-2 border-b border-gray-700 md:hidden">
+                                                <div class="relative">
+                                                    <input type="text" id="tabletSearchMobile" placeholder="Rechercher une tablette..." class="w-full bg-gray-700 border-0 rounded-md p-2 pl-8 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500" data-i18n="search_tablet">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 absolute left-2 top-1/2 transform -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                                    </svg>
                                                 </div>
                                             </div>
                                             
-                                            <!-- List of models -->
-                                            <div id="tabletModelsList" class="w-2/3 overflow-y-auto custom-scrollbar">
-                                                <!-- Models inserted dynamically -->
+                                            <!-- Main container for brands and models -->
+                                            <div class="flex h-[400px] overflow-hidden">
+                                                <!-- Left column: Brands -->
+                                                <div class="w-1/3 flex flex-col border-r border-gray-700">
+                                                    <!-- List of brands -->
+                                                    <div id="tabletBrandsList" class="flex-grow overflow-y-auto custom-scrollbar">
+                                                        <!-- Desktop search -->
+                                                        <div class="sticky top-0 p-2 border-b border-gray-700 bg-gray-800 z-10 hidden md:block">
+                                                            <div class="relative">
+                                                                <input type="text" id="tabletSearch" placeholder="Rechercher..." class="w-full bg-gray-700 border-0 rounded-md p-1.5 pl-7 text-sm text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500" data-i18n="search">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gray-400 absolute left-2 top-1/2 transform -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                                                </svg>
+                                                            </div>
+                                                        </div>
+                                                        <!-- Brands inserted dynamically -->
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- List of models -->
+                                                <div id="tabletModelsList" class="w-2/3 overflow-y-auto custom-scrollbar">
+                                                    <!-- Models inserted dynamically -->
+                                                </div>
+                                            </div>
+
+                                            <!-- Custom dimensions section -->
+                                            <div class="border-t border-gray-700 w-full">
+                                                <button id="customTabletButton" type="button" class="flex items-center justify-center gap-2 py-4 w-full text-center hover:bg-blue-600 bg-gray-750 text-white font-medium transition-colors">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                                    </svg>
+                                                    <span data-i18n="custom_tablet">Dimensions personnalisées</span>
+                                                </button>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
 
-                                        <!-- Custom dimensions section -->
-                                        <div class="border-t border-gray-700 w-full">
-                                            <button id="customTabletButton" type="button" class="flex items-center justify-center gap-2 py-4 w-full text-center hover:bg-blue-600 bg-gray-750 text-white font-medium transition-colors">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            <!-- Tablet Dimensions (side by side) -->
+                            <div id="tablet-dimensions-container" class="hidden space-y-4">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div id="tablet-width-group">
+                                        <label for="tabletWidth" class="block text-sm font-medium text-gray-400 mb-1.5" data-i18n="tablet_width">
+                                            Largeur Tablette
+                                        </label>
+                                        <div class="relative">
+                                            <input type="number" id="tabletWidth" value="152.0" min="10" max="2000" step="0.1" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2 pl-3 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                            <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm" data-i18n="tablet_units">mm</span>
+                                        </div>
+                                    </div>
+                                    <div id="tablet-height-group">
+                                        <label for="tabletHeight" class="block text-sm font-medium text-gray-400 mb-1.5" data-i18n="tablet_height">
+                                            Hauteur Tablette
+                                        </label>
+                                        <div class="relative">
+                                            <input type="number" id="tabletHeight" value="95.0" min="10" max="2000" step="0.1" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2 pl-3 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                            <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm" data-i18n="tablet_units">mm</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr id="tablet-manual-hr" class="border-gray-800">
+                            </div>
+
+                            <!-- Area Settings -->
+                            <div class="card bg-gray-900 p-5 rounded-xl shadow-lg border border-gray-800">
+                                <h2 class="text-xl font-semibold text-white mb-4 pb-3 border-b border-gray-800 flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                                    </svg>
+                                    <span data-i18n="area_settings">Paramètres Zone Active</span>
+                                </h2>
+                                <div class="space-y-4">
+                                    <!-- Ratio -->
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label for="customRatio" class="block text-sm font-medium text-gray-400 mb-1.5" data-i18n="ratio">
+                                                Ratio (Largeur/Hauteur)
+                                            </label>
+                                            <div class="relative">
+                                                <input type="number" id="customRatio" value="1.000" min="0.001" max="10" step="0.001" class="w-full h-[38px] bg-gray-800 border border-gray-700 rounded-md p-2 pl-3 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-400 mb-1.5 opacity-0">
+                                                Verrouillage
+                                            </label>
+                                            <div class="flex items-center h-[38px] mt-[1px]">
+                                                <button id="lockRatio" 
+                                                        type="button" 
+                                                        class="h-[24px] w-[24px] bg-gray-800 border border-gray-700 rounded-md hover:border-gray-600 outline-none relative" 
+                                                        aria-pressed="true"
+                                                        onclick="toggleLockRatio(this)">
+                                                    <div id="lockRatioIndicator" class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                                        <div class="w-3.5 h-3.5 bg-blue-500 rounded-sm transform scale-100 transition-transform duration-200 ease-out origin-center"></div>
+                                                    </div>
+                                                </button>
+                                                <span class="ml-2 text-[13px] font-medium text-gray-300" data-i18n="lock_ratio">Verrouiller ratio</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Dimensions -->
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label for="areaWidth" class="block text-sm font-medium text-gray-400 mb-1.5" data-i18n="area_width">
+                                                Largeur de l'area
+                                            </label>
+                                            <div class="relative">
+                                                <input type="number" id="areaWidth" value="75.0" min="1" max="1000" step="0.1" class="w-full h-[38px] bg-gray-800 border border-gray-700 rounded-md p-2 pl-3 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                                <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm" data-i18n="tablet_units">mm</span>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label for="areaHeight" class="block text-sm font-medium text-gray-400 mb-1.5" data-i18n="area_height">
+                                                Hauteur de l'area
+                                            </label>
+                                            <div class="relative">
+                                                <input type="number" id="areaHeight" value="75.0" min="1" max="1000" step="0.1" class="w-full h-[38px] bg-gray-800 border border-gray-700 rounded-md p-2 pl-3 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                                <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm" data-i18n="tablet_units">mm</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Position -->
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label for="areaOffsetX" class="block text-sm font-medium text-gray-400 mb-1.5" data-i18n="position_x">
+                                                Offset X
+                                            </label>
+                                            <div class="relative">
+                                                <input type="number" id="areaOffsetX" value="76.000" step="0.001" class="w-full h-[38px] bg-gray-800 border border-gray-700 rounded-md p-2 pl-3 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                                <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm" data-i18n="tablet_units">mm</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div>
+                                            <label for="areaOffsetY" class="block text-sm font-medium text-gray-400 mb-1.5" data-i18n="position_y">
+                                                Offset Y
+                                            </label>
+                                            <div class="relative">
+                                                <input type="number" id="areaOffsetY" value="47.500" step="0.001" class="w-full h-[38px] bg-gray-800 border border-gray-700 rounded-md p-2 pl-3 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                                <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm" data-i18n="tablet_units">mm</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Actions -->
+                                    <div class="grid grid-cols-2 gap-3 mt-2">
+                                        <button id="swap-btn" class="bg-amber-600 hover:bg-amber-700 text-sm font-medium rounded-md py-2 px-4 text-white flex justify-center items-center transition-colors">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                                            </svg>
+                                            <span data-i18n="swap">Inverser</span>
+                                        </button>
+                                        <button id="center-btn" class="bg-indigo-600 hover:bg-indigo-700 text-sm font-medium rounded-md py-2 px-4 text-white flex justify-center items-center transition-colors">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                                            </svg>
+                                            <span data-i18n="center">Centrer</span>
+                                        </button>
+                                    </div>
+
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <button id="copy-btn" class="bg-cyan-600 hover:bg-cyan-700 text-sm font-medium rounded-md py-2 px-4 text-white flex justify-center items-center transition-colors">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                                            </svg>
+                                            <span data-i18n="copy_info">Copier Infos</span>
+                                        </button>
+                                        <button id="save-btn" class="bg-emerald-600 hover:bg-emerald-700 text-sm font-medium rounded-md py-2 px-4 text-white flex justify-center items-center transition-colors">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                                            </svg>
+                                            <span data-i18n="save">Sauvegarder</span>
+                                        </button>
+                                    </div>
+                                    
+                                    <button id="cancel-edit-btn" class="hidden w-full bg-rose-600 hover:bg-rose-700 text-sm font-medium rounded-md py-2 px-4 text-white justify-center items-center transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                        <span data-i18n="cancel">Annuler l'édition</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Actions and Summary -->
+                            <div class="grid grid-cols-1 gap-6">
+                                <!-- Summary -->
+                                <div class="card bg-gray-900 p-5 rounded-xl shadow-lg border border-gray-800 hover:bg-gray-850/40 transition-colors duration-300" id="recap-card">
+                                    <div class="flex justify-between items-center p-2 transition-colors cursor-pointer" id="recap-toggle">
+                                        <h2 class="text-xl font-semibold text-white flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                            </svg>
+                                            <span data-i18n="summary">Récapitulatif</span>
+                                        </h2>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 transition-transform duration-200 rotate-180" id="recap-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </div>
+                                    <div id="recap-content" class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm transition-all duration-300 ease-in-out opacity-0" style="max-height: 0; overflow: hidden;">
+                                        <!-- Tablet Section -->
+                                        <div class="col-span-2 pb-1 mb-1">
+                                            <span class="text-white font-semibold flex items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7" />
                                                 </svg>
-                                                <span data-i18n="custom_tablet">Dimensions personnalisées</span>
-                                            </button>
+                                                TABLETTE
+                                            </span>
                                         </div>
+                                        
+                                        <p class="flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                                            </svg>
+                                            <span>Dimensions:</span>
+                                        </p>
+                                        <p class="text-gray-300 text-right font-medium" id="tablet-dimensions-info">... mm</p>
+                                        
+                                        <p class="flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                                            </svg>
+                                            <span data-i18n="ratio">Ratio:</span>
+                                        </p>
+                                        <p class="text-gray-300 text-right font-medium" id="tablet-ratio-info">...</p>
+                                        
+                                        <!-- Area Section -->
+                                        <div class="col-span-2 pb-1 mb-1 mt-3">
+                                            <span class="text-white font-semibold flex items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6z" />
+                                                </svg>
+                                                <span data-i18n="area_settings">ZONE ACTIVE</span>
+                                            </span>
+                                        </div>
+                                        
+                                        <p class="flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                                            </svg>
+                                            <span>Dimensions:</span>
+                                        </p>
+                                        <p class="text-gray-300 text-right font-medium" id="dimensions-info">... mm</p>
+                                        
+                                        <p class="flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                            </svg>
+                                            <span>Surface:</span>
+                                        </p>
+                                        <p class="text-gray-300 text-right font-medium" id="area-info">... mm²</p>
+                                        
+                                        <p class="flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                                            </svg>
+                                            <span data-i18n="ratio">Ratio:</span>
+                                        </p>
+                                        <p class="text-gray-300 text-right font-medium" id="ratio-info">...</p>
+                                        
+                                        <p class="flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                            <span data-i18n="area_position">Position:</span>
+                                        </p>
+                                        <p class="text-gray-300 text-right font-medium" id="position-info">... mm</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
 
-                        <!-- Tablet Dimensions (side by side) -->
-                        <div id="tablet-dimensions-container" class="hidden space-y-4">
-                            <div class="grid grid-cols-2 gap-4">
-                                <div id="tablet-width-group">
-                                    <label for="tabletWidth" class="block text-sm font-medium text-gray-400 mb-1.5" data-i18n="tablet_width">
-                                        Largeur Tablette
-                                    </label>
-                                    <div class="relative">
-                                        <input type="number" id="tabletWidth" value="152.0" min="10" max="2000" step="0.1" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2 pl-3 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
-                                        <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm" data-i18n="tablet_units">mm</span>
-                                    </div>
-                                </div>
-                                <div id="tablet-height-group">
-                                    <label for="tabletHeight" class="block text-sm font-medium text-gray-400 mb-1.5" data-i18n="tablet_height">
-                                        Hauteur Tablette
-                                    </label>
-                                    <div class="relative">
-                                        <input type="number" id="tabletHeight" value="95.0" min="10" max="2000" step="0.1" class="w-full bg-gray-800 border border-gray-700 rounded-md p-2 pl-3 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
-                                        <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm" data-i18n="tablet_units">mm</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <hr id="tablet-manual-hr" class="border-gray-800">
-                        </div>
-
-                        <!-- Area Settings -->
-                        <div class="card bg-gray-900 p-5 rounded-xl shadow-lg border border-gray-800">
-                            <h2 class="text-xl font-semibold text-white mb-4 pb-3 border-b border-gray-800 flex items-center">
+                <!-- Right column: Visualization + Favorites -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Visualization -->
+                    <div class="card bg-gray-900 p-5 rounded-xl shadow-lg border border-gray-800">
+                        <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-800">
+                            <h2 class="text-xl font-semibold text-white flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                 </svg>
-                                <span data-i18n="area_settings">Paramètres Zone Active</span>
+                                <span data-i18n="tablet_visualization">Visualisation</span>
                             </h2>
-                            <div class="space-y-4">
-                                <!-- Ratio -->
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label for="customRatio" class="block text-sm font-medium text-gray-400 mb-1.5" data-i18n="ratio">
-                                            Ratio (Largeur/Hauteur)
-                                        </label>
-                                        <div class="relative">
-                                            <input type="number" id="customRatio" value="1.000" min="0.001" max="10" step="0.001" class="w-full h-[38px] bg-gray-800 border border-gray-700 rounded-md p-2 pl-3 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-400 mb-1.5 opacity-0">
-                                            Verrouillage
-                                        </label>
-                                        <div class="flex items-center h-[38px] mt-[1px]">
-                                            <button id="lockRatio" 
-                                                    type="button" 
-                                                    class="h-[24px] w-[24px] bg-gray-800 border border-gray-700 rounded-md hover:border-gray-600 outline-none relative" 
-                                                    aria-pressed="true"
-                                                    onclick="toggleLockRatio(this)">
-                                                <div id="lockRatioIndicator" class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                                    <div class="w-3.5 h-3.5 bg-blue-500 rounded-sm transform scale-100 transition-transform duration-200 ease-out origin-center"></div>
-                                                </div>
-                                            </button>
-                                            <span class="ml-2 text-[13px] font-medium text-gray-300" data-i18n="lock_ratio">Verrouiller ratio</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Dimensions -->
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label for="areaWidth" class="block text-sm font-medium text-gray-400 mb-1.5" data-i18n="area_width">
-                                            Largeur de l'area
-                                        </label>
-                                        <div class="relative">
-                                            <input type="number" id="areaWidth" value="75.0" min="1" max="1000" step="0.1" class="w-full h-[38px] bg-gray-800 border border-gray-700 rounded-md p-2 pl-3 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
-                                            <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm" data-i18n="tablet_units">mm</span>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label for="areaHeight" class="block text-sm font-medium text-gray-400 mb-1.5" data-i18n="area_height">
-                                            Hauteur de l'area
-                                        </label>
-                                        <div class="relative">
-                                            <input type="number" id="areaHeight" value="75.0" min="1" max="1000" step="0.1" class="w-full h-[38px] bg-gray-800 border border-gray-700 rounded-md p-2 pl-3 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
-                                            <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm" data-i18n="tablet_units">mm</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Position -->
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label for="areaOffsetX" class="block text-sm font-medium text-gray-400 mb-1.5" data-i18n="position_x">
-                                            Offset X
-                                        </label>
-                                        <div class="relative">
-                                            <input type="number" id="areaOffsetX" value="76.000" step="0.001" class="w-full h-[38px] bg-gray-800 border border-gray-700 rounded-md p-2 pl-3 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
-                                            <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm" data-i18n="tablet_units">mm</span>
-                                        </div>
-                                    </div>
-                                    
-                                    <div>
-                                        <label for="areaOffsetY" class="block text-sm font-medium text-gray-400 mb-1.5" data-i18n="position_y">
-                                            Offset Y
-                                        </label>
-                                        <div class="relative">
-                                            <input type="number" id="areaOffsetY" value="47.500" step="0.001" class="w-full h-[38px] bg-gray-800 border border-gray-700 rounded-md p-2 pl-3 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
-                                            <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm" data-i18n="tablet_units">mm</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Actions -->
-                                <div class="grid grid-cols-2 gap-3 mt-2">
-                                    <button id="swap-btn" class="bg-amber-600 hover:bg-amber-700 text-sm font-medium rounded-md py-2 px-4 text-white flex justify-center items-center transition-colors">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
-                                        </svg>
-                                        <span data-i18n="swap">Inverser</span>
-                                    </button>
-                                    <button id="center-btn" class="bg-indigo-600 hover:bg-indigo-700 text-sm font-medium rounded-md py-2 px-4 text-white flex justify-center items-center transition-colors">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-                                        </svg>
-                                        <span data-i18n="center">Centrer</span>
-                                    </button>
-                                </div>
-
-                                <div class="grid grid-cols-2 gap-3">
-                                    <button id="copy-btn" class="bg-cyan-600 hover:bg-cyan-700 text-sm font-medium rounded-md py-2 px-4 text-white flex justify-center items-center transition-colors">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                                        </svg>
-                                        <span data-i18n="copy_info">Copier Infos</span>
-                                    </button>
-                                    <button id="save-btn" class="bg-emerald-600 hover:bg-emerald-700 text-sm font-medium rounded-md py-2 px-4 text-white flex justify-center items-center transition-colors">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                                        </svg>
-                                        <span data-i18n="save">Sauvegarder</span>
-                                    </button>
-                                </div>
-                                
-                                <button id="cancel-edit-btn" class="hidden w-full bg-rose-600 hover:bg-rose-700 text-sm font-medium rounded-md py-2 px-4 text-white justify-center items-center transition-colors">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                    <span data-i18n="cancel">Annuler l'édition</span>
-                                </button>
+                            <div class="flex items-center">
+                                <label for="toggleGridCheckbox" class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="toggleGridCheckbox" checked class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-blue-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                    <span class="ml-2 text-sm font-medium text-gray-300" data-i18n="show_grid">Grille</span>
+                                </label>
                             </div>
                         </div>
-
-                        <!-- Actions and Summary -->
-                        <div class="grid grid-cols-1 gap-6">
-                            <!-- Summary -->
-                            <div class="card bg-gray-900 p-5 rounded-xl shadow-lg border border-gray-800 hover:bg-gray-850/40 transition-colors duration-300" id="recap-card">
-                                <div class="flex justify-between items-center p-2 transition-colors cursor-pointer" id="recap-toggle">
-                                    <h2 class="text-xl font-semibold text-white flex items-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                        </svg>
-                                        <span data-i18n="summary">Récapitulatif</span>
-                                    </h2>
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 transition-transform duration-200 rotate-180" id="recap-arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        
+                        <div id="visual-container" class="w-full h-[500px] bg-gray-950 rounded-lg border border-gray-800 items-center justify-center overflow-hidden relative">
+                            <!-- Overlay of loading with a more elegant animation -->
+                            <div id="loading-overlay" class="absolute inset-0 z-10 bg-gray-950 flex items-center justify-center">
+                                <div class="loading-spinner">
+                                    <svg class="w-10 h-10" viewBox="0 0 50 50">
+                                        <circle class="spinner-track" cx="25" cy="25" r="20" fill="none" stroke-width="3"></circle>
+                                        <circle class="spinner-circle" cx="25" cy="25" r="20" fill="none" stroke-width="3"></circle>
                                     </svg>
                                 </div>
-                                <div id="recap-content" class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm transition-all duration-300 ease-in-out opacity-0" style="max-height: 0; overflow: hidden;">
-                                    <!-- Tablet Section -->
-                                    <div class="col-span-2 pb-1 mb-1">
-                                        <span class="text-white font-semibold flex items-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7" />
-                                            </svg>
-                                            TABLETTE
-                                        </span>
-                                    </div>
-                                    
-                                    <p class="flex items-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                                        </svg>
-                                        <span>Dimensions:</span>
-                                    </p>
-                                    <p class="text-gray-300 text-right font-medium" id="tablet-dimensions-info">... mm</p>
-                                    
-                                    <p class="flex items-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                                        </svg>
-                                        <span data-i18n="ratio">Ratio:</span>
-                                    </p>
-                                    <p class="text-gray-300 text-right font-medium" id="tablet-ratio-info">...</p>
-                                    
-                                    <!-- Area Section -->
-                                    <div class="col-span-2 pb-1 mb-1 mt-3">
-                                        <span class="text-white font-semibold flex items-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6z" />
-                                            </svg>
-                                            <span data-i18n="area_settings">ZONE ACTIVE</span>
-                                        </span>
-                                    </div>
-                                    
-                                    <p class="flex items-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                                        </svg>
-                                        <span>Dimensions:</span>
-                                    </p>
-                                    <p class="text-gray-300 text-right font-medium" id="dimensions-info">... mm</p>
-                                    
-                                    <p class="flex items-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                        </svg>
-                                        <span>Surface:</span>
-                                    </p>
-                                    <p class="text-gray-300 text-right font-medium" id="area-info">... mm²</p>
-                                    
-                                    <p class="flex items-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                                        </svg>
-                                        <span data-i18n="ratio">Ratio:</span>
-                                    </p>
-                                    <p class="text-gray-300 text-right font-medium" id="ratio-info">...</p>
-                                    
-                                    <p class="flex items-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
-                                        <span data-i18n="area_position">Position:</span>
-                                    </p>
-                                    <p class="text-gray-300 text-right font-medium" id="position-info">... mm</p>
-                                </div>
+                            </div>
+                            <div id="backgroundGrid" class="absolute inset-0 opacity-30" style="background-size: 20px 20px; background-image: linear-gradient(to right, rgb(75, 85, 99) 1px, transparent 1px), linear-gradient(to bottom, rgb(75, 85, 99) 1px, transparent 1px);"></div>
+                            <div id="tablet-boundary" class="relative border-2 border-gray-600 rounded bg-gray-800/30 flex items-center justify-center">
+                                <div id="rectangle" class="absolute bg-blue-500/40 border-2 border-blue-500 rounded invisible" style="position: absolute; left: 0; top: 0;"></div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Right column: Visualization + Favorites -->
-            <div class="lg:col-span-2 space-y-6">
-                <!-- Visualization -->
-                <div class="card bg-gray-900 p-5 rounded-xl shadow-lg border border-gray-800">
-                    <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-800">
-                        <h2 class="text-xl font-semibold text-white flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                            </svg>
-                            <span data-i18n="tablet_visualization">Visualisation</span>
-                        </h2>
-                        <div class="flex items-center">
-                            <label for="toggleGridCheckbox" class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="toggleGridCheckbox" checked class="sr-only peer">
-                                <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-blue-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                                <span class="ml-2 text-sm font-medium text-gray-300" data-i18n="show_grid">Grille</span>
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <div id="visual-container" class="w-full h-[500px] bg-gray-950 rounded-lg border border-gray-800 items-center justify-center overflow-hidden relative">
-                        <!-- Overlay of loading with a more elegant animation -->
-                        <div id="loading-overlay" class="absolute inset-0 z-10 bg-gray-950 flex items-center justify-center">
-                            <div class="loading-spinner">
-                                <svg class="w-10 h-10" viewBox="0 0 50 50">
-                                    <circle class="spinner-track" cx="25" cy="25" r="20" fill="none" stroke-width="3"></circle>
-                                    <circle class="spinner-circle" cx="25" cy="25" r="20" fill="none" stroke-width="3"></circle>
+                    <!-- Favorites -->
+                    <div class="card bg-gray-900 p-5 rounded-xl shadow-lg border border-gray-800">
+                        <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-800">
+                            <h2 class="text-xl font-semibold text-white flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                                 </svg>
+                                <span data-i18n="favorites">Favoris</span>
+                            </h2>
+                            <div id="sort-options" class="flex space-x-1">
+                                <button data-sort="date" class="sort-button py-1.5 px-2.5 text-xs rounded-md font-medium text-gray-300 bg-gray-800/80 hover:bg-gray-700 border border-gray-700 transition-colors" data-i18n="sort_date">Date</button>
+                                <button data-sort="name" class="sort-button py-1.5 px-2.5 text-xs rounded-md font-medium text-gray-300 bg-gray-800/80 hover:bg-gray-700 border border-gray-700 transition-colors" data-i18n="sort_name">Nom</button>
+                                <button data-sort="size" class="sort-button py-1.5 px-2.5 text-xs rounded-md font-medium text-gray-300 bg-gray-800/80 hover:bg-gray-700 border border-gray-700 transition-colors" data-i18n="sort_size">Taille</button>
                             </div>
                         </div>
-                        <div id="backgroundGrid" class="absolute inset-0 opacity-30" style="background-size: 20px 20px; background-image: linear-gradient(to right, rgb(75, 85, 99) 1px, transparent 1px), linear-gradient(to bottom, rgb(75, 85, 99) 1px, transparent 1px);"></div>
-                        <div id="tablet-boundary" class="relative border-2 border-gray-600 rounded bg-gray-800/30 flex items-center justify-center">
-                            <div id="rectangle" class="absolute bg-blue-500/40 border-2 border-blue-500 rounded invisible" style="position: absolute; left: 0; top: 0;"></div>
+                        
+                        <!-- Ajout d'un espace supplémentaire après l'en-tête -->
+                        <div class="mt-4"></div>
+                        
+                        <div id="favorites-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-80 overflow-y-auto pr-1 custom-scrollbar">
+                            <p class="text-gray-400 text-center italic p-6 col-span-full" data-i18n="no_favorites">Aucun favori enregistré. Sauvegardez une configuration pour la retrouver ici.</p>
+                            <!-- Favorites will be inserted here dynamically -->
                         </div>
-                    </div>
-                </div>
-
-                <!-- Favorites -->
-                <div class="card bg-gray-900 p-5 rounded-xl shadow-lg border border-gray-800">
-                    <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-800">
-                        <h2 class="text-xl font-semibold text-white flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                            </svg>
-                            <span data-i18n="favorites">Favoris</span>
-                        </h2>
-                        <div id="sort-options" class="flex space-x-1">
-                            <button data-sort="date" class="sort-button py-1.5 px-2.5 text-xs rounded-md font-medium text-gray-300 bg-gray-800/80 hover:bg-gray-700 border border-gray-700 transition-colors" data-i18n="sort_date">Date</button>
-                            <button data-sort="name" class="sort-button py-1.5 px-2.5 text-xs rounded-md font-medium text-gray-300 bg-gray-800/80 hover:bg-gray-700 border border-gray-700 transition-colors" data-i18n="sort_name">Nom</button>
-                            <button data-sort="size" class="sort-button py-1.5 px-2.5 text-xs rounded-md font-medium text-gray-300 bg-gray-800/80 hover:bg-gray-700 border border-gray-700 transition-colors" data-i18n="sort_size">Taille</button>
-                        </div>
-                    </div>
-                    
-                    <!-- Ajout d'un espace supplémentaire après l'en-tête -->
-                    <div class="mt-4"></div>
-                    
-                    <div id="favorites-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-80 overflow-y-auto pr-1 custom-scrollbar">
-                        <p class="text-gray-400 text-center italic p-6 col-span-full" data-i18n="no_favorites">Aucun favori enregistré. Sauvegardez une configuration pour la retrouver ici.</p>
-                        <!-- Favorites will be inserted here dynamically -->
                     </div>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-gray-900 py-4 mt-8 border-t border-gray-800">
-        <div class="container mx-auto text-center text-gray-400 text-sm">
-            <p>Osu!rea - Area Visualizer v2.0 - <span data-i18n="footer_credit">Conçu pour la communauté osu! par Yuzuctus</span></p>
-            <p class="mt-1" data-i18n="footer_description">Utilisez cet outil pour visualiser et sauvegarder votre zone active de tablette graphique.</p>
-        </div>
-    </footer>
+    <!-- Container for delayed footer -->
+    <div id="footer-container" style="opacity: 0; transition: opacity 0.4s ease-out;"></div>
+
+    <!-- Footer and loading script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create footer element
+            const footer = document.createElement('footer');
+            footer.className = "bg-gray-900 py-4 mt-8 border-t border-gray-800";
+            footer.innerHTML = `
+                <div class="container mx-auto text-center text-gray-400 text-sm">
+                    <p>Osu!rea - Area Visualizer v2.0 - <span data-i18n="footer_credit">Conçu pour la communauté osu! par Yuzuctus</span></p>
+                    <p class="mt-1" data-i18n="footer_description">Utilisez cet outil pour visualiser et sauvegarder votre zone active de tablette graphique.</p>
+                </div>
+            `;
+            
+            // Get footer container
+            const footerContainer = document.getElementById('footer-container');
+            
+            // Add a listener to load the footer after the page content is loaded
+            window.addEventListener('load', function() {
+                setTimeout(function() {
+                    if (footerContainer) {
+                        footerContainer.appendChild(footer);
+                        // Fade in the footer only after everything else is loaded
+                        setTimeout(function() {
+                            footerContainer.style.opacity = '1';
+                            
+                            // Apply any translations to the footer
+                            if (typeof updateAllTranslations === 'function') {
+                                updateAllTranslations();
+                            }
+                        }, 300);
+                    }
+                }, 150);
+            });
+        });
+    </script>
 
     <!-- Context Menu -->
     <div id="context-menu" class="fixed hidden bg-gray-900 border border-blue-500 rounded-lg p-3 shadow-xl z-[9999] min-w-[220px]">
@@ -622,22 +701,22 @@
     </div>
 
     <!-- JavaScript Scripts -->
-    <script type="module" src="assets/locales/index.js"></script>
-    <script type="module">
+    <script type="module" src="assets/locales/index.js" defer></script>
+    <script type="module" defer>
         import initializeI18n from './assets/js/i18n-init.js';
         // Initialize translation system
         document.addEventListener('DOMContentLoaded', initializeI18n);
     </script>
-    <script type="module" src="assets/js/locale-switcher.js"></script>
-    <script src="assets/js/utils/helpers.js"></script>
-    <script src="assets/js/utils/storage.js"></script>
-    <script src="assets/js/utils/preferences.js"></script>
-    <script src="assets/js/utils/constraintHelpers.js"></script>
-    <script src="assets/js/components/contextMenu.js"></script>
-    <script src="assets/js/components/notifications.js"></script>
-    <script src="assets/js/components/visualizer.js"></script>
-    <script src="assets/js/components/favorites.js"></script>
-    <script src="assets/js/components/tabletSelector.js"></script>
+    <script type="module" src="assets/js/locale-switcher.js" defer></script>
+    <script src="assets/js/utils/helpers.js" defer></script>
+    <script src="assets/js/utils/storage.js" defer></script>
+    <script src="assets/js/utils/preferences.js" defer></script>
+    <script src="assets/js/utils/constraintHelpers.js" defer></script>
+    <script src="assets/js/components/contextMenu.js" defer></script>
+    <script src="assets/js/components/notifications.js" defer></script>
+    <script src="assets/js/components/visualizer.js" defer></script>
+    <script src="assets/js/components/favorites.js" defer></script>
+    <script src="assets/js/components/tabletSelector.js" defer></script>
     
     <script>
         // Function to handle the ratio lock toggle
@@ -717,29 +796,35 @@
                         Object.assign(rectangle.style, defaultStyles);
                     }
                     
-                    // Remove loading overlay correctly after page load completes
+                    // Remove loading overlay correctly after page load completes - OPTIMISÉ
                     window.addEventListener('load', () => {
+                        // Supprimer complètement le délai initial
+                        const loadingOverlay = document.getElementById('loading-overlay');
+                        if (loadingOverlay) {
+                            loadingOverlay.style.opacity = '0';
+                            loadingOverlay.style.transition = 'opacity 0.075s cubic-bezier(0.4, 0, 0.2, 1)';
+                        }
+                        
+                        // Réduire considérablement le délai de transition
                         setTimeout(() => {
-                            const loadingOverlay = document.getElementById('loading-overlay');
+                            document.documentElement.style.removeProperty('--transition-fast');
+                            document.documentElement.style.removeProperty('--transition-normal');
+                            
                             if (loadingOverlay) {
-                                loadingOverlay.style.opacity = '0';
-                                loadingOverlay.style.transition = 'opacity 0.4s ease';
+                                loadingOverlay.style.display = 'none';
                             }
                             
-                            // Reactivate CSS transitions when everything is loaded
-                            setTimeout(() => {
-                                document.documentElement.style.removeProperty('--transition-fast');
-                                document.documentElement.style.removeProperty('--transition-normal');
-                                
-                                if (loadingOverlay) {
-                                    loadingOverlay.style.display = 'none';
-                                }
-                                
-                                // Remove loading classes
-                                document.documentElement.classList.remove('loading');
-                                document.body.classList.remove('loading');
-                            }, 400);
-                        }, 100);
+                            // Remove loading classes
+                            document.documentElement.classList.remove('loading');
+                            document.body.classList.add('page-loaded');
+                            document.body.classList.remove('loading');
+                            
+                            // Accélérer l'animation séquentielle des cartes
+                            const cards = document.querySelectorAll('.card, .section');
+                            cards.forEach((card, index) => {
+                                card.style.animationDelay = `${Math.min(index * 0.01, 0.02)}s`;
+                            });
+                        }, 20); // Délai minimal pour permettre le rendu initial
                     });
                 } catch (error) {
                     console.error('Error during initialization:', error);
@@ -765,8 +850,9 @@
                 }
                 // Always remove loading classes after the safety delay
                 document.documentElement.classList.remove('loading');
+                document.body.classList.add('page-loaded');
                 document.body.classList.remove('loading');
-            }, 5000); // Safety delay of 5 seconds
+            }, 400); // Réduire le délai de sécurité à moins d'une seconde
         })();
     </script>
     

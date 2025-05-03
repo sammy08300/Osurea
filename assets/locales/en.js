@@ -1,6 +1,6 @@
 const en = {
     // Navigation and header elements
-    "app_title": "Osu!rea - Area Visualizer",
+    "app_title": "Area Visualizer",
     "app_description": "Area visualizer for osu! players who use a graphics tablet. Configure and precisely visualize your active area, save your configurations as favorites and share them.",
     
     // Tablet Settings
@@ -24,7 +24,7 @@ const en = {
     "position_x": "X Position",
     "position_y": "Y Position",
     "center": "Center",
-    "swap": "Swap",
+    "swap": "Reverse",
     
     // Visual Options
     "visual_options": "Visual Options",

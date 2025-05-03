@@ -1,6 +1,6 @@
 const fr = {
     // Navigation elements and header
-    "app_title": "Osu!rea - Area Visualizer",
+    "app_title": "Area Visualizer",
     "app_description": "Visualiseur d'area pour les joueurs d'osu! Configurez et visualisez votre zone active précisément, sauvegardez vos configurations dans des favoris et partagez-les.",
     
     // Tablet settings
