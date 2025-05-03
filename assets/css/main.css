@@ -109,16 +109,18 @@ select:disabled {
 /* Favorite items styles */
 .favorite-item {
     transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), 
-                box-shadow 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+                box-shadow 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                z-index 0.3s ease;
     will-change: transform, box-shadow;
     position: relative;
+    top: 4px;
     z-index: 1;
 }
 
 .favorite-item:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 16px rgba(59, 130, 246, 0.15);
-    z-index: 10;
+    transform: translateY(-12px) !important;
+    box-shadow: 0 14px 20px rgba(59, 130, 246, 0.2) !important;
+    z-index: 10 !important;
 }
 
 .favorite-item:active {
@@ -858,15 +860,24 @@ body.loading-favorites #favorites-list .favorite-item {
 /* Ajouter de l'espace pour éviter le chevauchement des cartes avec l'en-tête */
 #favorites-list {
     margin-top: 16px;
-    padding-top: 4px;
+    padding-top: 0px;
+    position: relative;
+    z-index: 5; /* Augmenter le z-index pour tout le conteneur */
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Modifier l'overflow pour que les cartes puissent sortir du conteneur pendant l'animation */
+#favorites-list.custom-scrollbar {
+    overflow: visible !important; /* Permettre aux éléments de sortir de la zone */
+    overflow-y: auto !important; /* Mais garder le défilement vertical */
+    clip-path: inset(0 0 -100px 0); /* Créer un clipping qui laisse de l'espace en haut */
 }
 
 /* Ajuster le positionnement des favoris pour qu'ils commencent plus bas */
 #favorites-list > .favorite-item:nth-child(1),
 #favorites-list > .favorite-item:nth-child(2),
 #favorites-list > .favorite-item:nth-child(3) {
-    margin-top: 6px;
+    margin-top: 0px;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 

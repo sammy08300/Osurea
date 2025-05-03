@@ -234,13 +234,8 @@ const Favorites = {
         
         const item = document.createElement('div');
         // Utilisation de className pour mettre en œuvre l'effet de soulèvement
-        item.className = 'favorite-item bg-gray-800 rounded-xl p-3 border border-gray-700 hover:border-blue-500/30 shadow-lg cursor-pointer transform-gpu';
+        item.className = 'favorite-item bg-gray-800 rounded-xl p-3 border border-gray-700 hover:border-blue-500/30 shadow-lg cursor-pointer animate-fadeIn-smooth';
         item.dataset.id = favorite.id;
-        
-        // Add the animation class but only if already initialized
-        if (this.isInitialized) {
-            item.classList.add('animate-fadeIn');
-        }
         
         // Use the title if it exists, otherwise use the old comment field if it exists, otherwise default text
         let title = favorite.title || favorite.comment || 'i18n:default_favorite_name';
