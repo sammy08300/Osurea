@@ -15,6 +15,12 @@ import localeManager from '../locales/index.js';
  */
 function detectAndApplyBrowserLanguage() {
   try {
+    // Vérifier si l'utilisateur a déjà choisi une langue
+    const savedLocale = localeManager.getSafeLocalStorage('osureaLocale');
+    if (savedLocale && localeManager.translations[savedLocale]) {
+      console.log(`[LangDetect] User has already chosen language: ${savedLocale}, skipping auto-detection`);
+      return;
+    }
     // Uses only the browser's interface language
     let lang = 'en'; // fallback
     if (navigator.language) {

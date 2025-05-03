@@ -1,7 +1,30 @@
 import localeManager from '../locales/index.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    initializeLocaleSwitcher();
+    // Cacher le sélecteur au chargement
+    const localeSelector = document.getElementById('locale-switcher');
+    if (localeSelector) {
+        localeSelector.style.visibility = 'hidden';
+        localeSelector.style.opacity = '0';
+    }
+
+    // Attendre que la langue soit correctement initialisée (préférence utilisateur OU détection auto)
+    const initLocaleSwitcher = () => {
+        if (localeManager.getCurrentLocale()) {
+            initializeLocaleSwitcher();
+            // Afficher le sélecteur une fois prêt
+            if (localeSelector) {
+                localeSelector.style.visibility = 'visible';
+                // Appliquer le fondu
+                setTimeout(() => {
+                    localeSelector.style.opacity = '1';
+                }, 10); // léger délai pour déclencher la transition
+            }
+        } else {
+            setTimeout(initLocaleSwitcher, 50);
+        }
+    };
+    initLocaleSwitcher();
 });
 
 function initializeLocaleSwitcher() {

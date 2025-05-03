@@ -10,13 +10,11 @@ class LocaleManager {
       es
     };
     
-    // Do not initialize the language here to allow correct browser detection
-    // The language will be set by our detectAndApplyBrowserLanguage()
-    this.currentLocale = null;
+    // Initialize with English as fallback
+    this.currentLocale = 'en';
     
     try {
       // Get the user preference if it exists
-      // Some browsers may block localStorage in private mode
       const savedLocale = this.getSafeLocalStorage('osureaLocale');
       
       // If a user preference exists and is valid, use it
@@ -24,12 +22,17 @@ class LocaleManager {
         this.currentLocale = savedLocale;
         // Update the page's lang attribute
         this.safeSetLang(this.currentLocale);
+      } else {
+        // If no saved preference, use browser detection
+        const browserLang = this.getBrowserLanguage();
+        if (browserLang) {
+          this.currentLocale = browserLang;
+          this.safeSetLang(this.currentLocale);
+        }
       }
     } catch (e) {
       console.warn('Error during initialization of LocaleManager:', e);
     }
-    // If no language is defined, the browser detection will be done
-    // by the detectAndApplyBrowserLanguage() function later
   }
   
   // Secure method to access localStorage
@@ -97,6 +100,7 @@ class LocaleManager {
     try {
       if (this.translations[locale]) {
         this.currentLocale = locale;
+        // Always save the user's choice to localStorage
         this.setSafeLocalStorage('osureaLocale', locale);
         this.safeSetLang(locale);
         
