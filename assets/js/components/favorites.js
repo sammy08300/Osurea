@@ -253,7 +253,7 @@ const Favorites = {
         }
         
         // Limit the title to 25 characters with an ellipsis if necessary
-        const displayTitle = translatedTitle.length > 25 ? translatedTitle.substring(0, 25) + '...' : translatedTitle;
+        const displayTitle = translatedTitle.length > 32 ? translatedTitle.substring(0, 32) + '...' : translatedTitle;
         
         // Limit to 3 decimal places for all numeric values
         const areaWidth = formatNumber(favorite.areaWidth || favorite.width, 3);
@@ -378,9 +378,9 @@ const Favorites = {
                             </svg>
                             <span data-i18n="favorite_name">Titre</span>
                         </div>
-                        <span id="title-counter" class="text-xs font-medium px-2 py-1 bg-gray-800 rounded-md text-gray-400">0/25</span>
+                        <span id="title-counter" class="text-xs font-medium px-2 py-1 bg-gray-800 rounded-md text-gray-400">0/32</span>
                     </h3>
-                    <input type="text" id="comment-input" maxlength="25" data-i18n-placeholder="favorite_name_placeholder" placeholder="" 
+                    <input type="text" id="comment-input" maxlength="32" data-i18n-placeholder="favorite_name_placeholder" placeholder="" 
                            class="w-full bg-gray-800 border border-gray-700 rounded-md p-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-colors duration-200">
                 </div>
                 
@@ -596,20 +596,20 @@ const Favorites = {
         descriptionInput.value = '';
         
         // Update counters with initial values
-        if (titleCounter) titleCounter.textContent = '0/25';
+        if (titleCounter) titleCounter.textContent = '0/32';
         if (descriptionCounter) descriptionCounter.textContent = '0/144';
         
         // Setup input counters
         const updateTitleCounter = () => {
             if (!titleCounter) return;
             const length = commentInput.value.length;
-            titleCounter.textContent = `${length}/25`;
+            titleCounter.textContent = `${length}/32`;
             
             // Reset the classes
             titleCounter.className = 'text-xs font-medium px-2 py-1 bg-gray-800 rounded-md text-gray-400';
             
             // Add the classes based on the limit
-            if (length >= 25) {
+            if (length >= 32) {
                 titleCounter.classList.add('at-limit');
             } else if (length > 15) {
                 titleCounter.classList.add('near-limit');
@@ -1192,9 +1192,9 @@ const Favorites = {
                     commentData.title = "i18n:default_favorite_name";
                 }
                 // If it is a translation key, do not truncate
-                if (!commentData.title.startsWith('i18n:') && commentData.title.length > 25) {
-                    Notifications.warning("Le titre a été tronqué à 25 caractères.");
-                    commentData.title = commentData.title.substring(0, 25);
+                if (!commentData.title.startsWith('i18n:') && commentData.title.length > 32) {
+                    Notifications.warning("Le titre a été tronqué à 32 caractères.");
+                    commentData.title = commentData.title.substring(0, 32);
                 }
                 if (commentData.description && commentData.description.length > 144) {
                     Notifications.warning("La description a été tronquée à 144 caractères.");
@@ -1344,13 +1344,13 @@ const Favorites = {
         
         // Update the title counter
         if (titleCounter) {
-            titleCounter.textContent = `${displayTitle.length}/25`;
+            titleCounter.textContent = `${displayTitle.length}/32`;
             
             // Reset the classes
             titleCounter.className = 'text-xs font-medium px-2 py-1 bg-gray-800 rounded-md text-gray-400';
             
             // Add the classes according to the limit
-            if (displayTitle.length >= 25) {
+            if (displayTitle.length >= 32) {
                 titleCounter.classList.add('at-limit');
             } else if (displayTitle.length > 15) {
                 titleCounter.classList.add('near-limit');
@@ -1605,9 +1605,9 @@ const Favorites = {
                             </svg>
                             <span data-i18n="favorite_name">Titre</span>
                         </div>
-                        <span id="details-title-counter" class="text-xs font-medium px-2 py-1 bg-gray-800 rounded-md text-gray-400">0/25</span>
+                        <span id="details-title-counter" class="text-xs font-medium px-2 py-1 bg-gray-800 rounded-md text-gray-400">0/32</span>
                     </h3>
-                    <input type="text" id="details-title" maxlength="25" data-i18n-placeholder="favorite_name_placeholder" placeholder="" 
+                    <input type="text" id="details-title" maxlength="32" data-i18n-placeholder="favorite_name_placeholder" placeholder="" 
                            class="w-full bg-gray-800 border border-gray-700 rounded-md p-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 mb-0 transition-colors duration-200">
                 </div>
                 
@@ -1796,13 +1796,13 @@ const Favorites = {
             const updateTitleCounter = () => {
                 if (!titleCounter) return;
                 const length = titleInput.value.length;
-                titleCounter.textContent = `${length}/25`;
+                titleCounter.textContent = `${length}/32`;
                 
                 // Reset the classes
                 titleCounter.className = 'text-xs font-medium px-2 py-1 bg-gray-800 rounded-md text-gray-400';
                 
                 // Add the classes based on the limit
-                if (length >= 25) {
+                if (length >= 32) {
                     titleCounter.classList.add('at-limit');
                 } else if (length > 15) {
                     titleCounter.classList.add('near-limit');
