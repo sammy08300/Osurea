@@ -830,11 +830,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const contentHeight = recapContent.scrollHeight;
             recapContent.style.maxHeight = `${contentHeight}px`;
             recapContent.style.opacity = '1';
-            recapContent.classList.add('border-t', 'border-gray-800', 'mt-3', 'pt-3');
+            recapContent.classList.add('border-t', 'border-gray-800', 'mt-2', 'pt-2');
             recapArrow.style.transform = 'rotate(0deg)';
             recapCard.classList.add('bg-gray-850');
             recapCard.classList.remove('bg-gray-900');
             recapCard.classList.remove('cursor-pointer');
+            recapToggle.classList.remove('py-1');
+            recapToggle.classList.add('py-2');
             
             // Update the height after a short delay to handle content changes
             setTimeout(() => {
@@ -844,11 +846,13 @@ document.addEventListener('DOMContentLoaded', () => {
             // Collapse the content
             recapContent.style.maxHeight = '0';
             recapContent.style.opacity = '0';
-            recapContent.classList.remove('border-t', 'border-gray-800', 'mt-3', 'pt-3');
+            recapContent.classList.remove('border-t', 'border-gray-800', 'mt-2', 'pt-2');
             recapArrow.style.transform = 'rotate(180deg)';
             recapCard.classList.remove('bg-gray-850');
             recapCard.classList.add('bg-gray-900');
             recapCard.classList.add('cursor-pointer');
+            recapToggle.classList.remove('py-2');
+            recapToggle.classList.add('py-1');
         }
     };
     

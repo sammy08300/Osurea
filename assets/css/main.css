@@ -45,6 +45,11 @@
     visibility: visible;
     /* Retirer toute transition initiale */
     transition: none;
+    /* Optimisations GPU pour une meilleure performance */
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
 }
 
 /* Apply transitions only after initial loading */

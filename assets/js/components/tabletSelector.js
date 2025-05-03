@@ -69,7 +69,6 @@ function translateWithFallback(key) {
 /**
  * Tablet selector component with popup
  */
-
 const TabletSelector = {
     selectorButton: null,
     selectorText: null,
@@ -376,7 +375,7 @@ const TabletSelector = {
         
         // Filter the tablets corresponding to the search
         this.filteredModels = this.tabletData.filter(tablet => {
-            return tablet.brand.toLowerCase().includes(query) || 
+            return tablet.brand.toLowerCase().includes(query) ||
                    tablet.model.toLowerCase().includes(query) ||
                    `${tablet.width}x${tablet.height}`.includes(query);
         });
@@ -634,11 +633,11 @@ const TabletSelector = {
                 // Adapt the active area intelligently for the new model
                 const oldTablet = { width: currentTabletWidth, height: currentTabletHeight };
                 const newTablet = { width: tablet.width, height: tablet.height };
-                const currentState = { 
-                    areaWidth: currentAreaWidth, 
-                    areaHeight: currentAreaHeight, 
-                    offsetX: currentOffsetX, 
-                    offsetY: currentOffsetY 
+                const currentState = {
+                    areaWidth: currentAreaWidth,
+                    areaHeight: currentAreaHeight,
+                    offsetX: currentOffsetX,
+                    offsetY: currentOffsetY
                 };
                 
                 // Adapt the active area to the new model
@@ -672,8 +671,8 @@ const TabletSelector = {
         }
         
         // Trigger a custom event to inform other components
-        const event = new CustomEvent('tablet:selected', { 
-            detail: { tablet } 
+        const event = new CustomEvent('tablet:selected', {
+            detail: { tablet }
         });
         document.dispatchEvent(event);
     },
