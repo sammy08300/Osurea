@@ -3,7 +3,7 @@
  */
 
 // Constants
-const DECIMAL_PRECISION_POSITION = 3; // Précision pour les positions (X/Y)
+const DECIMAL_PRECISION_POSITION = 3; // Precision for positions (X/Y)
 
 /**
  * Throttle function to limit the rate at which a function can fire
@@ -49,7 +49,7 @@ function formatNumber(value, decimalPlaces = 1) {
         return '0';
     }
     
-    // Optimiser pour les nombres entiers
+    // Optimize for integer numbers
     if (Number.isInteger(value) && decimalPlaces === 0) {
         return value.toString();
     }
@@ -58,7 +58,7 @@ function formatNumber(value, decimalPlaces = 1) {
 }
 
 /**
- * Convert millimeters to pixels based on the scaling factor
+ * Convert millimeters to pixels based on the scaling factor 
  * @param {number} mm - The value in millimeters
  * @param {number} scale - The scaling factor
  * @returns {number} - The value in pixels

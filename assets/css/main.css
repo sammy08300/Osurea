@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
     --scrollbar-width: 8px;
     --scrollbar-track-bg: rgba(31, 41, 55, 0.3);
@@ -43,7 +47,7 @@
     transition: none;
 }
 
-/* Appliquer les transitions seulement après le chargement initial */
+/* Apply transitions only after initial loading */
 .page-loaded #rectangle {
     transition: width var(--transition-fast), height var(--transition-fast), transform var(--transition-fast);
 }
@@ -52,13 +56,13 @@
     cursor: grabbing;
 }
 
-/* Prévention du rectangle "flash" pendant le chargement */
+/* Prevent "flash" rectangle during charging */
 [data-loading="true"] #rectangle,
 body:not(.page-loaded) #rectangle {
     pointer-events: none !important;
 }
 
-/* Prévention des animations flash lors des rafraîchissements rapides */
+/* Preventing flash animations during quick refreshments */
 @media (prefers-reduced-motion: reduce) {
     * {
         transition: none !important;
@@ -66,14 +70,14 @@ body:not(.page-loaded) #rectangle {
     }
 }
 
-/* Éviter le flash blanc lors des rafraîchissements répétés */
+/* Avoid white flash during repeated refreshments */
 html, body {
     background-color: rgb(3, 7, 18); /* bg-gray-950 en couleur fixe */
     min-height: 100%;
     height: 100%;
 }
 
-/* Désactiver le comportement de défilement pendant le chargement */
+/* Disable scrolling behavior during loading */
 html.loading, body.loading {
     overflow: hidden !important;
 }
@@ -104,12 +108,24 @@ select:disabled {
 
 /* Favorite items styles */
 .favorite-item {
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                box-shadow 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                z-index 0.3s ease;
+    will-change: transform, box-shadow;
+    position: relative;
+    top: 4px;
+    z-index: 1;
 }
 
 .favorite-item:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transform: translateY(-12px) !important;
+    box-shadow: 0 14px 20px rgba(59, 130, 246, 0.2) !important;
+    z-index: 10 !important;
+}
+
+.favorite-item:active {
+    transform: translateY(-4px);
+    transition-duration: 0.1s;
 }
 
 /* Action buttons styles in favorite cards */
@@ -208,9 +224,9 @@ input[type="number"]::-webkit-outer-spin-button {
     }
 }
 
-/* Styles pour le visualiseur de zone de tablette osu! */
+/* Styles for osu! tablet zone viewer */
 
-/* Menu contextuel */
+/* Context menu */
 #context-menu {
     transform-origin: top left;
     animation: appear 0.15s ease-out;
@@ -230,7 +246,7 @@ input[type="number"]::-webkit-outer-spin-button {
     }
 }
 
-/* Empêcher le menu contextuel du navigateur sur les éléments clés */
+/* Prevent browser context menu on key elements */
 #rectangle, #tablet-boundary, #visual-container {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -239,7 +255,7 @@ input[type="number"]::-webkit-outer-spin-button {
     user-select: none;
 }
 
-/* Curseur pour indiquer qu'on peut déplacer le rectangle */
+/* Cursor to indicate that the rectangle can be moved */
 #rectangle {
     cursor: grab;
 }
@@ -248,7 +264,7 @@ input[type="number"]::-webkit-outer-spin-button {
     cursor: grabbing;
 }
 
-/* Scrollbar personnalisée */
+/* custom scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
     width: 6px;
 }
@@ -267,7 +283,7 @@ input[type="number"]::-webkit-outer-spin-button {
     background: rgba(59, 130, 246, 0.8);
 }
 
-/* Styles pour le sélecteur de tablette */
+/* Styles for tablet selector */
 .tablet-selector-container {
     position: relative;
 }
@@ -345,7 +361,7 @@ input[type="number"]::-webkit-outer-spin-button {
     border-left-color: rgba(59, 130, 246, 0.5);
 }
 
-/* Style pour le champ de recherche */
+/* Style for search field */
 #tabletSearch, #tabletSearchMobile {
     transition: all 0.2s ease;
     font-size: 0.9rem;
@@ -355,7 +371,7 @@ input[type="number"]::-webkit-outer-spin-button {
     background-color: rgba(55, 65, 81, 1);
 }
 
-/* Style pour le bouton de dimensions personnalisées */
+/* Style for custom dimensions button */
 #customTabletButton {
     width: 100%;
     color: rgba(209, 213, 219, 1);
@@ -417,7 +433,7 @@ input[type="number"]::-webkit-outer-spin-button {
     }
 }
 
-/* Amélioration de la scrollbar personnalisée */
+/* Improvement of the custom scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
     width: 4px;
 }
@@ -435,7 +451,7 @@ input[type="number"]::-webkit-outer-spin-button {
     background: rgba(59, 130, 246, 0.6);
 }
 
-/* Animations pour le sélecteur de tablette */
+/* Animations for tablet selector */
 #tabletSelectorButton.updating {
     animation: buttonUpdate 0.3s ease;
 }
@@ -460,14 +476,14 @@ input[type="number"]::-webkit-outer-spin-button {
     }
 }
 
-/* Transitions pour les groupes de dimensions */
+/* Transitions for dimension groups */
 #tablet-width-group,
 #tablet-height-group,
 #tablet-manual-hr {
     transition: opacity 0.2s ease;
 }
 
-/* Animation du menu déroulant */
+/* Animation of dropdown menu */
 #tabletSelectorPopup {
     transform-origin: top;
     transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
@@ -480,7 +496,7 @@ input[type="number"]::-webkit-outer-spin-button {
     pointer-events: none;
 }
 
-/* Amélioration de l'apparence des inputs */
+/* Improvement of input appearance */
 #tabletSearch,
 #tabletSearchMobile {
     transition: all 0.2s ease;
@@ -492,7 +508,7 @@ input[type="number"]::-webkit-outer-spin-button {
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
 }
 
-/* Effet de survol amélioré pour les éléments de liste */
+/* Improved hover effect for list items */
 .brand-item,
 .model-item {
     position: relative;
@@ -517,7 +533,7 @@ input[type="number"]::-webkit-outer-spin-button {
     opacity: 1;
 }
 
-/* État actif des éléments */
+/* Active state of elements */
 .brand-item.active,
 .model-item.active {
     position: relative;
@@ -544,7 +560,7 @@ input[type="number"]::-webkit-outer-spin-button {
     }
 }
 
-/* Animation pour l'apparition des favoris */
+/* Animation for favorites appearance */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -560,22 +576,100 @@ input[type="number"]::-webkit-outer-spin-button {
     animation: fadeIn 0.3s ease-out forwards;
 }
 
-/* Masquer les favoris pendant le chargement */
-.favorites-loading > .favorite-item {
-    opacity: 0;
-    visibility: hidden;
+/* Animation for language change - smoother version */
+@keyframes fadeInSmooth {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-/* Animation séquentielle pour les favoris */
-.favorite-item:nth-child(2) { animation-delay: 0.05s; }
-.favorite-item:nth-child(3) { animation-delay: 0.1s; }
-.favorite-item:nth-child(4) { animation-delay: 0.15s; }
-.favorite-item:nth-child(5) { animation-delay: 0.2s; }
-.favorite-item:nth-child(6) { animation-delay: 0.25s; }
-.favorite-item:nth-child(7) { animation-delay: 0.3s; }
-.favorite-item:nth-child(8) { animation-delay: 0.35s; }
-.favorite-item:nth-child(9) { animation-delay: 0.4s; }
-.favorite-item:nth-child(10) { animation-delay: 0.45s; }
+.animate-fadeIn-smooth {
+    animation: fadeInSmooth 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    will-change: opacity, transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    opacity: 0; /* Commencer invisible */
+}
+
+/* Animation pour la transition de sortie des favoris */
+.favorites-transition-out {
+    animation: fadeOut 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    will-change: opacity, transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+}
+
+/* Animation pour la transition d'entrée des favoris */
+.favorites-transition-in {
+    animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    will-change: opacity, transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+/* Hide favorites during loading */
+.favorites-loading > .favorite-item {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    animation: none !important;
+    transition: none !important;
+}
+
+/* Animation de fadeIn uniquement lorsque nécessaire */
+.favorite-item.animate-fadeIn {
+    animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    will-change: opacity, transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+/* Délais d'animation plus progressifs pour éviter le clignotement */
+.favorite-item.animate-fadeIn-smooth:nth-child(1) { animation-delay: 0s; }
+.favorite-item.animate-fadeIn-smooth:nth-child(2) { animation-delay: 0.05s; }
+.favorite-item.animate-fadeIn-smooth:nth-child(3) { animation-delay: 0.1s; }
+.favorite-item.animate-fadeIn-smooth:nth-child(4) { animation-delay: 0.15s; }
+.favorite-item.animate-fadeIn-smooth:nth-child(5) { animation-delay: 0.2s; }
+.favorite-item.animate-fadeIn-smooth:nth-child(6) { animation-delay: 0.25s; }
+.favorite-item.animate-fadeIn-smooth:nth-child(7) { animation-delay: 0.3s; }
+.favorite-item.animate-fadeIn-smooth:nth-child(8) { animation-delay: 0.35s; }
+.favorite-item.animate-fadeIn-smooth:nth-child(9) { animation-delay: 0.4s; }
+.favorite-item.animate-fadeIn-smooth:nth-child(10) { animation-delay: 0.45s; }
+
+/* Animation plus douce pour l'entrée */
+@keyframes fadeInSmooth {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Assurer que les cartes restent visibles après l'animation */
+.favorite-item.animate-fadeIn-smooth.animation-complete {
+    opacity: 1;
+    transform: translateY(0);
+}
 
 /* Loading overlay */
 #loading-overlay {
@@ -596,8 +690,8 @@ input[type="number"]::-webkit-outer-spin-button {
 #loading-overlay {
     background-color: rgba(17, 24, 39, 0.98);
     z-index: 100;
-    transition: opacity 0.4s ease;
-    /* Empêcher le flash blanc lors des rafraîchissements répétés */
+    transition: opacity 0.2s ease;
+    /* Prevent white flash during repeated refreshments */
     will-change: opacity;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
@@ -610,7 +704,7 @@ input[type="number"]::-webkit-outer-spin-button {
     height: 100vh;
 }
 
-/* Animation du spinner de chargement élégant */
+/* Elegant loading spinner animation */
 .loading-spinner {
     position: relative;
     width: 50px;
@@ -623,7 +717,7 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .spinner-circle {
-    stroke: #3b82f6; /* Bleu */
+    stroke: #3b82f6; /* Blue */
     stroke-linecap: round;
     transform-origin: center;
     stroke-dasharray: 125;
@@ -654,7 +748,7 @@ input[type="number"]::-webkit-outer-spin-button {
     visibility: hidden;
 }
 
-/* Styles pour les dialogues modaux */
+/* Styles for modal dialogues */
 #comment-dialog, #delete-dialog {
     pointer-events: auto;
     transition: opacity 0.2s ease-out;
@@ -665,17 +759,17 @@ input[type="number"]::-webkit-outer-spin-button {
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
-/* Styles pour les compteurs de caractères */
+/* Styles for character counters */
 #title-counter, #description-counter {
     transition: color 0.2s ease;
 }
 
-/* Styles pour les inputs et textarea avec focus visuel amélioré */
+/* Styles for inputs and textarea with improved visual focus */
 #comment-input:focus, #description-input:focus {
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5), 0 0 0 4px rgba(59, 130, 246, 0.1);
     background-color: rgba(30, 41, 59, 0.8); /* légèrement plus clair pour indiquer le focus */
 }
-/* Style pour les inputs et textarea avec focus visuel amélioré - sans effet de rebond */
+/* Style for inputs and textarea with improved visual focus - without bounce effect */
 #comment-input:focus, #description-input:focus {
     border-color: #4287f5;
     background-color: rgba(30, 41, 59, 0.8); 
@@ -683,21 +777,21 @@ input[type="number"]::-webkit-outer-spin-button {
     transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
-/* Style pour les icônes SVG dans la popup de détails des favoris */
+/* Style for SVG icons in the favorite details popup */
 #favorite-details-popup svg {
     fill: none;
     stroke: white;
     color: white;
 }
 
-/* Style pour les icônes SVG dans le récapitulatif */
+/* Style for SVG icons in the summary */
 #recap-content svg, #recap-toggle svg:not(#recap-arrow) {
     fill: none;
     stroke: white;
     color: white;
 }
 
-/* Styles pour les dialogues modaux */
+/* Styles for modal dialogues */
 #comment-dialog, #delete-dialog {
     pointer-events: auto;
     transition: opacity 0.2s ease-out;
@@ -708,7 +802,7 @@ input[type="number"]::-webkit-outer-spin-button {
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
-/* Styles pour les compteurs de caractères */
+/* Styles for character counters */
 #title-counter, #description-counter {
     transition: all 0.2s ease;
 }
@@ -722,7 +816,7 @@ input[type="number"]::-webkit-outer-spin-button {
     animation: pulse 1s infinite;
 }
 
-/* Animation de pulse pour les compteurs à la limite */
+/* Pulse animation for limit counters */
 @keyframes pulse {
     0%, 100% {
         opacity: 1;
@@ -732,23 +826,64 @@ input[type="number"]::-webkit-outer-spin-button {
     }
 }
 
-/* Améliorations des champs de saisie */
+/* Improvements of input fields */
 #comment-input, #description-input {
     transition: all 0.2s ease;
 }
 
 #comment-input:focus, #description-input:focus {
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5), 0 0 0 4px rgba(59, 130, 246, 0.1);
-    background-color: rgba(30, 41, 59, 0.8); /* légèrement plus clair pour indiquer le focus */
+    background-color: rgba(30, 41, 59, 0.8); 
 }
 
-/* Style pour les titres des dialogues */
+/* Style for dialog titles */
 #comment-dialog h3, #delete-dialog h3 {
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-/* Style amélioré pour les boutons d'action */
+/* Improved style for action buttons */
 #save-comment-btn, #confirm-delete-btn {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     font-weight: 500;
+}
+
+/* Empêcher toutes les animations pendant le chargement initial */
+body.loading-favorites #favorites-list * {
+    animation: none !important;
+    transition: none !important;
+}
+
+body.loading-favorites #favorites-list .favorite-item {
+    opacity: 0 !important;
+}
+
+/* Ajouter de l'espace pour éviter le chevauchement des cartes avec l'en-tête */
+#favorites-list {
+    margin-top: 16px;
+    padding-top: 0px;
+    position: relative;
+    z-index: 5; /* Augmenter le z-index pour tout le conteneur */
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Modifier l'overflow pour que les cartes puissent sortir du conteneur pendant l'animation */
+#favorites-list.custom-scrollbar {
+    overflow: visible !important; /* Permettre aux éléments de sortir de la zone */
+    overflow-y: auto !important; /* Mais garder le défilement vertical */
+    clip-path: inset(0 0 -100px 0); /* Créer un clipping qui laisse de l'espace en haut */
+}
+
+/* Ajuster le positionnement des favoris pour qu'ils commencent plus bas */
+#favorites-list > .favorite-item:nth-child(1),
+#favorites-list > .favorite-item:nth-child(2),
+#favorites-list > .favorite-item:nth-child(3) {
+    margin-top: 0px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Maintenir l'espace du footer pendant la transition */
+#favorites-list.favorites-transition-out,
+#favorites-list.favorites-transition-in {
+    min-height: 100px; /* Hauteur minimale pour éviter le saut */
+    transition: min-height 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }

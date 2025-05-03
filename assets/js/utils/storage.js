@@ -6,13 +6,13 @@ const StorageManager = {
     // Storage key for favorites
     FAVORITES_KEY: 'Osu!reaFavorites_v2',
     
-    // Cache des favoris pour éviter des lectures répétées du localStorage
+    // favorites cache
     _favoritesCache: null,
     _cacheTimestamp: 0,
-    _CACHE_EXPIRY: 3000, // 3 secondes en millisecondes
+    _CACHE_EXPIRY: 3000, // 3 seconds in milliseconds
     
     /**
-     * Efface le cache des favoris
+     * Clear the favorites cache
      */
     clearCache() {
         this._favoritesCache = null;
@@ -25,17 +25,17 @@ const StorageManager = {
      */
     getFavorites() {
         try {
-            // Utiliser le cache si disponible et non expiré
+            // Use the cache if available and not expired
             const now = Date.now();
             if (this._favoritesCache !== null && (now - this._cacheTimestamp) < this._CACHE_EXPIRY) {
-                return [...this._favoritesCache]; // Retourner une copie du cache
+                return [...this._favoritesCache]; // Return a copy of the cache
             }
             
             const favoritesJson = localStorage.getItem(this.FAVORITES_KEY);
             const favorites = favoritesJson ? JSON.parse(favoritesJson) : [];
             const result = Array.isArray(favorites) ? favorites : [];
             
-            // Mettre à jour le cache
+            // Update the cache
             this._favoritesCache = [...result];
             this._cacheTimestamp = now;
             
@@ -56,11 +56,11 @@ const StorageManager = {
                 throw new Error('Favorites must be an array');
             }
             
-            // Mettre à jour le cache avant d'enregistrer
+            // Update the cache before saving
             this._favoritesCache = [...favorites];
             this._cacheTimestamp = Date.now();
             
-            // Enregistrer en utilisant un Worker si disponible pour éviter de bloquer le thread principal
+            // Save using a Worker if available to avoid blocking the main thread
             const favoritesJson = JSON.stringify(favorites);
             
             if (window.requestIdleCallback) {
@@ -116,7 +116,7 @@ const StorageManager = {
                 ...favorites[index],
                 ...updatedData,
                 id: favorites[index].id, // Ensure ID doesn't change
-                lastModified: Date.now() // Ajouter la date de dernière modification
+                lastModified: Date.now() // Add the last modification date
             };
             
             this.saveFavorites(favorites);
@@ -139,6 +139,10 @@ const StorageManager = {
             
             if (filteredFavorites.length === favorites.length) return false;
             
+            // Vider complètement le cache pour forcer un rechargement
+            this.clearCache();
+            
+            // Sauvegarder les favoris filtrés
             this.saveFavorites(filteredFavorites);
             return true;
         } catch (error) {
@@ -154,7 +158,7 @@ const StorageManager = {
      */
     getFavoriteById(id) {
         try {
-            // Optimisation: si le cache est disponible, chercher directement dedans
+            // Optimization: if the cache is available, search directly in it
             if (this._favoritesCache !== null && (Date.now() - this._cacheTimestamp) < this._CACHE_EXPIRY) {
                 return this._favoritesCache.find(f => f.id.toString() === id.toString()) || null;
             }
@@ -188,11 +192,11 @@ const StorageManager = {
                 throw new Error('Imported data is not an array');
             }
             
-            // Add timestamp to ensure unique IDs and optimiser avec un timestamp de base
+            // Add timestamp to ensure unique IDs and optimize with a base timestamp
             const now = Date.now();
             const favoritesWithIds = importedFavorites.map((favorite, index) => ({
                 ...favorite,
-                id: favorite.id || (now + index) // Plus efficace que Math.random
+                id: favorite.id || (now + index) // More efficient than Math.random
             }));
             
             this.saveFavorites(favoritesWithIds);

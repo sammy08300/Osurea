@@ -1,5 +1,5 @@
 /**
- * Notifications component that handles displaying and managing notifications
+ * Notifications component that handles displaying and managing notifications 
  */
 
 const Notifications = {

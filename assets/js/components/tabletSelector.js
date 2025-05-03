@@ -1,7 +1,74 @@
 /**
- * Module de sélection de tablette avec popup
+ * Utility function to translate an i18n key with robust fallback
+ * @param {string} key - The translation key without the i18n: prefix
+ * @returns {string} - The translation or a formatted default value
  */
+function translateWithFallback(key) {
+    // First try to use the standard translation system
+    let translated = null;
+    
+    if (typeof localeManager !== 'undefined' && typeof localeManager.translate === 'function') {
+        try {
+            translated = localeManager.translate(key);
+            if (translated === key) translated = null; // If translation returns the key, consider it a failure
+        } catch (e) {
+            console.error("[ERROR] Translation failed for key:", key, e);
+        }
+    }
+    
+    // If standard translation failed, use fallbacks
+    if (!translated || translated.startsWith('i18n:')) {
+        const htmlLang = document.documentElement.lang || 'fr';
+        
+        // Manually defined translations for common keys
+        const fallbackTranslations = {
+            'select_model': {
+                'en': 'Select a model',
+                'es': 'Seleccionar modelo',
+                'fr': 'Sélectionner un modèle'
+            },
+            'custom_dimensions': {
+                'en': 'Custom dimensions',
+                'es': 'Dimensiones personalizadas',
+                'fr': 'Dimensions personnalisées'
+            },
+            'no_results': {
+                'en': 'No results found',
+                'es': 'No se encontraron resultados',
+                'fr': 'Aucun résultat trouvé'
+            },
+            'search': {
+                'en': 'Search',
+                'es': 'Buscar',
+                'fr': 'Rechercher'
+            }
+        };
+        
+        // Determine the language to use (prefix only)
+        let lang = 'fr'; // Default
+        if (htmlLang.startsWith('en')) {
+            lang = 'en';
+        } else if (htmlLang.startsWith('es')) {
+            lang = 'es';
+        }
+        
+        // Use fallback translation if available
+        if (fallbackTranslations[key] && fallbackTranslations[key][lang]) {
+            translated = fallbackTranslations[key][lang];
+        } else {
+            // Default formatting for unknown keys
+            translated = key.replace(/_/g, ' ');
+            // First letter uppercase
+            translated = translated.charAt(0).toUpperCase() + translated.slice(1);
+        }
+    }
+    
+    return translated;
+}
 
+/**
+ * Tablet selector component with popup
+ */
 const TabletSelector = {
     selectorButton: null,
     selectorText: null,
@@ -14,15 +81,17 @@ const TabletSelector = {
     tabletData: [],
     selectedBrand: null,
     filteredModels: [],
+    defaultTabletModel: 'CTL-472 Small (One by Wacom S)',
+    defaultTabletBrand: 'Wacom',
     
     /**
-     * Initialise le sélecteur de tablette
-     * @param {Array} tabletData - Données des tablettes issues du fichier tablets.json
+     * Initialize the tablet selector
+     * @param {Array} tabletData - Data of the tablets from the tablets.json file
      */
     init(tabletData) {
-        console.log('Initialisation du sélecteur de tablette...');
+        console.log('Initializing tablet selector...');
         
-        // Récupération des éléments DOM
+        // DOM elements recovery
         this.selectorButton = document.getElementById('tabletSelectorButton');
         this.selectorText = document.getElementById('tabletSelectorText');
         this.selectorPopup = document.getElementById('tabletSelectorPopup');
@@ -32,44 +101,226 @@ const TabletSelector = {
         this.searchInput = document.getElementById('tabletSearch');
         this.searchInputMobile = document.getElementById('tabletSearchMobile');
         
-        // Vérification des éléments essentiels
+        // Flag to track if tablet was loaded from preferences
+        this.loadedFromPreferences = false;
+        
+        // Essential elements verification
         if (!this.selectorButton || !this.selectorText || !this.selectorPopup || 
             !this.brandsList || !this.modelsList || !this.customButton) {
-            console.error('Sélecteur de tablette: éléments essentiels introuvables');
+            console.error('Tablet selector: essential elements not found');
             return;
         }
         
-        // Ajouter un attribut title au texte du sélecteur pour l'info-bulle
-        this.selectorText.title = this.selectorText.textContent;
-        
-        // Stockage des données
+        // Data storage
         this.tabletData = tabletData;
         
-        // Création des listes de marques
+        // Éviter d'afficher "Sélectionner un modèle" si on a des préférences sauvegardées
+        let savedPrefs = null;
+        try {
+            savedPrefs = localStorage.getItem('Osu!reaPreferences_v2');
+            if (savedPrefs) savedPrefs = JSON.parse(savedPrefs);
+        } catch (e) { savedPrefs = null; }
+        
+        if (savedPrefs && savedPrefs.tablet && savedPrefs.tablet.brand && savedPrefs.tablet.model) {
+            // Déterminer le texte à afficher en vérifiant si le modèle inclut déjà la marque
+            let displayText = '';
+            if (savedPrefs.tablet.model.includes(savedPrefs.tablet.brand)) {
+                // Si le modèle contient déjà la marque, l'utiliser tel quel
+                displayText = savedPrefs.tablet.model;
+            } else {
+                // Sinon, afficher la marque suivie du modèle
+                displayText = `${savedPrefs.tablet.brand} ${savedPrefs.tablet.model}`;
+            }
+            
+            // Afficher le texte
+            this.selectorText.textContent = displayText;
+            this.selectorText.title = displayText;
+            
+            // Stocker ces informations sur le bouton pour la persistance
+            this.selectorButton.dataset.tabletBrand = savedPrefs.tablet.brand;
+            this.selectorButton.dataset.tabletModel = savedPrefs.tablet.model;
+            this.loadedFromPreferences = true;
+        } else if (this.selectorText.hasAttribute('data-i18n')) {
+            // Si pas de préférences, utiliser la traduction mais de façon optimisée
+            // pour éviter le flash du texte par défaut
+            const translationKey = this.selectorText.getAttribute('data-i18n');
+            const translatedText = translateWithFallback(translationKey);
+            this.selectorText.textContent = translatedText;
+            this.selectorText.title = translatedText;
+            
+            // Pour les nouveaux utilisateurs, charger la tablette par défaut immédiatement
+            this.loadDefaultTablet();
+        } else {
+            this.selectorText.title = this.selectorText.textContent;
+            
+            // Pour les nouveaux utilisateurs, charger la tablette par défaut immédiatement
+            this.loadDefaultTablet();
+        }
+        
+        // Translate search placeholders if they have data-i18n-placeholder attributes
+        if (this.searchInput && this.searchInput.hasAttribute('data-i18n-placeholder')) {
+            const placeholderKey = this.searchInput.getAttribute('data-i18n-placeholder');
+            this.searchInput.placeholder = translateWithFallback(placeholderKey);
+        }
+        
+        if (this.searchInputMobile && this.searchInputMobile.hasAttribute('data-i18n-placeholder')) {
+            const placeholderKey = this.searchInputMobile.getAttribute('data-i18n-placeholder');
+            this.searchInputMobile.placeholder = translateWithFallback(placeholderKey);
+        }
+        
+        // Translate custom button if it has data-i18n attribute
+        if (this.customButton.hasAttribute('data-i18n')) {
+            const buttonKey = this.customButton.getAttribute('data-i18n');
+            this.customButton.textContent = translateWithFallback(buttonKey);
+        }
+        
+        // Brands list creation
         this.populateBrandsList();
         
-        // Ajout des écouteurs d'événements
+        // Event listeners addition
         this.addEventListeners();
         
-        console.log('Sélecteur de tablette initialisé avec succès');
+        // Listen for the preferences:loadTablet event
+        document.addEventListener('preferences:loadTablet', (e) => {
+            if (e.detail) {
+                this.loadTabletFromPreferences(e.detail);
+            }
+        });
+        
+        console.log('Tablet selector successfully initialized');
+        
+        // Vérifier à nouveau si aucune tablette n'a été chargée
+        // Ce timeout est maintenu pour s'assurer que toute l'initialisation est terminée
+        setTimeout(() => {
+            const currentText = this.selectorText.textContent;
+            const defaultText = translateWithFallback('select_model');
+            
+            if ((currentText === defaultText || !currentText) && !this.loadedFromPreferences) {
+                this.loadDefaultTablet();
+            }
+        }, 300);
     },
     
     /**
-     * Ajoute les écouteurs d'événements
+     * Load tablet model from preferences
+     * @param {Object} tabletData - Information about the tablet (brand, model, etc.)
+     */
+    loadTabletFromPreferences(tabletData) {
+        if (!tabletData || !tabletData.brand || !tabletData.model) {
+            return;
+        }
+        
+        this.loadedFromPreferences = true; // Marquer comme chargé depuis les préférences
+        
+        // Stockage immédiat des données sur le bouton pour éviter le flash
+        this.selectorButton.dataset.tabletBrand = tabletData.brand;
+        this.selectorButton.dataset.tabletModel = tabletData.model;
+        
+        if (tabletData.isCustom) {
+            // If it's a custom tablet, just select custom mode
+            this.selectCustomTablet();
+            
+            // Émettre un événement pour confirmer le chargement
+            document.dispatchEvent(new CustomEvent('tablet:loaded-from-preferences', { 
+                detail: { success: true, isCustom: true }
+            }));
+            return;
+        }
+        
+        // Find the tablet in our database
+        const tablet = this.tabletData.find(t => 
+            t.brand === tabletData.brand && 
+            t.model === tabletData.model
+        );
+        
+        if (tablet) {
+            // If we found the tablet in our database, select it
+            this.selectBrand(tablet.brand);
+            this.selectModel(tablet);
+            
+            // Émettre un événement pour confirmer le chargement
+            document.dispatchEvent(new CustomEvent('tablet:loaded-from-preferences', { 
+                detail: { success: true, tablet }
+            }));
+        } else {
+            // If the tablet is not found in our database but we have width and height
+            if (isValidNumber(tabletData.width) && isValidNumber(tabletData.height)) {
+                // Create a temporary tablet object
+                const tempTablet = {
+                    brand: tabletData.brand,
+                    model: tabletData.model,
+                    width: tabletData.width,
+                    height: tabletData.height
+                };
+                
+                // Apply it directly
+                this.selectModel(tempTablet);
+                
+                // Émettre un événement pour confirmer le chargement
+                document.dispatchEvent(new CustomEvent('tablet:loaded-from-preferences', { 
+                    detail: { success: true, tablet: tempTablet }
+                }));
+            } else {
+                // If we don't have valid dimensions, load the default tablet
+                this.loadDefaultTablet();
+                
+                // Émettre un événement pour signaler l'échec
+                document.dispatchEvent(new CustomEvent('tablet:loaded-from-preferences', { 
+                    detail: { success: false }
+                }));
+            }
+        }
+    },
+    
+    /**
+     * Load the default tablet (CTL-472)
+     */
+    loadDefaultTablet() {
+        // Find the default tablet in the data
+        const defaultTablet = this.tabletData.find(t => 
+            t.brand === this.defaultTabletBrand && 
+            t.model === this.defaultTabletModel
+        );
+        
+        if (defaultTablet) {
+            // Stockage immédiat des données sur le bouton pour éviter le flash
+            this.selectorButton.dataset.tabletBrand = defaultTablet.brand;
+            this.selectorButton.dataset.tabletModel = defaultTablet.model;
+            
+            // If the default tablet is found, select it
+            this.selectBrand(defaultTablet.brand);
+            this.selectModel(defaultTablet);
+        } else {
+            // If the default tablet is not found, just select the first tablet in the list
+            if (this.tabletData.length > 0) {
+                // Stockage immédiat des données sur le bouton pour éviter le flash
+                this.selectorButton.dataset.tabletBrand = this.tabletData[0].brand;
+                this.selectorButton.dataset.tabletModel = this.tabletData[0].model;
+                
+                this.selectBrand(this.tabletData[0].brand);
+                this.selectModel(this.tabletData[0]);
+            } else {
+                console.error('Aucun modèle de tablette disponible!');
+            }
+        }
+    },
+    
+    /**
+     * Add the event listeners
      */
     addEventListeners() {
-        // Ouvrir/fermer le popup au clic sur le bouton
+        // Open/close the popup on the button click
         this.selectorButton.addEventListener('click', () => {
             this.togglePopup();
         });
         
-        // Dimensions personnalisées
+        // Custom dimensions
         this.customButton.addEventListener('click', () => {
             this.selectCustomTablet();
             this.hidePopup();
         });
         
-        // Recherche
+        // Search
         if (this.searchInput) {
             this.searchInput.addEventListener('input', (e) => {
                 this.handleSearch(e.target.value);
@@ -82,31 +333,31 @@ const TabletSelector = {
             });
         }
         
-        // Fermeture du popup au clic extérieur
+        // Close the popup on outside click
         document.addEventListener('click', (e) => {
             if (this.selectorPopup.classList.contains('hidden')) return;
             
-            // Si on clique en dehors du popup et du bouton
+            // If we click outside the popup and the button
             if (!this.selectorPopup.contains(e.target) && !this.selectorButton.contains(e.target)) {
                 this.hidePopup();
             }
         });
         
-        // Fermeture du popup lors d'un défilement ou redimensionnement
+        // Close the popup on scroll or resize
         document.addEventListener('scroll', () => this.hidePopup());
         window.addEventListener('resize', () => this.hidePopup());
     },
     
     /**
-     * Gère la recherche dans les tablettes
-     * @param {string} query - Termes de recherche
+     * Handle the search in the tablets
+     * @param {string} query - Search terms
      */
     handleSearch(query) {
         query = query.toLowerCase().trim();
         
-        // Si la recherche est vide, réinitialiser l'affichage
+        // If the search is empty, reset the display
         if (!query) {
-            // Réinitialiser les listes
+            // Reset the lists
             this.populateBrandsList();
             if (this.selectedBrand) {
                 this.selectBrand(this.selectedBrand);
@@ -114,7 +365,7 @@ const TabletSelector = {
             return;
         }
         
-        // Synchroniser les champs de recherche si nécessaire
+        // Synchronize the search fields if necessary
         if (this.searchInput && this.searchInput.value !== query) {
             this.searchInput.value = query;
         }
@@ -122,31 +373,31 @@ const TabletSelector = {
             this.searchInputMobile.value = query;
         }
         
-        // Filtrer les tablettes correspondant à la recherche
+        // Filter the tablets corresponding to the search
         this.filteredModels = this.tabletData.filter(tablet => {
-            return tablet.brand.toLowerCase().includes(query) || 
+            return tablet.brand.toLowerCase().includes(query) ||
                    tablet.model.toLowerCase().includes(query) ||
                    `${tablet.width}x${tablet.height}`.includes(query);
         });
         
-        // Afficher les résultats de recherche
+        // Display the search results
         this.displaySearchResults();
     },
     
     /**
-     * Affiche les résultats de recherche
+     * Display the search results
      */
     displaySearchResults() {
-        // Vider les deux listes
+        // Clear the two lists
         this.brandsList.innerHTML = '';
         this.modelsList.innerHTML = '';
         
-        // S'il y a des résultats
+        // If there are results
         if (this.filteredModels.length > 0) {
-            // Obtenir les marques uniques des résultats
+            // Get the unique brands of the results
             const brands = [...new Set(this.filteredModels.map(t => t.brand))].sort();
             
-            // Afficher les marques filtrées
+            // Display the filtered brands
             brands.forEach(brand => {
                 const brandItem = document.createElement('div');
                 brandItem.className = 'brand-item';
@@ -164,16 +415,16 @@ const TabletSelector = {
                 this.brandsList.appendChild(brandItem);
             });
             
-            // Par défaut, montrer tous les modèles ou ceux de la marque sélectionnée
+            // By default, show all models or those of the selected brand
             let modelsToShow = this.filteredModels;
             if (this.selectedBrand && brands.includes(this.selectedBrand)) {
                 modelsToShow = this.filteredModels.filter(t => t.brand === this.selectedBrand);
             } else if (brands.length > 0) {
-                // Si la marque sélectionnée n'est pas dans les résultats, en sélectionner une nouvelle
+                // If the selected brand is not in the results, select a new one
                 this.selectedBrand = brands[0];
                 modelsToShow = this.filteredModels.filter(t => t.brand === this.selectedBrand);
                 
-                // Mettre à jour l'affichage visuel des marques
+                // Update the visual display of the brands
                 const brandItems = this.brandsList.querySelectorAll('.brand-item');
                 brandItems.forEach(item => {
                     if (item.dataset.brand === this.selectedBrand) {
@@ -184,25 +435,28 @@ const TabletSelector = {
                 });
             }
             
-            // Afficher les modèles correspondants
+            // Display the corresponding models
             this.displayModels(modelsToShow);
         } else {
-            // Aucun résultat
+            // No results
             const noResults = document.createElement('div');
             noResults.className = 'p-4 text-gray-400 text-center italic';
-            noResults.textContent = 'Aucun résultat trouvé';
+            
+            // Use translation for "No results found"
+            noResults.textContent = translateWithFallback('no_results');
+            
             this.modelsList.appendChild(noResults);
         }
     },
     
     /**
-     * Remplit la liste des marques
+     * Fill the brands list
      */
     populateBrandsList() {
-        // Vider la liste actuelle
+        // Clear the current list
         this.brandsList.innerHTML = '';
         
-        // Si aucune donnée, afficher un message
+        // If no data, display a message
         if (!this.tabletData || this.tabletData.length === 0) {
             const noData = document.createElement('div');
             noData.className = 'p-4 text-gray-400 text-center italic';
@@ -211,10 +465,10 @@ const TabletSelector = {
             return;
         }
         
-        // Obtenir les marques uniques
+        // Get the unique brands
         const brands = [...new Set(this.tabletData.map(tablet => tablet.brand))].sort();
         
-        // Créer un élément pour chaque marque
+        // Create an element for each brand
         brands.forEach(brand => {
             const brandItem = document.createElement('div');
             brandItem.className = 'brand-item';
@@ -225,7 +479,7 @@ const TabletSelector = {
             brandItem.textContent = brand;
             brandItem.dataset.brand = brand;
             
-            // Ajouter un écouteur d'événement
+            // Add an event listener
             brandItem.addEventListener('click', () => {
                 this.selectBrand(brand);
             });
@@ -233,25 +487,25 @@ const TabletSelector = {
             this.brandsList.appendChild(brandItem);
         });
         
-        // Par défaut, afficher la première marque si aucune n'est sélectionnée
+        // By default, display the first brand if no one is selected
         if (!this.selectedBrand && brands.length > 0) {
             this.selectBrand(brands[0]);
         } else if (this.selectedBrand) {
-            // Réafficher les modèles pour la marque déjà sélectionnée
+            // Display the models for the already selected brand
             this.selectBrand(this.selectedBrand);
         }
     },
     
     /**
-     * Sélectionne une marque et affiche ses modèles
-     * @param {string} brand - Nom de la marque
-     * @param {boolean} filterSearch - Indique si on filtre par les résultats de recherche
+     * Select a brand and display its models
+     * @param {string} brand - Brand name
+     * @param {boolean} filterSearch - Indicates if we filter by the search results
      */
     selectBrand(brand, filterSearch = false) {
-        // Mise à jour de la marque sélectionnée
+        // Update the selected brand
         this.selectedBrand = brand;
         
-        // Mise à jour visuelle des éléments sélectionnés
+        // Visual update of the selected elements
         const brandItems = this.brandsList.querySelectorAll('.brand-item');
         brandItems.forEach(item => {
             if (item.dataset.brand === brand) {
@@ -261,7 +515,7 @@ const TabletSelector = {
             }
         });
         
-        // Filtrer les modèles de cette marque
+        // Filter the models of this brand
         let models;
         if (filterSearch && this.filteredModels.length > 0) {
             models = this.filteredModels.filter(tablet => tablet.brand === brand);
@@ -269,16 +523,16 @@ const TabletSelector = {
             models = this.tabletData.filter(tablet => tablet.brand === brand);
         }
         
-        // Afficher les modèles
+        // Display the models
         this.displayModels(models);
     },
     
     /**
-     * Affiche les modèles dans la liste
-     * @param {Array} models - Liste des modèles à afficher
+     * Display the models in the list
+     * @param {Array} models - List of models to display
      */
     displayModels(models) {
-        // Vider la liste des modèles
+        // Clear the models list
         this.modelsList.innerHTML = '';
         
         if (models.length === 0) {
@@ -287,12 +541,12 @@ const TabletSelector = {
             noModels.textContent = 'Aucun modèle disponible';
             this.modelsList.appendChild(noModels);
         } else {
-            // Créer un élément pour chaque modèle
+            // Create an element for each model
             models.forEach(tablet => {
                 const modelItem = document.createElement('div');
                 modelItem.className = 'model-item';
                 
-                // Création du contenu avec nom et dimensions
+                // Creation of the content with name and dimensions
                 const modelName = document.createElement('div');
                 modelName.className = 'text-gray-100';
                 modelName.textContent = tablet.model;
@@ -304,15 +558,15 @@ const TabletSelector = {
                 modelItem.appendChild(modelName);
                 modelItem.appendChild(modelDimensions);
                 
-                // Stockage des données du modèle
+                // Storage of the model data
                 modelItem.dataset.brand = tablet.brand;
                 modelItem.dataset.model = tablet.model;
                 modelItem.dataset.width = tablet.width;
                 modelItem.dataset.height = tablet.height;
                 
-                // Événement au clic sur un modèle
+                // Event on the model click
                 modelItem.addEventListener('click', () => {
-                    // Ajouter une classe active temporairement
+                    // Add a temporary active class
                     modelItem.classList.add('active');
                     setTimeout(() => {
                         this.selectModel(tablet);
@@ -326,81 +580,81 @@ const TabletSelector = {
     },
     
     /**
-     * Sélectionne un modèle de tablette
-     * @param {Object} tablet - Objet tablette avec brand, model, width, height
+     * Select a tablet model
+     * @param {Object} tablet - Object tablet with brand, model, width, height
      */
     selectModel(tablet) {
-        // Récupérer les dimensions actuelles de la tablette
+        // Get the current dimensions of the tablet
         const currentTabletWidth = parseFloatSafe(document.getElementById('tabletWidth')?.value);
         const currentTabletHeight = parseFloatSafe(document.getElementById('tabletHeight')?.value);
         
-        // Récupérer les dimensions actuelles de la zone active
+        // Get the current dimensions of the active area
         const currentAreaWidth = parseFloatSafe(document.getElementById('areaWidth')?.value);
         const currentAreaHeight = parseFloatSafe(document.getElementById('areaHeight')?.value);
         const currentOffsetX = parseFloatSafe(document.getElementById('areaOffsetX')?.value);
         const currentOffsetY = parseFloatSafe(document.getElementById('areaOffsetY')?.value);
         
-        // Mise à jour du texte du bouton avec une animation
+        // Update the button text with an animation
         this.selectorButton.classList.add('updating');
-        const displayText = `${tablet.brand} ${tablet.model}`;
+        
+        // Vérifier si le modèle inclut déjà la marque pour éviter la duplication
+        let displayText = '';
+        if (tablet.model.includes(tablet.brand)) {
+            // Si le nom du modèle contient déjà la marque, l'utiliser tel quel
+            displayText = tablet.model;
+        } else {
+            // Sinon, afficher la marque suivie du modèle
+            displayText = `${tablet.brand} ${tablet.model}`;
+        }
+        
         this.selectorText.textContent = displayText;
-        this.selectorText.title = displayText; // Ajouter un title pour l'info-bulle
+        this.selectorText.title = displayText; // Add a title for the tooltip
+        
+        // Store the model and brand information on the button for persistence
+        this.selectorButton.dataset.tabletBrand = tablet.brand;
+        this.selectorButton.dataset.tabletModel = tablet.model;
+        
         setTimeout(() => {
             this.selectorButton.classList.remove('updating');
         }, 300);
         
-        // Mise à jour des champs de dimensions
+        // Update the dimensions fields
         const tabletWidthInput = document.getElementById('tabletWidth');
         const tabletHeightInput = document.getElementById('tabletHeight');
         const tabletDimensionsContainer = document.getElementById('tablet-dimensions-container');
         
         if (tabletWidthInput && tabletHeightInput) {
-            // Adapter la zone active si c'est un changement de modèle de tablette
+            // Adapt the active area if it is a tablet model change
             if (isValidNumber(currentTabletWidth) && isValidNumber(currentTabletHeight) &&
                 isValidNumber(currentAreaWidth) && isValidNumber(currentAreaHeight) &&
                 isValidNumber(currentOffsetX) && isValidNumber(currentOffsetY) &&
                 (currentTabletWidth !== tablet.width || currentTabletHeight !== tablet.height)) {
                 
-                // Log pour déboguer
-                console.log("Changement de tablette:", {
-                    ancienneTaille: { width: currentTabletWidth, height: currentTabletHeight },
-                    nouvelleTaille: { width: tablet.width, height: tablet.height },
-                    zoneActive: { 
-                        width: currentAreaWidth, 
-                        height: currentAreaHeight,
-                        offsetX: currentOffsetX,
-                        offsetY: currentOffsetY
-                    }
-                });
-                
-                // Ajuster intelligemment la zone active pour le nouveau modèle
+                // Adapt the active area intelligently for the new model
                 const oldTablet = { width: currentTabletWidth, height: currentTabletHeight };
                 const newTablet = { width: tablet.width, height: tablet.height };
-                const currentState = { 
-                    areaWidth: currentAreaWidth, 
-                    areaHeight: currentAreaHeight, 
-                    offsetX: currentOffsetX, 
-                    offsetY: currentOffsetY 
+                const currentState = {
+                    areaWidth: currentAreaWidth,
+                    areaHeight: currentAreaHeight,
+                    offsetX: currentOffsetX,
+                    offsetY: currentOffsetY
                 };
                 
-                // Adapter la zone active au nouveau modèle
+                // Adapt the active area to the new model
                 const adaptedState = adaptAreaToNewTablet(currentState, oldTablet, newTablet);
                 
-                // Log pour déboguer
-                console.log("Nouvelle zone active adaptée:", adaptedState);
-                
-                // Mettre à jour les champs avec les nouvelles valeurs
+                // Update the fields with the new values
                 document.getElementById('areaWidth').value = formatNumber(adaptedState.areaWidth);
                 document.getElementById('areaHeight').value = formatNumber(adaptedState.areaHeight);
                 document.getElementById('areaOffsetX').value = formatNumber(adaptedState.offsetX, 3);
                 document.getElementById('areaOffsetY').value = formatNumber(adaptedState.offsetY, 3);
             }
             
-            // Mettre à jour les dimensions de la tablette
+            // Update the tablet dimensions
             tabletWidthInput.value = formatNumber(tablet.width);
             tabletHeightInput.value = formatNumber(tablet.height);
             
-            // Cacher les champs manuels
+            // Hide the manual fields
             if (tabletDimensionsContainer) {
                 tabletDimensionsContainer.classList.add('hidden');
             }
@@ -416,49 +670,53 @@ const TabletSelector = {
             }
         }
         
-        // Déclencher un événement personnalisé pour informer d'autres composants
-        const event = new CustomEvent('tablet:selected', { 
-            detail: { tablet } 
+        // Trigger a custom event to inform other components
+        const event = new CustomEvent('tablet:selected', {
+            detail: { tablet }
         });
         document.dispatchEvent(event);
     },
     
     /**
-     * Sélectionne l'option "Dimensions personnalisées"
+     * Select custom dimensions
      */
     selectCustomTablet() {
-        // Mise à jour du texte du bouton avec une animation
-        this.selectorButton.classList.add('updating');
-        this.selectorText.textContent = 'Dimensions personnalisées';
-        this.selectorText.title = 'Dimensions personnalisées'; // Ajouter un titre pour l'info-bulle
-        setTimeout(() => {
-            this.selectorButton.classList.remove('updating');
-        }, 300);
-        
-        // Afficher les champs manuels avec animation
-        const tabletDimensionsContainer = document.getElementById('tablet-dimensions-container');
-        
-        if (tabletDimensionsContainer) {
-            tabletDimensionsContainer.classList.remove('hidden');
-            tabletDimensionsContainer.style.opacity = '0';
-            requestAnimationFrame(() => {
-                tabletDimensionsContainer.style.transition = 'opacity 0.2s ease';
-                tabletDimensionsContainer.style.opacity = '1';
-            });
-        }
-        
-        // Cancel edit mode if needed
+        // Cancel edit mode if necessary
         if (typeof appState !== 'undefined' && appState.cancelEditMode) {
             appState.cancelEditMode();
         }
         
-        // Déclencher un événement personnalisé
+        // Update the button text
+        const customText = translateWithFallback('custom_dimensions');
+        this.selectorText.textContent = customText;
+        this.selectorText.title = customText;
+        
+        // Remove the i18n data attribute and add a custom attribute to mark as customized
+        this.selectorText.removeAttribute('data-i18n');
+        this.selectorText.setAttribute('data-custom', 'true');
+        
+        // Clear the tablet brand and model data
+        delete this.selectorButton.dataset.tabletBrand;
+        delete this.selectorButton.dataset.tabletModel;
+        
+        // Show the dimensions fields
+        const tabletDimensionsContainer = document.getElementById('tablet-dimensions-container');
+        if (tabletDimensionsContainer) {
+            tabletDimensionsContainer.classList.remove('hidden');
+        }
+        
+        // Update the display
+        if (typeof updateDisplay === 'function') {
+            updateDisplay();
+        }
+        
+        // Trigger a custom event to notify other components
         const event = new CustomEvent('tablet:custom');
         document.dispatchEvent(event);
     },
     
     /**
-     * Affiche ou masque le popup
+     * Display or hide the popup
      */
     togglePopup() {
         if (this.selectorPopup.classList.contains('hidden')) {
@@ -469,23 +727,23 @@ const TabletSelector = {
     },
     
     /**
-     * Affiche le popup
+     * Display the popup
      */
     showPopup() {
         this.selectorPopup.classList.remove('hidden');
         
-        // Réinitialiser la recherche
+        // Reset the search
         if (this.searchInput) this.searchInput.value = '';
         if (this.searchInputMobile) this.searchInputMobile.value = '';
         
-        // Rafraîchir l'affichage des modèles
+        // Refresh the models display
         if (this.selectedBrand) {
             this.selectBrand(this.selectedBrand);
         }
     },
     
     /**
-     * Masque le popup
+     * Hide the popup
      */
     hidePopup() {
         this.selectorPopup.classList.add('hidden');

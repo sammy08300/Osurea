@@ -1,15 +1,15 @@
-// Service Worker pour Osu!rea - Area Visualizer
+// Service Worker for Osu!rea - Area Visualizer v2.2
 const CACHE_NAME = 'osu-area-visualizer-v2.2';
 const APP_SHELL_CACHE = 'app-shell-v2';
 const DYNAMIC_CACHE = 'dynamic-content-v2';
 const STATIC_CACHE = 'static-assets-v2';
 const IMAGE_CACHE = 'images-v2';
 
-// Durée de mise en cache (7 jours pour contenu statique, 1 jour pour contenu dynamique)
-const STATIC_CACHE_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 jours
-const DYNAMIC_CACHE_DURATION = 24 * 60 * 60 * 1000;    // 1 jour
+// Cache duration (7 days for static content, 1 day for dynamic content)
+const STATIC_CACHE_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days
+const DYNAMIC_CACHE_DURATION = 24 * 60 * 60 * 1000;    // 1 day
 
-// Ressources essentielles (app shell) à mettre en cache immédiatement
+// Essential resources (app shell) to cache immediately
 const APP_SHELL_ASSETS = [
   '/',
   '/index.html',
@@ -30,35 +30,35 @@ const APP_SHELL_ASSETS = [
   '/404.html'
 ];
 
-// Ressources que nous voulons précacher mais qui sont moins critiques
+// Resources we want to precache but are less critical
 const SECONDARY_ASSETS = [
   '/data/tablets.json'
 ];
 
-// Limites pour la taille des caches
+// Cache size limits
 const CACHE_SIZE_LIMITS = {
-  [DYNAMIC_CACHE]: 30,  // Nombre maximum d'entrées
-  [IMAGE_CACHE]: 50     // Nombre maximum d'images
+  [DYNAMIC_CACHE]: 30,  // Maximum number of entries
+  [IMAGE_CACHE]: 50     // Maximum number of images
 };
 
-// Installation du service worker avec mise en cache parallèle pour plus de rapidité
+// Install the service worker with parallel caching for faster performance
 self.addEventListener('install', (event) => {
   event.waitUntil(
     Promise.all([
-      // Mettre en cache l'app shell (priorité haute)
+      // Cache the app shell (high priority)
       caches.open(APP_SHELL_CACHE).then(cache => 
         Promise.all(
           APP_SHELL_ASSETS.map(url => 
-            cache.add(url).catch(err => console.warn(`Échec mise en cache de ${url}:`, err))
+            cache.add(url).catch(err => console.warn(`Failed to cache ${url}:`, err))
           )
         )
       ),
       
-      // Mettre en cache les ressources secondaires (parallèle)
+      // Cache the secondary resources (parallel)
       caches.open(DYNAMIC_CACHE).then(cache => 
         Promise.all(
           SECONDARY_ASSETS.map(url => 
-            cache.add(url).catch(err => console.warn(`Échec mise en cache secondaire de ${url}:`, err))
+            cache.add(url).catch(err => console.warn(`Secondary cache failed for ${url}:`, err))
           )
         )
       )
@@ -67,7 +67,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Activation et suppression des anciens caches
+// Activation and deletion of old caches
 self.addEventListener('activate', (event) => {
   const currentCaches = [APP_SHELL_CACHE, DYNAMIC_CACHE, STATIC_CACHE, IMAGE_CACHE];
   
@@ -84,24 +84,24 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fonction utilitaire pour limiter la taille d'un cache (LRU - Least Recently Used)
-async function trimCache(cacheName, maxItems) {
+// Utility function to limit the size of a cache (LRU - Least Recently Used)
+async function trimCache(cacheName, maxItems) { 
   const cache = await caches.open(cacheName);
   const keys = await cache.keys();
   
   if (keys.length > maxItems) {
-    // Supprimer les entrées les plus anciennes jusqu'à atteindre la limite
+    // Delete the oldest entries until the limit is reached
     for (let i = 0; i < keys.length - maxItems; i++) {
       await cache.delete(keys[i]);
     }
   }
 }
 
-// Fonction pour gérer les expirations du cache
+// Function to handle cache expiration
 async function cleanExpiredCache() {
   const now = Date.now();
   
-  // Nettoyer le cache statique
+  // Clean the static cache
   const staticCache = await caches.open(STATIC_CACHE);
   const staticKeys = await staticCache.keys();
   for (const request of staticKeys) {
@@ -113,7 +113,7 @@ async function cleanExpiredCache() {
     }
   }
   
-  // Nettoyer le cache dynamique
+  // Clean the dynamic cache
   const dynamicCache = await caches.open(DYNAMIC_CACHE);
   const dynamicKeys = await dynamicCache.keys();
   for (const request of dynamicKeys) {
@@ -126,7 +126,7 @@ async function cleanExpiredCache() {
   }
 }
 
-// Ajouter un timestamp aux réponses mises en cache
+// Add a timestamp to cached responses
 function addTimestampToResponse(response) {
   if (!response || !response.body) return response;
   
@@ -140,16 +140,16 @@ function addTimestampToResponse(response) {
   });
 }
 
-// Stratégie de mise en cache optimisée
+// Optimized caching strategy
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   
-  // Ne pas intercepter les requêtes non GET ou vers d'autres domaines
+  // Do not intercept non-GET requests or requests to other domains
   if (event.request.method !== 'GET' || !url.origin.includes(self.location.origin)) {
     return;
   }
   
-  // Stratégie spécifique pour les fichiers HTML (Network First)
+  // Specific strategy for HTML files (Network First)
   if (url.pathname.endsWith('.html') || url.pathname === '/') {
     event.respondWith(
       fetch(event.request)
@@ -164,36 +164,36 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
-  // Stratégie pour fichiers JavaScript et CSS (Cache First avec mise à jour en arrière-plan)
+  // Strategy for JavaScript and CSS files (Cache First with background update)
   if (url.pathname.endsWith('.js') || url.pathname.endsWith('.css')) {
     event.respondWith(
       caches.match(event.request)
         .then(cachedResponse => {
-          // Renvoyer la réponse mise en cache si elle existe
+          // Return the cached response if it exists
           const fetchPromise = fetch(event.request)
             .then(networkResponse => {
-              // Mettre à jour le cache en arrière-plan
+              // Update the cache in the background
               const timestamp = addTimestampToResponse(networkResponse.clone());
               caches.open(APP_SHELL_CACHE)
                 .then(cache => cache.put(event.request, timestamp));
               return networkResponse;
             });
           
-          // Renvoyer la réponse mise en cache immédiatement si disponible,
-          // sinon attendre la réponse réseau
+          // Return the cached response immediately if available,
+          // otherwise wait for the network response
           return cachedResponse || fetchPromise;
         })
     );
     return;
   }
   
-  // Stratégie pour les images (Cache First puis Network avec stockage)
+  // Strategy for images (Cache First then Network with storage)
   if (url.pathname.match(/\.(jpg|jpeg|png|gif|svg|webp)$/)) {
     event.respondWith(
       caches.match(event.request)
         .then(cachedResponse => {
           if (cachedResponse) {
-            // Mettre à jour l'image en arrière-plan si elle existe dans le cache
+            // Update the image in the background if it exists in the cache
             fetch(event.request)
               .then(networkResponse => {
                 if (networkResponse.ok) {
@@ -210,7 +210,7 @@ self.addEventListener('fetch', (event) => {
             return cachedResponse;
           }
           
-          // Si pas dans le cache, la récupérer et la mettre en cache
+          // If not in the cache, fetch it and cache it
           return fetch(event.request)
             .then(networkResponse => {
               if (!networkResponse || !networkResponse.ok) {
@@ -231,7 +231,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
-  // Stratégie pour les données JSON (Network First avec timeout pour les performances)
+  // Strategy for JSON data (Network First with timeout for performance)
   if (url.pathname.endsWith('.json')) {
     event.respondWith(
       Promise.race([
@@ -245,7 +245,7 @@ self.addEventListener('fetch', (event) => {
               });
             return response;
           }),
-        // Timeout de 2 secondes pour revenir au cache si le réseau est lent
+        // Timeout of 2 seconds to return to cache if the network is slow
         new Promise(resolve => {
           setTimeout(() => {
             caches.match(event.request).then(cachedResponse => {
@@ -259,7 +259,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
-  // Stratégie par défaut pour les autres ressources (Cache First)
+  // Default strategy for other resources (Cache First)
   event.respondWith(
     caches.match(event.request)
       .then(cachedResponse => {
@@ -269,12 +269,12 @@ self.addEventListener('fetch', (event) => {
         
         return fetch(event.request)
           .then(response => {
-            // Ne mettre en cache que les réponses valides
+            // Cache only valid responses
             if (!response || response.status !== 200 || response.type !== 'basic') {
               return response;
             }
             
-            // Mettre en cache la nouvelle ressource
+            // Cache the new resource
             const timestamp = addTimestampToResponse(response.clone());
             caches.open(STATIC_CACHE)
               .then(cache => cache.put(event.request, timestamp));
@@ -285,21 +285,21 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-// Nettoyer périodiquement les caches expirés (toutes les 24 heures)
+// Clean expired caches periodically (every 24 hours)
 self.addEventListener('periodicsync', event => {
   if (event.tag === 'cache-cleanup') {
     event.waitUntil(cleanExpiredCache());
   }
 });
 
-// Fallback pour les navigateurs qui ne supportent pas periodicSync
+// Fallback for browsers that do not support periodicSync
 self.addEventListener('message', event => {
   if (event.data && event.data.type === 'CACHE_CLEANUP') {
     event.waitUntil(cleanExpiredCache());
   }
 });
 
-// Planifier un nettoyage initial après l'activation
+// Schedule an initial cleanup after activation
 self.addEventListener('activate', event => {
   event.waitUntil(
     Promise.all([

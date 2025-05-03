@@ -2,13 +2,13 @@
  * Utility functions for handling constraints on area dimensions and position
  */
 
-// Seuils minimum pour les dimensions de la zone active
+// Minimum thresholds for the dimensions of the active area
 const MIN_AREA_DIMENSION = 10; // mm
 
 /**
  * Constraint utilities module
- * Ces fonctions permettent de s'assurer que les dimensions et position de la zone active
- * restent dans les limites acceptables par rapport aux dimensions de la tablette.
+ * These functions ensure that the dimensions and position of the active area
+ * remain within acceptable limits relative to the dimensions of the tablet.
  */
 
 /**
@@ -35,30 +35,30 @@ function constrainAreaOffset(offsetX, offsetY, areaWidth, areaHeight, tabletWidt
     let constrainedX = offsetX;
     let constrainedY = offsetY;
     
-    // Calculer les limites de déplacement pour garder la zone active entièrement 
-    // à l'intérieur de la tablette
+    // Calculate the movement limits to keep the active area entirely 
+    // within the tablet boundaries
     const halfAreaWidth = areaWidth / 2;
     const halfAreaHeight = areaHeight / 2;
     
-    // Limites pour l'offset X (position centrale de la zone)
+    // Limits for the X offset (center position of the area)
     const minX = halfAreaWidth;
     const maxX = tabletWidth - halfAreaWidth;
     
-    // Limites pour l'offset Y (position centrale de la zone)
+    // Limits for the Y offset (center position of the area)
     const minY = halfAreaHeight;
     const maxY = tabletHeight - halfAreaHeight;
     
-    // Appliquer les contraintes (clamping)
+    // Apply the constraints (clamping)
     constrainedX = clamp(offsetX, minX, maxX);
     
-    // Si la tablette est plus petite que la zone en largeur, centrer horizontalement
+    // If the tablet is smaller than the area in width, center horizontally
     if (minX > maxX) {
         constrainedX = tabletWidth / 2;
     }
     
     constrainedY = clamp(offsetY, minY, maxY);
     
-    // Si la tablette est plus petite que la zone en hauteur, centrer verticalement
+    // If the tablet is smaller than the area in height, center vertically
     if (minY > maxY) {
         constrainedY = tabletHeight / 2;
     }
@@ -78,7 +78,7 @@ function constrainAreaOffset(offsetX, offsetY, areaWidth, areaHeight, tabletWidt
  * @returns {Object} - The adapted area dimensions and position
  */
 function adaptAreaToNewTablet(currentState, oldTablet, newTablet) {
-    // Récupérer les dimensions et position actuelles
+    // Get the current dimensions and position
     const { areaWidth, areaHeight, offsetX, offsetY } = currentState;
     
     console.log("adaptAreaToNewTablet - Comparaison dimensions:", {
@@ -87,10 +87,10 @@ function adaptAreaToNewTablet(currentState, oldTablet, newTablet) {
         "Dimensions conservées": areaWidth <= newTablet.width && areaHeight <= newTablet.height
     });
     
-    // Si la zone active est déjà plus petite que la nouvelle tablette, 
-    // ne pas changer ses dimensions
+    // If the active area is already smaller than the new tablet, 
+    // do not change its dimensions
     if (areaWidth <= newTablet.width && areaHeight <= newTablet.height) {
-        // Seulement recalculer la position pour rester dans les limites
+        // Only recalculate the position to remain within the limits
         const constrainedOffsets = constrainAreaOffset(
             offsetX, offsetY, 
             areaWidth, areaHeight, 
@@ -110,24 +110,24 @@ function adaptAreaToNewTablet(currentState, oldTablet, newTablet) {
         };
     }
     
-    // Pour les autres cas, adapter les dimensions comme avant
-    // Calculer les ratios de mise à l'échelle
+    // For other cases, adapt the dimensions as before
+    // Calculate the scaling ratios
     const widthRatio = newTablet.width / oldTablet.width;
     const heightRatio = newTablet.height / oldTablet.height;
     
-    // Adapter les dimensions de la zone en fonction des nouveaux ratios
-    // tout en gardant le même pourcentage de couverture
+    // Adapt the dimensions of the area according to the new ratios
+    // while keeping the same coverage percentage
     const newAreaWidth = Math.min(areaWidth * widthRatio, newTablet.width);
     const newAreaHeight = Math.min(areaHeight * heightRatio, newTablet.height);
     
-    // Adapter la position en maintenant le même placement relatif
+    // Adapt the position while keeping the same relative placement
     const relativeX = offsetX / oldTablet.width;
     const relativeY = offsetY / oldTablet.height;
     
     let newOffsetX = relativeX * newTablet.width;
     let newOffsetY = relativeY * newTablet.height;
     
-    // Contraindre la nouvelle position pour s'assurer que la zone reste dans les limites
+    // Constrain the new position to ensure that the area remains within the limits
     const constrainedOffsets = constrainAreaOffset(
         newOffsetX, newOffsetY, 
         newAreaWidth, newAreaHeight, 
@@ -149,6 +149,6 @@ function adaptAreaToNewTablet(currentState, oldTablet, newTablet) {
     };
 }
 
-// Exporter les fonctions pour utilisation dans d'autres modules
+// Export the functions for use in other modules
 window.constrainAreaOffset = constrainAreaOffset;
 window.adaptAreaToNewTablet = adaptAreaToNewTablet; 

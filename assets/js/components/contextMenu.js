@@ -1,5 +1,5 @@
 /**
- * Menu contextuel pour l'alignement de la zone active
+ * Context menu for area alignment
  */
 
 const ContextMenu = {
@@ -9,12 +9,12 @@ const ContextMenu = {
     isVisible: false,
 
     /**
-     * Initialise le menu contextuel
+     * Initialize the context menu
      */
     init() {
-        console.log('Initialisation du menu contextuel...');
+        console.log('Initializing the context menu...');
         
-        // Récupérer les éléments existants
+        // Get existing elements
         this.rectangle = document.getElementById('rectangle');
         this.tabletBoundary = document.getElementById('tablet-boundary');
         this.menu = document.getElementById('context-menu');
@@ -33,16 +33,16 @@ const ContextMenu = {
     },
     
     /**
-     * Crée le menu contextuel
+     * Create the context menu
      */
     createMenu() {
         this.menu = document.createElement('div');
         this.menu.id = 'context-menu';
         this.menu.className = 'fixed z-50 bg-gray-900 border border-gray-700 rounded-lg shadow-xl p-4 hidden';
         
-        // Créer une grille 3x3 de boutons de positionnement
+        // Create a 3x3 grid of positioning buttons
         this.menu.innerHTML = `
-            <div class="text-center text-sm text-gray-300 mb-2">Position du rectangle</div>
+            <div class="text-center text-sm text-gray-300 mb-2">Rectangle Position</div>
             <div class="grid grid-cols-3 gap-2">
                 <!-- Première ligne: Haut-gauche, Haut, Haut-droite -->
                 <button class="align-btn bg-gray-800 hover:bg-gray-700 p-2 rounded-md" title="Haut-gauche" data-position="top-left">
@@ -101,17 +101,17 @@ const ContextMenu = {
     },
     
     /**
-     * Configure les écouteurs d'événements
+     * Configure the event listeners
      */
     setupEventListeners() {
-        // Gestionnaire pour le clic droit sur le rectangle
+        // Right click handler on the rectangle
         this.rectangle.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             e.stopPropagation();
             this.show(e.clientX, e.clientY);
         });
         
-        // Gestionnaire pour les clics sur les boutons d'alignement avec ID
+        // Handler for clicks on alignment buttons with IDs
         const alignmentButtons = [
             { id: 'align-top-left', position: 'top-left' },
             { id: 'align-top', position: 'top' },
@@ -134,7 +134,7 @@ const ContextMenu = {
             }
         });
         
-        // Conserver également l'ancien gestionnaire pour compatibilité
+        // Also keep the old handler for compatibility
         this.menu.addEventListener('click', (e) => {
             const alignBtn = e.target.closest('.align-btn');
             if (alignBtn && alignBtn.dataset.position) {
@@ -144,36 +144,36 @@ const ContextMenu = {
             }
         });
         
-        // Cacher le menu au clic en dehors
+        // Hide the menu on outside clicks
         document.addEventListener('click', (e) => {
             if (this.isVisible && !this.menu.contains(e.target)) {
                 this.hide();
             }
         });
         
-        // Cacher le menu lors du défilement ou du redimensionnement
+        // Hide the menu on scrolling or resizing
         window.addEventListener('scroll', () => this.hide());
         window.addEventListener('resize', () => this.hide());
     },
     
     /**
-     * Affiche le menu contextuel à la position spécifiée
-     * @param {number} x - Position X en pixels
-     * @param {number} y - Position Y en pixels
+     * Show the context menu at the specified position
+     * @param {number} x - Position X in pixels
+     * @param {number} y - Position Y in pixels
      */
     show(x, y) {
         if (!this.menu) return;
         
-        // Rendre le menu visible pour calculer ses dimensions
+        // Make the menu visible to calculate its dimensions
         this.menu.style.display = 'block';
         this.menu.classList.remove('hidden');
         
-        // Calculer les dimensions
+        // Calculate the dimensions
         const menuRect = this.menu.getBoundingClientRect();
         const windowWidth = window.innerWidth;
         const windowHeight = window.innerHeight;
         
-        // Ajuster la position pour éviter les débordements
+        // Adjust the position to avoid overflows
         if (x + menuRect.width > windowWidth) {
             x = windowWidth - menuRect.width - 5;
         }
@@ -182,14 +182,14 @@ const ContextMenu = {
             y = windowHeight - menuRect.height - 5;
         }
         
-        // Positionner le menu
+        // Position the menu
         this.menu.style.left = `${x}px`;
         this.menu.style.top = `${y}px`;
         this.isVisible = true;
     },
     
     /**
-     * Masque le menu contextuel
+     * Hide the context menu
      */
     hide() {
         if (this.menu) {
@@ -200,8 +200,8 @@ const ContextMenu = {
     },
     
     /**
-     * Aligne la zone active selon la position spécifiée
-     * @param {string} position - Position d'alignement
+     * Align the active area according to the specified position
+     * @param {string} position - Alignment position
      */
     alignArea(position) {
         console.log("Alignement à la position:", position);
@@ -211,25 +211,25 @@ const ContextMenu = {
         const areaWidth = parseFloatSafe(document.getElementById('areaWidth').value);
         const areaHeight = parseFloatSafe(document.getElementById('areaHeight').value);
         
-        // Vérifier la validité des dimensions
+        // Check the validity of the dimensions
         if ([tabletWidth, tabletHeight, areaWidth, areaHeight].some(v => !isValidNumber(v, 0))) {
-            Notifications.error('Dimensions invalides pour l\'alignement');
+            Notifications.error('Invalid dimensions for alignment');
             return;
         }
         
         const areaOffsetX = document.getElementById('areaOffsetX');
         const areaOffsetY = document.getElementById('areaOffsetY');
         
-        // Demi-dimensions pour le calcul des bords
+        // Half-dimensions for border calculations
         const halfWidth = areaWidth / 2;
         const halfHeight = areaHeight / 2;
         
         let newX, newY;
         
-        // Calculer la nouvelle position selon l'alignement demandé
+        // Calculate the new position according to the requested alignment
         switch (position) {
             // Coins
-            case 'top-left':
+            case 'top-left': 
                 newX = halfWidth;
                 newY = halfHeight;
                 break;
@@ -248,20 +248,20 @@ const ContextMenu = {
             
             // Bords
             case 'top':
-                newX = tabletWidth / 2; // Centre horizontal
+                newX = tabletWidth / 2; // Horizontal center
                 newY = halfHeight;
                 break;
             case 'right':
                 newX = tabletWidth - halfWidth;
-                newY = tabletHeight / 2; // Centre vertical
+                newY = tabletHeight / 2; // Vertical center
                 break;
             case 'bottom':
-                newX = tabletWidth / 2; // Centre horizontal
+                newX = tabletWidth / 2; // Horizontal center
                 newY = tabletHeight - halfHeight;
                 break;
             case 'left':
                 newX = halfWidth;
-                newY = tabletHeight / 2; // Centre vertical
+                newY = tabletHeight / 2; // Vertical center
                 break;
             
             // Centre
@@ -271,22 +271,22 @@ const ContextMenu = {
                 break;
                 
             default:
-                console.error('Position inconnue:', position);
+                console.error('unknown position:', position);
                 return;
         }
         
-        // Mettre à jour les champs de saisie
+        // Update the input fields
         areaOffsetX.value = formatNumber(newX, 3);
         areaOffsetY.value = formatNumber(newY, 3);
         
-        // Mettre à jour l'affichage
+        // Update the display
         if (typeof updateDisplay === 'function') {
             updateDisplay();
         } else if (typeof window.updateDisplay === 'function') {
             window.updateDisplay();
         }
         
-        // Notification de confirmation
+        // Confirmation notification
         const positionNames = {
             'left': 'à gauche',
             'right': 'à droite',
@@ -300,5 +300,16 @@ const ContextMenu = {
         };
         
         Notifications.success(`Zone active positionnée ${positionNames[position]}`);
+        
+        // Émettre un événement personnalisé pour informer de la modification de la zone active
+        document.dispatchEvent(new CustomEvent('activearea:positioned', {
+            detail: {
+                position: position,
+                offsetX: newX,
+                offsetY: newY,
+                width: areaWidth,
+                height: areaHeight
+            }
+        }));
     }
 };

@@ -1,32 +1,212 @@
 [
   {
     "brand": "Wacom",
-    "model": "CTL-480 (Intuos Pen S)",
-    "width": 152,
-    "height": 95
-  },
-  {
-    "brand": "Wacom",
     "model": "CTL-472 Small (One by Wacom S)",
-    "width": 152,
-    "height": 95
+    "width": 152.0,
+    "height": 95.0
   },
   {
     "brand": "Wacom",
     "model": "CTL-672 Medium (One by Wacom M)",
-    "width": 216,
-    "height": 135
+    "width": 216.0,
+    "height": 135.0
   },
   {
-    "brand": "Huion",
-    "model": "H430P (Inspiroy)",
-    "width": 121.9,
+    "brand": "Wacom",
+    "model": "CTL-480 Small (Intuos Pen S)",
+    "width": 152.0,
+    "height": 95.0
+  },
+  {
+    "brand": "Wacom",
+    "model": "CTL-680 Medium (Intuos Pen M)",
+    "width": 216.0,
+    "height": 137.0
+  },
+  {
+    "brand": "Wacom",
+    "model": "CTH-480 Small (Intuos Pen & Touch S)",
+    "width": 152.0,
+    "height": 95.0
+  },
+  {
+    "brand": "Wacom",
+    "model": "CTH-680 Medium (Intuos Pen & Touch M)",
+    "width": 216.0,
+    "height": 137.0
+  },
+  {
+    "brand": "Wacom",
+    "model": "CTL-490 Small (Intuos Draw S)",
+    "width": 152.0,
+    "height": 95.0
+  },
+  {
+    "brand": "Wacom",
+    "model": "CTL-690 Medium (Intuos Draw M)",
+    "width": 216.0,
+    "height": 135.0
+  },
+  {
+    "brand": "Wacom",
+    "model": "CTH-490 Small (Intuos Art/Comic/Photo S)",
+    "width": 152.0,
+    "height": 95.0
+  },
+  {
+    "brand": "Wacom",
+    "model": "CTH-690 Medium (Intuos Art/Comic/Photo M)",
+    "width": 216.0,
+    "height": 135.0
+  },
+  {
+    "brand": "Wacom",
+    "model": "PTH-451 Small (Intuos Pro S)",
+    "width": 157.0,
+    "height": 98.0
+  },
+  {
+    "brand": "Wacom",
+    "model": "PTH-651 Medium (Intuos Pro M)",
+    "width": 224.0,
+    "height": 140.0
+  },
+  {
+    "brand": "Wacom",
+    "model": "PTH-851 Large (Intuos Pro L)",
+    "width": 325.0,
+    "height": 203.0
+  },
+  {
+    "brand": "Wacom",
+    "model": "CTL-4100 Small (Intuos S)",
+    "width": 152.0,
+    "height": 95.0
+  },
+  {
+    "brand": "Wacom",
+    "model": "CTL-6100 Medium (Intuos M)",
+    "width": 216.0,
+    "height": 135.0
+  },
+  {
+    "brand": "XP-Pen",
+    "model": "G430",
+    "width": 102.4,
     "height": 76.2
   },
   {
     "brand": "XP-Pen",
-    "model": "Star G640 (Rev A)",
-    "width": 152.4,
+    "model": "G430S",
+    "width": 102.4,
+    "height": 76.2
+  },
+  {
+    "brand": "XP-Pen",
+    "model": "G540",
+    "width": 139.7,
+    "height": 88.9
+  },
+  {
+    "brand": "XP-Pen",
+    "model": "G640",
+    "width": 160.0,
+    "height": 100.0
+  },
+  {
+    "brand": "XP-Pen",
+    "model": "G640S",
+    "width": 160.0,
+    "height": 100.0
+  },
+  {
+    "brand": "XP-Pen",
+    "model": "Deco 01",
+    "width": 254.0,
+    "height": 159.0
+  },
+  {
+    "brand": "XP-Pen",
+    "model": "Deco 02",
+    "width": 254.0,
+    "height": 143.0
+  },
+  {
+    "brand": "XP-Pen",
+    "model": "Deco 03",
+    "width": 254.0,
+    "height": 143.0
+  },
+  {
+    "brand": "XP-Pen",
+    "model": "Star G430S",
+    "width": 102.4,
+    "height": 76.2
+  },
+  {
+    "brand": "XP-Pen",
+    "model": "Star G540",
+    "width": 139.7,
+    "height": 88.9
+  },
+  {
+    "brand": "XP-Pen",
+    "model": "Star G640",
+    "width": 160.0,
+    "height": 100.0
+  },
+  {
+    "brand": "XP-Pen",
+    "model": "Star G640S",
+    "width": 160.0,
+    "height": 100.0
+  },
+  {
+    "brand": "Huion",
+    "model": "H420",
+    "width": 104.0,
+    "height": 78.0
+  },
+  {
+    "brand": "Huion",
+    "model": "H430P",
+    "width": 121.9,
+    "height": 76.2
+  },
+  {
+    "brand": "Huion",
+    "model": "H640P",
+    "width": 160.0,
+    "height": 100.0
+  },
+  {
+    "brand": "Huion",
+    "model": "HS64",
+    "width": 160.0,
+    "height": 100.0
+  },
+  {
+    "brand": "Huion",
+    "model": "HS611",
+    "width": 220.0,
+    "height": 138.0
+  },
+  {
+    "brand": "Huion",
+    "model": "Inspiroy H950P",
+    "width": 221.0,
+    "height": 138.0
+  },
+  {
+    "brand": "Huion",
+    "model": "G640",
+    "width": 160.0,
+    "height": 100.0
+  },
+  {
+    "brand": "Gaomon",
+    "model": "S56K",
+    "width": 165.1,
     "height": 101.6
   },
   {
@@ -36,153 +216,9 @@
     "height": 101.6
   },
   {
-    "brand": "XP-Pen",
-    "model": "Star G430S",
-    "width": 101.6,
-    "height": 76.2
-  },
-  {
-    "brand": "Wacom",
-    "model": "CTL-4100 (Intuos S)",
-    "width": 152,
-    "height": 95
-  },
-  {
-    "brand": "VEIKK",
-    "model": "S640",
-    "width": 152.4,
-    "height": 101.6
-  },
-  {
-    "brand": "Huion",
-    "model": "osu!tablet (v1/v2)",
-    "width": 101.6,
-    "height": 63.5
-  },
-  {
-    "brand": "Wacom",
-    "model": "CTH-470 (Bamboo Pen & Touch)",
-    "width": 147,
-    "height": 92
-  },
-  {
     "brand": "Gaomon",
     "model": "S630",
-    "width": 165.1,
-    "height": 101.6
-  },
-  {
-    "brand": "XP-Pen",
-    "model": "Deco Mini 4",
-    "width": 101.6,
-    "height": 76.2
-  },
-  {
-    "brand": "Wacom",
-    "model": "Intuos S (Ancien, ex: CTL-490)",
-    "width": 152,
-    "height": 95
-  },
-  {
-    "brand": "Huion",
-    "model": "HS64 (Inspiroy)",
-    "width": 160,
-    "height": 102
-  },
-  {
-    "brand": "XP-Pen",
-    "model": "Artist 12 Pro (Écran)",
-    "width": 256.32,
-    "height": 144.18
-  },
-  {
-    "brand": "Wacom",
-    "model": "CTL-471 (Bamboo One)",
-    "width": 152,
-    "height": 95
-  },
-  {
-    "brand": "Huion",
-    "model": "H420",
-    "width": 101.6,
-    "height": 56.6
-  },
-  {
-    "brand": "XP-Pen",
-    "model": "Deco Mini7",
-    "width": 177.8,
-    "height": 111.1
-  },
-  {
-    "brand": "UGEE",
-    "model": "M708",
-    "width": 254,
-    "height": 152.4
-  },
-  {
-    "brand": "Huion",
-    "model": "Inspiroy H640P",
-    "width": 160,
-    "height": 100
-  },
-  {
-    "brand": "Parblo",
-    "model": "A640",
-    "width": 152.4,
-    "height": 101.6
-  },
-  {
-    "brand": "Gaomon",
-    "model": "S56K",
-    "width": 152.4,
-    "height": 127.0
-  },
-  {
-    "brand": "Huion",
-    "model": "H950P",
-    "width": 221.0,
-    "height": 138.0
-  },
-  {
-    "brand": "Huion",
-    "model": "Inspiroy H1060P",
-    "width": 254.0,
-    "height": 158.8
-  },
-  {
-    "brand": "Huion",
-    "model": "H610 Pro",
-    "width": 254.0,
-    "height": 158.8
-  },
-  {
-    "brand": "XP-Pen",
-    "model": "Deco 01 V2",
-    "width": 254.0,
-    "height": 159.0
-  },
-  {
-    "brand": "XP-Pen",
-    "model": "Star 06C",
-    "width": 254.0,
-    "height": 152.0
-  },
-  {
-    "brand": "XP-Pen",
-    "model": "Star 05 Wireless",
-    "width": 203.0,
-    "height": 127.0
-  },
-  {
-    "brand": "XP-Pen",
-    "model": "Deco L",
-    "width": 254.0,
-    "height": 152.0
-  },
-  {
-    "brand": "XP-Pen",
-    "model": "Deco M",
     "width": 203.0,
     "height": 127.0
   }
-]
+] 

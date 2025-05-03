@@ -2,6 +2,69 @@
  * Main application module
  */
 
+/**
+ * Utility function to translate an i18n key with robust fallback
+ * @param {string} key - The translation key without the i18n: prefix
+ * @returns {string} - The translation or a formatted default value
+ */
+function translateWithFallback(key) {
+    // First try to use the standard translation system
+    let translated = null;
+    
+    if (typeof localeManager !== 'undefined' && typeof localeManager.translate === 'function') {
+        try {
+            translated = localeManager.translate(key);
+            if (translated === key) translated = null; // If translation returns the key, consider it a failure
+        } catch (e) {
+            console.error("[ERROR] Translation failed for key:", key, e);
+        }
+    }
+    
+    // If standard translation failed, use fallbacks
+    if (!translated || translated.startsWith('i18n:')) {
+        const htmlLang = document.documentElement.lang || 'fr';
+        
+        // Manually defined translations for common keys
+        const fallbackTranslations = {
+            'select_model': {
+                'en': 'Select a model',
+                'es': 'Seleccionar modelo',
+                'fr': 'Sélectionner un modèle'
+            },
+            'default_favorite_name': {
+                'en': 'Saved configuration',
+                'es': 'Configuración guardada',
+                'fr': 'Configuration sauvegardée'
+            },
+            'custom_dimensions': {
+                'en': 'Custom dimensions',
+                'es': 'Dimensiones personalizadas',
+                'fr': 'Dimensions personnalisées'
+            }
+        };
+        
+        // Determine the language to use (prefix only)
+        let lang = 'fr'; // Default
+        if (htmlLang.startsWith('en')) {
+            lang = 'en';
+        } else if (htmlLang.startsWith('es')) {
+            lang = 'es';
+        }
+        
+        // Use fallback translation if available
+        if (fallbackTranslations[key] && fallbackTranslations[key][lang]) {
+            translated = fallbackTranslations[key][lang];
+        } else {
+            // Default formatting for unknown keys
+            translated = key.replace(/_/g, ' ');
+            // First letter uppercase
+            translated = translated.charAt(0).toUpperCase() + translated.slice(1);
+        }
+    }
+    
+    return translated;
+}
+
 // Global application state
 const appState = {
     tabletData: [],
@@ -22,11 +85,11 @@ const appState = {
             }
             this.tabletData = await response.json();
             
-            // Initialiser le nouveau sélecteur de tablettes
+            // Initialize the new tablet selector
             if (typeof TabletSelector !== 'undefined') {
                 TabletSelector.init(this.tabletData);
             } else {
-                // Fallback vers l'ancienne méthode si nécessaire
+                // Fallback to the old method if necessary
                 this.populateTabletPresets();
             }
         } catch (error) {
@@ -45,7 +108,7 @@ const appState = {
             return;
         }
         
-        console.warn('Utilisation de la méthode populateTabletPresets obsolète. Utilisez TabletSelector si possible.');
+        console.warn('Using the obsolete populateTabletPresets method. Please use TabletSelector if possible.');
         
         // Group tablets by brand
         const tabletsByBrand = this.tabletData.reduce((groups, tablet) => {
@@ -85,7 +148,7 @@ const appState = {
      * Setup all input listeners
      */
     setupInputListeners() {
-        // Tablet presets - ancienne méthode - gardée pour compatibilité
+        // Tablet presets - old method - kept for compatibility
         const tabletPresetSelect = document.getElementById('tabletPresetSelect');
         if (tabletPresetSelect) {
             tabletPresetSelect.addEventListener('change', (e) => {
@@ -149,19 +212,19 @@ const appState = {
         
         if (tabletWidthInput) {
             tabletWidthInput.addEventListener('input', () => {
-                // Si l'ancien sélecteur existe, mettre à jour sa valeur
+                // If the old selector exists, update its value
                 if (tabletPresetSelect) {
                     tabletPresetSelect.value = 'custom';
                 }
                 
-                // Mettre à jour le texte du nouveau sélecteur
+                // Update the text of the new selector
                 const selectorText = document.getElementById('tabletSelectorText');
                 if (selectorText) {
-                    selectorText.textContent = 'Dimensions personnalisées';
-                    selectorText.title = 'Dimensions personnalisées';
+                    selectorText.textContent = 'Custom dimensions';
+                    selectorText.title = 'Custom dimensions';
                 }
                 
-                // S'assurer que le conteneur de dimensions est visible
+                // Ensure the dimensions container is visible
                 const tabletDimensionsContainer = document.getElementById('tablet-dimensions-container');
                 if (tabletDimensionsContainer) {
                     tabletDimensionsContainer.classList.remove('hidden');
@@ -174,19 +237,19 @@ const appState = {
         
         if (tabletHeightInput) {
             tabletHeightInput.addEventListener('input', () => {
-                // Si l'ancien sélecteur existe, mettre à jour sa valeur
+                // If the old selector exists, update its value
                 if (tabletPresetSelect) {
                     tabletPresetSelect.value = 'custom';
                 }
                 
-                // Mettre à jour le texte du nouveau sélecteur
+                // Update the text of the new selector
                 const selectorText = document.getElementById('tabletSelectorText');
                 if (selectorText) {
-                    selectorText.textContent = 'Dimensions personnalisées';
-                    selectorText.title = 'Dimensions personnalisées';
+                    selectorText.textContent = 'Custom dimensions';
+                    selectorText.title = 'Custom dimensions';
                 }
                 
-                // S'assurer que le conteneur de dimensions est visible
+                // Ensure the dimensions container is visible
                 const tabletDimensionsContainer = document.getElementById('tablet-dimensions-container');
                 if (tabletDimensionsContainer) {
                     tabletDimensionsContainer.classList.remove('hidden');
@@ -203,52 +266,52 @@ const appState = {
         const customRatioInput = document.getElementById('customRatio');
         const lockRatioButton = document.getElementById('lockRatio');
         
-        // Fonction pour mettre à jour l'état du champ ratio en fonction de l'état du verrou
+        // Function to update the ratio field state based on the lock state
         const updateRatioFieldState = () => {
             const isLocked = lockRatioButton.getAttribute('aria-pressed') === 'true';
             customRatioInput.readOnly = !isLocked;
             
-            // Appliquer les styles appropriés en fonction de l'état
+            // Apply the appropriate styles based on the state
             if (isLocked) {
-                // Si verrouillé, l'input est modifiable et garde la même apparence que les autres inputs
+                // If locked, the input is editable and keeps the same appearance as the other inputs
                 customRatioInput.classList.remove('ratio-editable');
                 customRatioInput.classList.add('ratio-locked');
-                // Réinitialiser les styles inline
+                // Reset the inline styles
                 customRatioInput.style.backgroundColor = "";
                 customRatioInput.style.color = "";
-                customRatioInput.style.pointerEvents = ""; // Permettre l'interaction
-                customRatioInput.title = "Ratio personnalisé (modifiable)";
+                customRatioInput.style.pointerEvents = ""; // Allow interaction
+                customRatioInput.title = "Custom ratio (editable)";
             } else {
-                // Si déverrouillé, l'input n'est pas modifiable et a une apparence plus sombre
+                // If unlocked, the input is not editable and has a darker appearance
                 customRatioInput.classList.remove('ratio-locked');
                 customRatioInput.classList.add('ratio-editable');
-                customRatioInput.style.backgroundColor = "#111827"; // bg-gray-900 - plus foncé
-                customRatioInput.style.color = "#9CA3AF"; // text-gray-400 - plus clair
-                customRatioInput.style.pointerEvents = "none"; // Empêcher l'interaction
-                customRatioInput.title = "Ratio calculé automatiquement (non modifiable)";
+                customRatioInput.style.backgroundColor = "#111827"; // bg-gray-900 - darker
+                customRatioInput.style.color = "#9CA3AF"; // text-gray-400 - lighter
+                customRatioInput.style.pointerEvents = "none"; // Prevent interaction
+                customRatioInput.title = "Automatically calculated ratio (not editable)";
             }
         };
         
-        // Rendre la fonction accessible globalement
+        // Make the function accessible globally
         window.updateRatioFieldState = updateRatioFieldState;
         
-        // Initialiser l'état du champ ratio
+        // Initialize the ratio field state
         updateRatioFieldState();
         
-        // Appliquer le style initial si déverrouillé
+        // Apply the initial style if unlocked
         if (lockRatioButton.getAttribute('aria-pressed') !== 'true') {
-            customRatioInput.style.backgroundColor = "#111827"; // bg-gray-900 - plus foncé
-            customRatioInput.style.color = "#9CA3AF"; // text-gray-400 - plus clair
-            customRatioInput.style.pointerEvents = "none"; // Empêcher l'interaction
+            customRatioInput.style.backgroundColor = "#111827"; // bg-gray-900 - darker
+            customRatioInput.style.color = "#9CA3AF"; // text-gray-400 - lighter
+            customRatioInput.style.pointerEvents = "none"; // Prevent interaction
         }
         
-        // Ajouter un écouteur d'événement au bouton de verrouillage pour mettre à jour l'état du champ
+        // Add an event listener to the lock button to update the field state
         lockRatioButton.addEventListener('click', () => {
-            // L'état du bouton va changer après l'exécution de cet événement
+            // The button state will change after this event execution
             const willBeLocked = lockRatioButton.getAttribute('aria-pressed') !== 'true';
             
             if (willBeLocked) {
-                // Si on va verrouiller, on prend le ratio actuel des dimensions
+                // If we are going to lock, take the current ratio of the dimensions
                 const width = parseFloatSafe(areaWidthInput.value);
                 const height = parseFloatSafe(areaHeightInput.value);
                 
@@ -257,12 +320,12 @@ const appState = {
                     customRatioInput.value = formatNumber(this.currentRatio, 3);
                 }
             } else {
-                // Si on va déverrouiller, on recalcule le ratio à partir des dimensions
-                // (même si c'est le même, c'est pour la cohérence)
+                // If we are going to unlock, recalculate the ratio from the dimensions
+                // (even if it's the same, it's for consistency)
                 this.debouncedUpdateRatio();
             }
             
-            // Mettre à jour l'état du champ après le changement d'état du bouton
+            // Update the field state after the button state change
             setTimeout(() => {
                 updateRatioFieldState();
             }, 0);
@@ -274,22 +337,22 @@ const appState = {
                     this.cancelEditMode();
                 }
                 
-                // Récupérer les dimensions de la tablette et de la zone active
+                // Get the tablet and active area dimensions
                 const tabletWidth = parseFloatSafe(tabletWidthInput.value);
                 const tabletHeight = parseFloatSafe(tabletHeightInput.value);
                 const areaWidth = parseFloatSafe(areaWidthInput.value);
                 
-                // Contraindre la largeur de la zone active
+                // Constrain the active area width
                 const constrainedWidth = Math.min(areaWidth, tabletWidth);
                 if (constrainedWidth !== areaWidth) {
                     areaWidthInput.value = formatNumber(constrainedWidth);
                 }
                 
-                // Uniquement mettre à jour la hauteur si le ratio est verrouillé
+                // Only update the height if the ratio is locked
                 if (lockRatioButton.getAttribute('aria-pressed') === 'true' && this.currentRatio > 0 && !isNaN(this.currentRatio)) {
                     let newHeight = constrainedWidth / this.currentRatio;
                     
-                    // Contraindre également la hauteur
+                    // Constrain also the height
                     newHeight = Math.min(newHeight, tabletHeight);
                     
                     if (!isNaN(newHeight) && newHeight >= 0) {
@@ -299,7 +362,7 @@ const appState = {
                     this.debouncedUpdateRatio();
                 }
                 
-                // Contraindre également l'offset pour éviter que la zone ne dépasse
+                // Constrain also the offset to avoid the area exceeding
                 const areaHeight = parseFloatSafe(areaHeightInput.value);
                 const offsetX = parseFloatSafe(document.getElementById('areaOffsetX').value);
                 const offsetY = parseFloatSafe(document.getElementById('areaOffsetY').value);
@@ -326,22 +389,22 @@ const appState = {
                     this.cancelEditMode();
                 }
                 
-                // Récupérer les dimensions de la tablette et de la zone active
+                // Get the tablet and active area dimensions
                 const tabletWidth = parseFloatSafe(tabletWidthInput.value);
                 const tabletHeight = parseFloatSafe(tabletHeightInput.value);
                 const areaHeight = parseFloatSafe(areaHeightInput.value);
                 
-                // Contraindre la hauteur de la zone active
+                // Constrain the active area height
                 const constrainedHeight = Math.min(areaHeight, tabletHeight);
                 if (constrainedHeight !== areaHeight) {
                     areaHeightInput.value = formatNumber(constrainedHeight);
                 }
                 
-                // Uniquement mettre à jour la largeur si le ratio est verrouillé
+                // Only update the width if the ratio is locked
                 if (lockRatioButton.getAttribute('aria-pressed') === 'true' && this.currentRatio > 0 && !isNaN(this.currentRatio)) {
                     let newWidth = constrainedHeight * this.currentRatio;
                     
-                    // Contraindre également la largeur
+                    // Constrain also the width
                     newWidth = Math.min(newWidth, tabletWidth);
                     
                     if (!isNaN(newWidth) && newWidth >= 0) {
@@ -351,7 +414,7 @@ const appState = {
                     this.debouncedUpdateRatio();
                 }
                 
-                // Contraindre également l'offset pour éviter que la zone ne dépasse
+                // Constrain also the offset to avoid the area exceeding
                 const areaWidth = parseFloatSafe(areaWidthInput.value);
                 const offsetX = parseFloatSafe(document.getElementById('areaOffsetX').value);
                 const offsetY = parseFloatSafe(document.getElementById('areaOffsetY').value);
@@ -377,7 +440,7 @@ const appState = {
                 this.cancelEditMode();
             }
             
-            // Si le champ est en lecture seule, ignorer la saisie
+            // If the field is read-only, ignore the input
             if (customRatioInput.readOnly) {
                 return;
             }
@@ -401,9 +464,9 @@ const appState = {
             updateDisplay();
         });
         
-        // Ajouter un événement focus pour empêcher les mises à jour pendant l'édition directe
+        // Add an event focus to prevent updates during direct editing
         customRatioInput.addEventListener('focus', () => {
-            // Ne permettre l'édition que si le ratio est verrouillé
+            // Allow editing only if the ratio is locked
             if (!customRatioInput.readOnly) {
                 customRatioInput.dataset.editing = 'true';
             }
@@ -411,7 +474,7 @@ const appState = {
         
         customRatioInput.addEventListener('blur', () => {
             delete customRatioInput.dataset.editing;
-            // Recalculer le ratio en fonction des dimensions actuelles si nécessaire
+            // Recalculate the ratio based on the current dimensions if necessary
             if (lockRatioButton.getAttribute('aria-pressed') !== 'true') {
                 this.debouncedUpdateRatio();
             }
@@ -426,31 +489,31 @@ const appState = {
                 this.cancelEditMode();
             }
             
-            // Récupérer les dimensions nécessaires
+            // Get the necessary dimensions
             const tabletWidth = parseFloatSafe(tabletWidthInput.value);
             const tabletHeight = parseFloatSafe(tabletHeightInput.value);
             const areaWidth = parseFloatSafe(areaWidthInput.value);
             const areaHeight = parseFloatSafe(areaHeightInput.value);
             
-            // Récupérer la valeur de l'offset
+            // Get the offset value
             let offsetX = areaOffsetXInput.value.trim();
             const offsetY = parseFloatSafe(areaOffsetYInput.value);
             
-            // Si le champ est vide, autoriser la saisie
+            // If the field is empty, allow the input
             if (offsetX === '') {
-                // Ne rien faire pour laisser l'utilisateur terminer sa saisie
+                // Do nothing to let the user finish his input
                 return;
             }
             
-            // Sinon convertir en nombre et contraindre
+            // Otherwise convert to a number and constrain
             offsetX = parseFloatSafe(offsetX);
             
-            // Si la valeur est invalide, ne pas continuer
+            // If the value is invalid, do not continue
             if (!isValidNumber(offsetX)) {
                 return;
             }
             
-            // Contraindre l'offset dans les limites de la tablette
+            // Constrain the offset within the tablet limits
             const constrainedOffsets = constrainAreaOffset(
                 offsetX,
                 offsetY,
@@ -460,7 +523,7 @@ const appState = {
                 tabletHeight
             );
             
-            // Mettre à jour la valeur si elle a été contrainte
+            // Update the value if it has been constrained
             if (constrainedOffsets.x !== offsetX) {
                 areaOffsetXInput.value = formatNumber(constrainedOffsets.x, 3);
             }
@@ -473,31 +536,31 @@ const appState = {
                 this.cancelEditMode();
             }
             
-            // Récupérer les dimensions nécessaires
+            // Get the necessary dimensions
             const tabletWidth = parseFloatSafe(tabletWidthInput.value);
             const tabletHeight = parseFloatSafe(tabletHeightInput.value);
             const areaWidth = parseFloatSafe(areaWidthInput.value);
             const areaHeight = parseFloatSafe(areaHeightInput.value);
             const offsetX = parseFloatSafe(areaOffsetXInput.value);
             
-            // Récupérer la valeur de l'offset
+            // Get the offset value
             let offsetY = areaOffsetYInput.value.trim();
             
-            // Si le champ est vide, autoriser la saisie
+            // If the field is empty, allow the input
             if (offsetY === '') {
-                // Ne rien faire pour laisser l'utilisateur terminer sa saisie
+                // Do nothing to let the user finish his input
                 return;
             }
             
-            // Sinon convertir en nombre et contraindre
+            // Otherwise convert to a number and constrain
             offsetY = parseFloatSafe(offsetY);
             
-            // Si la valeur est invalide, ne pas continuer
+            // If the value is invalid, do not continue
             if (!isValidNumber(offsetY)) {
                 return;
             }
             
-            // Contraindre l'offset dans les limites de la tablette
+            // Constrain the offset within the tablet limits
             const constrainedOffsets = constrainAreaOffset(
                 offsetX,
                 offsetY,
@@ -507,7 +570,7 @@ const appState = {
                 tabletHeight
             );
             
-            // Mettre à jour la valeur si elle a été contrainte
+            // Update the value if it has been constrained
             if (constrainedOffsets.y !== offsetY) {
                 areaOffsetYInput.value = formatNumber(constrainedOffsets.y, 3);
             }
@@ -529,7 +592,7 @@ const appState = {
             areaWidthInput.value = areaHeightInput.value;
             areaHeightInput.value = width;
             
-            // Si le verrou est activé, mettre à jour immédiatement le ratio
+            // If the lock is activated, update the ratio immediately
             if (lockRatioButton.getAttribute('aria-pressed') === 'true') {
                 const newWidth = parseFloatSafe(areaWidthInput.value);
                 const newHeight = parseFloatSafe(areaHeightInput.value);
@@ -540,7 +603,7 @@ const appState = {
                 }
                 updateDisplay();
             } else {
-                // Sinon utiliser la fonction debounced et mettre à jour l'affichage sans le ratio
+                // Otherwise use the debounced function and update the display without the ratio
                 this.debouncedUpdateRatio();
                 updateDisplayWithoutRatio();
             }
@@ -572,7 +635,7 @@ Centre Y: ${formatNumber(offsetY, 3)} mm`;
                     Notifications.success('Informations copiées !');
                 })
                 .catch(() => {
-                    Notifications.error('Erreur lors de la copie');
+                    Notifications.error('Erreur lors de la copie'); 
                     console.error('Failed to copy text: ', info);
                 });
         });
@@ -585,7 +648,7 @@ Centre Y: ${formatNumber(offsetY, 3)} mm`;
             this.cancelEditMode();
         });
         
-        // Bouton de réinitialisation des préférences
+        // Reset preferences button
         const resetPrefsBtn = document.getElementById('reset-prefs-btn');
         if (resetPrefsBtn && typeof PreferencesManager !== 'undefined') {
             resetPrefsBtn.addEventListener('click', () => {
@@ -620,7 +683,7 @@ Centre Y: ${formatNumber(offsetY, 3)} mm`;
      */
     cancelEditMode() {
         if (this.editingFavoriteId && this.originalValues) {
-            // Restaurer les valeurs originales
+            // Restore the original values
             document.getElementById('areaWidth').value = formatNumber(this.originalValues.width);
             document.getElementById('areaHeight').value = formatNumber(this.originalValues.height);
             document.getElementById('areaOffsetX').value = formatNumber(this.originalValues.x, 3);
@@ -638,24 +701,42 @@ Centre Y: ${formatNumber(offsetY, 3)} mm`;
             if (this.originalValues.presetInfo) {
                 const tabletSelector = document.getElementById('tabletSelectorButton');
                 if (tabletSelector) {
-                    tabletSelector.querySelector('#tabletSelectorText').textContent = this.originalValues.presetInfo;
+                    const selectorText = tabletSelector.querySelector('#tabletSelectorText');
+                    
+                    // Vérifier si presetInfo est une clé de traduction
+                    if (this.originalValues.presetInfo.startsWith('i18n:')) {
+                        const key = this.originalValues.presetInfo.substring(5);
+                        
+                        // Appliquer la clé de traduction à l'attribut data-i18n
+                        selectorText.setAttribute('data-i18n', key);
+                        
+                        // Utiliser translateWithFallback pour obtenir la traduction si disponible
+                        let translated = translateWithFallback(key);
+                        
+                        selectorText.textContent = translated;
+                    } else {
+                        // C'est un nom de modèle normal, pas une clé de traduction
+                        selectorText.removeAttribute('data-i18n');
+                        selectorText.textContent = this.originalValues.presetInfo;
+                    }
                 }
             }
             
-            // Mettre à jour l'affichage
+            // Update the display
             if (typeof updateDisplay === 'function') {
                 updateDisplay();
             }
             
-            // Cacher le bouton d'annulation
+            // Reset the edit mode
+            this.editingFavoriteId = null;
+            this.originalValues = null;
+            
+            // Hide the cancel button
             const cancelBtn = document.getElementById('cancel-edit-btn');
             if (cancelBtn) {
                 cancelBtn.classList.add('hidden');
+                cancelBtn.classList.remove('flex');
             }
-            
-            // Réinitialiser l'état
-            this.editingFavoriteId = null;
-            this.originalValues = null;
             
             Notifications.info('Modifications annulées');
         }
@@ -668,13 +749,13 @@ Centre Y: ${formatNumber(offsetY, 3)} mm`;
         // Initialize notification system
         Notifications.init();
         
-        // Précharger les favoris pendant le chargement des autres données
+        // Preload favorites during the loading of other data
         if (typeof Favorites !== 'undefined') {
-            // Initialiser Favorites le plus tôt possible pour éviter le flash
+            // Initialize Favorites as soon as possible to avoid the flash
             Favorites.init();
         }
         
-        // Initialiser le gestionnaire de préférences s'il existe
+        // Initialize the preferences manager if it exists
         if (typeof PreferencesManager !== 'undefined') {
             PreferencesManager.init();
         }
@@ -685,14 +766,14 @@ Centre Y: ${formatNumber(offsetY, 3)} mm`;
         // Setup input event listeners
         this.setupInputListeners();
         
-        // Appliquer l'état initial du champ de ratio
+        // Apply the initial state of the ratio field
         const lockRatioButton = document.getElementById('lockRatio');
         const customRatioInput = document.getElementById('customRatio');
         if (lockRatioButton && customRatioInput && typeof window.updateRatioFieldState === 'function') {
             window.updateRatioFieldState();
         }
         
-        // Création d'une fonction debounce pour mettre à jour le ratio
+        // Creation of a debounce function to update the ratio
         this.debouncedUpdateRatio = debounce(() => {
             const areaWidthInput = document.getElementById('areaWidth');
             const areaHeightInput = document.getElementById('areaHeight');
@@ -704,7 +785,7 @@ Centre Y: ${formatNumber(offsetY, 3)} mm`;
             
             if (height > 0 && width > 0) {
                 const calculatedRatio = width / height;
-                // Toujours mettre à jour le ratio, sauf si l'utilisateur édite directement le champ
+                // Always update the ratio, unless the user is directly editing the field
                 if (!customRatioInput.dataset.editing && !customRatioInput.matches(':focus')) {
                     customRatioInput.value = formatNumber(calculatedRatio, 3);
                     this.currentRatio = calculatedRatio;
@@ -721,69 +802,73 @@ Centre Y: ${formatNumber(offsetY, 3)} mm`;
 document.addEventListener('DOMContentLoaded', () => {
     appState.init();
     
-    // Empêcher le menu contextuel du navigateur sur toute la page
+    // Prevent the browser context menu on the entire page
     document.addEventListener('contextmenu', (e) => {
         e.preventDefault();
         return false;
     });
     
-    // S'assurer que le menu contextuel est initialisé après le visualiseur
+    // Ensure the context menu is initialized after the visualizer
     setTimeout(() => {
         ContextMenu.init();
-        console.log('Menu contextuel initialisé depuis le chargement du DOM');
+        console.log('Context menu initialized from the DOM loading');
     }, 500);
 
-    // Gestion du menu dépliant du récapitulatif
+    // Handling of the collapsible recap menu
     const recapCard = document.getElementById('recap-card');
     const recapToggle = document.getElementById('recap-toggle');
     const recapContent = document.getElementById('recap-content');
     const recapArrow = document.getElementById('recap-arrow');
     
-    // État initial : plié
+    // Initial state: collapsed
     let isRecapExpanded = false;
     
-    // Fonction pour mettre à jour l'état visuel
+    // Function to update the visual state
     const updateRecapState = () => {
         if (isRecapExpanded) {
-            // Déplier le contenu
+            // Expand the content
             const contentHeight = recapContent.scrollHeight;
             recapContent.style.maxHeight = `${contentHeight}px`;
             recapContent.style.opacity = '1';
-            recapContent.classList.add('border-t', 'border-gray-800', 'mt-3', 'pt-3');
+            recapContent.classList.add('border-t', 'border-gray-800', 'mt-2', 'pt-2');
             recapArrow.style.transform = 'rotate(0deg)';
             recapCard.classList.add('bg-gray-850');
             recapCard.classList.remove('bg-gray-900');
             recapCard.classList.remove('cursor-pointer');
+            recapToggle.classList.remove('py-1');
+            recapToggle.classList.add('py-2');
             
-            // Mettre à jour la hauteur après un court délai pour gérer les changements de contenu
+            // Update the height after a short delay to handle content changes
             setTimeout(() => {
                 recapContent.style.maxHeight = `${recapContent.scrollHeight}px`;
             }, 50);
         } else {
-            // Replier le contenu
+            // Collapse the content
             recapContent.style.maxHeight = '0';
             recapContent.style.opacity = '0';
-            recapContent.classList.remove('border-t', 'border-gray-800', 'mt-3', 'pt-3');
+            recapContent.classList.remove('border-t', 'border-gray-800', 'mt-2', 'pt-2');
             recapArrow.style.transform = 'rotate(180deg)';
             recapCard.classList.remove('bg-gray-850');
             recapCard.classList.add('bg-gray-900');
             recapCard.classList.add('cursor-pointer');
+            recapToggle.classList.remove('py-2');
+            recapToggle.classList.add('py-1');
         }
     };
     
-    // Initialiser l'état
+    // Initialize the state
     recapContent.style.transition = 'max-height 0.3s ease-in-out, opacity 0.3s ease-in-out';
     updateRecapState();
     
-    // Gérer le clic sur le titre
+    // Handle the click on the title
     recapToggle.addEventListener('click', (e) => {
-        e.stopPropagation(); // Empêcher la propagation au parent
+        e.stopPropagation(); // Prevent the propagation to the parent
         
-        // Basculer l'état
+        // Toggle the state
         isRecapExpanded = !isRecapExpanded;
         updateRecapState();
         
-        // Effet visuel sur le clic
+        // Visual effect on the click
         const ripple = document.createElement('div');
         ripple.className = 'bg-gray-700/30 absolute rounded-full pointer-events-none';
         ripple.style.width = '20px';
@@ -807,9 +892,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 10);
     });
     
-    // Gérer le clic sur la carte quand le menu est replié
+    // Handle the click on the card when the menu is collapsed
     recapCard.addEventListener('click', (e) => {
-        // Ne traiter que si le menu est replié et qu'on n'a pas cliqué sur le toggle
+        // Only process if the menu is collapsed and the click is not on the toggle
         if (!isRecapExpanded && !recapToggle.contains(e.target)) {
             isRecapExpanded = true;
             updateRecapState();

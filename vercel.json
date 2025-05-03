@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "outputDirectory": "public",
+  "buildCommand": "npm run build",
+  "devCommand": "npm run watch:css",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+} 

@@ -1,6 +1,5 @@
 <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g clip-path="url(#clip0)">
-<rect width="64" height="64" fill="#1A1F2E"/>
 <circle cx="32" cy="32" r="27.5" stroke="#FF69B4" stroke-width="9"/>
 <rect x="14.5" y="14.5" width="35" height="35" rx="6" transform="rotate(45 32 32)" fill="#4A86E8"/>
 </g>

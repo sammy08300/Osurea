@@ -8,116 +8,123 @@
 
 ---
 
-## 📋 Sommaire
-- [Présentation](#-présentation)
-- [Fonctionnalités](#-fonctionnalités)
-- [Avantages](#-avantages)
-- [Guide d'utilisation](#-guide-dutilisation)
+## 📋 Table of Contents
+- [Overview](#-overview)
+- [Features](#-features)
+- [Advantages](#-advantages)
+- [User Guide](#-user-guide)
 - [FAQ](#-faq)
-- [Crédits](#-crédits)
+- [Credits](#-credits)
 
 ---
 
-## 🎮 Présentation
+## 🎮 Overview
 
-Osu!rea est un visualiseur de zone active (area) pour les joueurs d'osu! qui utilisent une tablette graphique. Cet outil vous permet de configurer, visualiser et sauvegarder précisément votre zone active pour optimiser votre expérience de jeu.
+Osu!rea is an active area visualizer for osu! players who use a graphics tablet. This tool allows you to configure, visualize, and precisely save your active area to optimize your gaming experience.
 
-> 💾 Toutes vos configurations sont sauvegardées dans le stockage local de votre navigateur.
-
----
-
-## 🔍 Fonctionnalités
-
-### 🖱️ Sélection de tablette
-- **Base de données de tablettes intégrée** : Plus de 50 modèles de tablettes (Wacom, XP-Pen, Huion, Gaomon, VEIKK, UGEE)
-- **Dimensions personnalisées** : Possibilité de définir manuellement les dimensions de votre tablette
-
-### 📐 Configuration de la zone active
-- **Dimensions précises** : Définition au dixième de millimètre près
-- **Positionnement exact** : Contrôle des coordonnées X et Y du centre de la zone
-- **Verrouillage du ratio** : Maintien automatique du rapport largeur/hauteur
-- **Prévisualisation en temps réel** : Visualisation immédiate des changements
-
-### 🖼️ Manipulation visuelle
-- **Glisser-déposer** : Déplacement direct de la zone active avec la souris
-- **Menu contextuel** : Accès rapide aux options d'alignement (clic droit)
-- **Grille de référence** : Activation/désactivation d'une grille pour faciliter le positionnement
-
-### 💾 Gestion des configurations
-- **Sauvegarde de favoris** : Enregistrement de configurations avec titre et description
-- **Tri des favoris** : Classement par date, nom ou taille
-- **Récapitulatif détaillé** : Affichage complet des paramètres actuels
-- **Partage facile** : Copie rapide des informations pour partage
-
-### 🖥️ Interface utilisateur
-- **Design moderne** : Interface sombre, élégante et intuitive
-- **Responsive** : Adaptation à tous les appareils (desktop, tablette, mobile)
-- **Animations fluides** : Transitions douces pour une expérience agréable
+> 💾 All your configurations are saved in your browser's local storage.
 
 ---
 
-## 💡 Avantages
+## 🔍 Features
 
-- **Confidentialité** : Toutes les données sont stockées uniquement sur votre appareil
-- **Performance optimale** : Application légère et réactive
-- **Mises à jour automatiques** : Améliorations régulières sans intervention
-- **Accessible hors-ligne** : Après un premier chargement, le site reste accessible à tout moment, même sans connexion internet, en utilisant la même URL
+### 🖱️ Tablet Selection
+- **Built-in tablet database**: Over 50 tablet models (Wacom, XP-Pen, Huion, Gaomon, VEIKK, UGEE)
+- **Custom dimensions**: Ability to manually set your tablet's dimensions
+
+### 📐 Active Area Configuration
+- **Precise dimensions**: Set to the nearest tenth of a millimeter
+- **Exact positioning**: Control the X and Y coordinates of the area's center
+- **Ratio lock**: Automatically maintain width/height ratio
+- **Real-time preview**: Instantly see changes as you make them
+
+### 🖼️ Visual Manipulation
+- **Drag and drop**: Move the active area directly with your mouse
+- **Context menu**: Quick access to alignment options (right-click)
+- **Reference grid**: Toggle a grid to help with positioning
+
+### 💾 Configuration Management
+- **Save favorites**: Store configurations with a title and description
+- **Sort favorites**: Sort by date, name, or size
+- **Detailed summary**: Full display of current parameters
+- **Easy sharing**: Quickly copy information for sharing
+
+### 🖥️ User Interface
+- **Modern design**: Dark, sleek, and intuitive interface
+- **Responsive**: Adapts to all devices (desktop, tablet, mobile)
+- **Smooth animations**: Soft transitions for a pleasant experience
+- **Multi-language support**: Available in French, English, and Spanish.
+- **Automatic language detection**: The interface language is automatically set based on your browser's settings, defaulting to English.
 
 ---
 
-## 📖 Guide d'utilisation
+## 💡 Advantages
 
-### ⚙️ Configuration de base
-1. **Choisir votre tablette** : Sélectionnez votre modèle dans la liste déroulante ou entrez des dimensions personnalisées
-2. **Définir la zone active** : Ajustez la largeur et la hauteur selon vos préférences
-3. **Positionner la zone** : Définissez les coordonnées du centre ou utilisez le glisser-déposer
-4. **Verrouiller le ratio** : Activez cette option pour maintenir les proportions lors des ajustements
+- **Privacy**: All data is stored only on your device
+- **Optimal performance**: Lightweight and responsive app
+- **Automatic updates**: Regular improvements without user intervention
+- **Offline accessible**: After the first load, the site remains accessible at any time, even without an internet connection, using the same URL
 
-### 🛠️ Techniques avancées
-- **Alignement précis** : Faites un clic droit sur la zone pour ouvrir le menu contextuel d'alignement
-- **Centrage rapide** : Utilisez le bouton "Centrer" pour placer la zone au milieu de la tablette
-- **Inversion des dimensions** : Le bouton "Inverser" permet de permuter largeur et hauteur
-- **Ajustement du ratio** : Modifiez directement le ratio pour des configurations spécifiques
+---
 
-### ⭐ Gestion des favoris
-1. **Sauvegarder une configuration** : Cliquez sur "Sauvegarder" pour enregistrer vos paramètres actuels
-2. **Nommer votre configuration** : Donnez un titre et une description optionnelle
-3. **Charger un favori** : Cliquez sur un favori enregistré pour appliquer sa configuration
-4. **Supprimer ou modifier** : Utilisez les boutons dédiés pour gérer vos favoris
+## 📖 User Guide
+
+### ⚙️ Basic Setup
+1. **Choose your tablet**: Select your model from the dropdown list or enter custom dimensions
+2. **Set the active area**: Adjust the width and height to your preference
+3. **Position the area**: Set the center coordinates or use drag and drop
+4. **Lock the ratio**: Enable this option to maintain proportions during adjustments
+
+### 🛠️ Advanced Techniques
+- **Precise alignment**: Right-click on the area to open the alignment context menu
+- **Quick centering**: Use the "Center" button to place the area in the middle of the tablet
+- **Swap dimensions**: The "Swap" button lets you switch width and height
+- **Adjust ratio**: Directly modify the ratio for specific configurations
+
+### ⭐ Favorites Management
+1. **Save a configuration**: Click "Save" to store your current settings
+2. **Name your configuration**: Give it a title and optional description
+3. **Load a favorite**: Click a saved favorite to apply its configuration
+4. **Delete or edit**: Use the dedicated buttons to manage your favorites
 
 ---
 
 ## ❓ FAQ
 
 <details>
-<summary><strong>Q: Mes configurations sont-elles sauvegardées automatiquement ?</strong></summary>
-R: Les paramètres actuels sont automatiquement conservés entre les sessions, mais vous devez cliquer sur "Sauvegarder" pour créer un favori permanent.
+<summary><strong>Q: Are my configurations saved automatically?</strong></summary>
+A: Current settings are automatically kept between sessions, but you must click "Save" to create a permanent favorite.
 </details>
 
 <details>
-<summary><strong>Q: Comment puis-je transférer mes favoris sur un autre appareil ?</strong></summary>
-R: Actuellement, vous devez copier manuellement les informations. Une fonction d'exportation/importation est prévue dans une future mise à jour.
+<summary><strong>Q: How can I transfer my favorites to another device?</strong></summary>
+A: Currently, you need to copy the information manually. An export/import feature is planned for a future update.
 </details>
 
 <details>
-<summary><strong>Q: La zone active dans Osu!rea correspond-elle exactement à celle dans opentabletdriver ?</strong></summary>
-R: Oui, les dimensions et positions sont calculées selon les mêmes principes que dans le driver. Une fonction pour convertir les zones Wacom et autres est prévue dans une future mise à jour.
+<summary><strong>Q: Does the active area in Osu!rea match exactly with opentabletdriver?</strong></summary>
+A: Yes, dimensions and positions are calculated using the same principles as the driver. A feature to convert Wacom and other zones is planned for a future update.
 </details>
 
 <details>
-<summary><strong>Q: Puis-je utiliser Osu!rea sans connexion internet ?</strong></summary>
-R: Oui, après le premier chargement, l'application peut fonctionner hors ligne grâce au Service Worker. <br><br>💡 Si vous avez déjà chargé le site une fois, vous pouvez y retourner à tout moment, même sans connexion internet, en utilisant exactement la même URL !
+<summary><strong>Q: Can I use Osu!rea without an internet connection?</strong></summary>
+A: Yes, after the first load, the app can work offline thanks to the Service Worker. <br><br>💡 If you have already loaded the site once, you can return to it at any time, even without an internet connection, by using exactly the same URL!
+</details>
+
+<details>
+<summary><strong>Q: Is the site available in several languages? </strong></summary>
+A: Yes, the site is available in two languages. My native language. I also took some time to translate it into English before sharing it with the osu community!
 </details>
 
 ---
 
-## 👨‍💻 Crédits
+## 👨‍💻 Credits
 
-Développé par Yuzuctus. Avant tout pour Yuzuctus mais partagé à la communauté.
+Developed by Yuzuctus. Primarily for Yuzuctus but shared with the community.
 
 ---
 
 <div align="center">
-  <p><strong>Osu!rea - Area Visualizer v2.0</strong> | Conçu par moi, pour moi, mais partagé pour la communauté osu!</p>
-  <p>Utilisez cet outil pour visualiser et sauvegarder votre zone active de tablette graphique.</p>
+  <p><strong>Osu!rea - Area Visualizer v2.0</strong> | Designed by me, for me, but shared with the osu!git community </p>
+  <p>Use this tool to visualize and save your graphics tablet's active area.</p>
 </div>
