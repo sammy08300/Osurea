@@ -258,6 +258,7 @@ const Favorites = {
         // Limit to 3 decimal places for all numeric values
         const areaWidth = formatNumber(favorite.areaWidth || favorite.width, 3);
         const areaHeight = formatNumber(favorite.areaHeight || favorite.height, 3);
+        const areaRadius = typeof favorite.radius !== 'undefined' ? favorite.radius : 0;
         const areaRatio = formatNumber(calculateRatio(favorite.areaWidth || favorite.width, favorite.areaHeight || favorite.height), 3);
         
         // Création du HTML en un seul bloc pour de meilleures performances
@@ -266,7 +267,7 @@ const Favorites = {
                 <div class="flex items-center mb-2">
                     <div class="flex-1">
                         <h3 class="font-medium text-white text-sm truncate mb-0.5">${displayTitle}</h3>
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2 flex-wrap">
                             <span class="text-xs text-gray-400 bg-gray-800/70 px-1.5 py-0.5 rounded-md inline-flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
@@ -278,6 +279,12 @@ const Favorites = {
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                                 </svg>
                                 ${areaRatio}
+                            </span>
+                            <span class="text-xs text-gray-400 bg-gray-800/70 px-1.5 py-0.5 rounded-md inline-flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4a8 8 0 100 16 8 8 0 000-16z" />
+                                </svg>
+                                ${areaRadius}%
                             </span>
                         </div>
                     </div>
@@ -798,6 +805,11 @@ const Favorites = {
                     this.favoritesPlaceholder.classList.add('col-span-full');
                 }
             }
+            
+            // Supprimer tous les éléments favorite-item
+            const existingItems = this.favoritesList.querySelectorAll('.favorite-item');
+            existingItems.forEach(item => item.remove());
+            
             this.favoritesList.classList.remove('favorites-loading');
             
             // Make the list visible again
@@ -812,15 +824,12 @@ const Favorites = {
             this.favoritesPlaceholder.classList.add('hidden');
         }
         
-        // Clear the existing list more efficacement
-        // Keep the placeholder instead of deleting it
-        const placeholder = this.favoritesPlaceholder;
+        // Supprimer tous les éléments favorite-item existants
+        const existingItems = this.favoritesList.querySelectorAll('.favorite-item');
+        existingItems.forEach(item => item.remove());
         
-        // Utiliser innerHTML pour un nettoyage plus rapide
-        this.favoritesList.innerHTML = '';
-        if (placeholder) {
-            this.favoritesList.appendChild(placeholder);
-        }
+        // Garder le placeholder
+        const placeholder = this.favoritesPlaceholder;
         
         // Load all sorted favorites
         const sortedFavorites = this.sortFavorites(favorites, this.currentSortCriteria);
@@ -836,6 +845,11 @@ const Favorites = {
             }
             fragment.appendChild(cardElement);
         });
+        
+        // S'assurer que le placeholder est le premier élément
+        if (placeholder && !this.favoritesList.contains(placeholder)) {
+            this.favoritesList.appendChild(placeholder);
+        }
         
         this.favoritesList.appendChild(fragment);
         
@@ -916,6 +930,14 @@ const Favorites = {
                 document.getElementById('customRatio').value = formatNumber(favorite.ratio, 3);
             }
             
+            // Update the radius
+            if (typeof favorite.radius !== 'undefined') {
+                document.getElementById('areaRadius').value = favorite.radius;
+                window.currentRadius = favorite.radius;
+                const radiusPercentage = document.getElementById('radius-percentage');
+                if (radiusPercentage) radiusPercentage.textContent = `${favorite.radius}%`;
+            }
+            
             // Update the tablet preset if available
             if (favorite.presetInfo) {
                 const tabletSelector = document.getElementById('tabletSelectorButton');
@@ -958,6 +980,11 @@ const Favorites = {
             
             // Highlight the loaded favorite
             this.highlightFavorite(id);
+            
+            // Sauvegarder l'état actuel dans les préférences
+            if (typeof PreferencesManager !== 'undefined') {
+                setTimeout(() => PreferencesManager.saveCurrentState(), 100);
+            }
             
             Notifications.success('Configuration chargée');
         } catch (error) {
@@ -1061,6 +1088,13 @@ const Favorites = {
         this.highlightFavorite(id);
         
         Notifications.info('Mode édition activé - Modifiez les paramètres puis cliquez sur "Sauvegarder"');
+        
+        if (typeof favorite.radius !== 'undefined') {
+            document.getElementById('areaRadius').value = favorite.radius;
+            window.currentRadius = favorite.radius;
+            const radiusPercentage = document.getElementById('radius-percentage');
+            if (radiusPercentage) radiusPercentage.textContent = `${favorite.radius}%`;
+        }
     },
     
     /**
@@ -1070,13 +1104,24 @@ const Favorites = {
     deleteFavorite(id) {
         this.showDeleteDialog((confirmed) => {
             if (confirmed) {
+                // Supprimer immédiatement l'élément de l'interface pour éviter le double clic
+                const element = this.favoritesList.querySelector(`.favorite-item[data-id="${id}"]`);
+                if (element) {
+                    element.remove();
+                }
+                
                 const success = StorageManager.removeFavorite(id);
                 
                 if (success) {
+                    // Vider le cache pour forcer un rechargement complet
+                    this.cachedFavorites = null;
                     this.loadFavorites();
                     Notifications.success('Favori supprimé');
                 } else {
                     Notifications.error('Erreur lors de la suppression du favori');
+                    
+                    // Si la suppression a échoué, recharger la liste pour récupérer l'élément
+                    this.loadFavorites();
                 }
             }
         });
@@ -1093,6 +1138,7 @@ const Favorites = {
         const areaOffsetX = parseFloatSafe(document.getElementById('areaOffsetX').value);
         const areaOffsetY = parseFloatSafe(document.getElementById('areaOffsetY').value);
         const customRatio = parseFloatSafe(document.getElementById('customRatio').value);
+        const areaRadius = parseInt(document.getElementById('areaRadius')?.value) || 0;
         
         // Get the preset tablet information
         const tabletSelector = document.getElementById('tabletSelectorButton');
@@ -1123,7 +1169,8 @@ const Favorites = {
                 tabletH: !isNaN(tabletHeight) ? tabletHeight : appState.originalValues.tabletH,
                 presetInfo: presetInfo || appState.originalValues.presetInfo,
                 title: appState.originalValues.title,
-                description: appState.originalValues.description
+                description: appState.originalValues.description,
+                radius: !isNaN(areaRadius) ? areaRadius : (appState.originalValues.radius || 0)
             };
             
             const success = StorageManager.updateFavorite(appState.editingFavoriteId, updatedData);
@@ -1163,7 +1210,8 @@ const Favorites = {
                     description: commentData.description,
                     tabletW: tabletWidth,
                     tabletH: tabletHeight,
-                    presetInfo: presetInfo
+                    presetInfo: presetInfo,
+                    radius: areaRadius
                 };
                 const savedFavorite = StorageManager.addFavorite(newFavorite);
                 if (savedFavorite) {
@@ -1326,6 +1374,23 @@ const Favorites = {
         document.getElementById('details-area-ratio').textContent = areaRatio;
         document.getElementById('details-area-size').textContent = `${surface} mm²`;
         document.getElementById('details-area-position').textContent = `X: ${formatNumber(favorite.x || favorite.offsetX, 3)}, Y: ${formatNumber(favorite.y || favorite.offsetY, 3)}`;
+        // Ajout radius
+        let areaRadius = typeof favorite.radius !== 'undefined' ? favorite.radius : 0;
+        let radiusDetails = document.getElementById('details-area-radius');
+        if (!radiusDetails) {
+            // Crée dynamiquement si absent
+            const parent = document.getElementById('details-area-position').parentElement;
+            const label = document.createElement('div');
+            label.className = 'flex items-center';
+            label.innerHTML = `<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-3.5 w-3.5 mr-1.5 text-white flex-shrink-0\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4a8 8 0 100 16 8 8 0 000-16z\" /></svg><span class=\"text-gray-300\" data-i18n=\"area_radius\">Rayon:</span>`;
+            const value = document.createElement('div');
+            value.className = 'text-right text-white font-medium';
+            value.id = 'details-area-radius';
+            parent.appendChild(label);
+            parent.appendChild(value);
+            radiusDetails = value;
+        }
+        radiusDetails.textContent = `${areaRadius}%`;
         
         if (favorite.tabletW && favorite.tabletH) {
             document.getElementById('details-tablet-dimensions').textContent = `${tabletWidth} × ${tabletHeight} mm`;

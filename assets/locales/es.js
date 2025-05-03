@@ -18,6 +18,7 @@ const es = {
     "area_settings": "Configuración del Área",
     "area_width": "Ancho del área",
     "area_height": "Alto del área",
+    "area_radius": "Radio de borde",
     "ratio": "Proporción",
     "lock_ratio": "Bloquear proporción",
     "area_position": "Posición del área",

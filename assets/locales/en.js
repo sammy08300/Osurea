@@ -18,6 +18,7 @@ const en = {
     "area_settings": "Area Configuration",
     "area_width": "Area width",
     "area_height": "Area height",
+    "area_radius": "Border radius",
     "ratio": "Ratio",
     "lock_ratio": "Lock ratio",
     "area_position": "Area position",

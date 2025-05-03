@@ -18,6 +18,7 @@ const fr = {
     "area_settings": "Configuration de la zone",
     "area_width": "Largeur de la zone",
     "area_height": "Hauteur de la zone",
+    "area_radius": "Rayon de la bordure",
     "ratio": "Ratio",
     "lock_ratio": "Verrouiller le ratio",
     "area_position": "Position de la zone",

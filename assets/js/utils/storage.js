@@ -139,6 +139,10 @@ const StorageManager = {
             
             if (filteredFavorites.length === favorites.length) return false;
             
+            // Vider complètement le cache pour forcer un rechargement
+            this.clearCache();
+            
+            // Sauvegarder les favoris filtrés
             this.saveFavorites(filteredFavorites);
             return true;
         } catch (error) {

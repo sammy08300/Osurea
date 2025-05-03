@@ -294,7 +294,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                <hr id="tablet-manual-hr" class="border-gray-800">
                             </div>
 
                             <!-- Area Settings -->
@@ -376,6 +375,19 @@
                                             <div class="relative">
                                                 <input type="number" id="areaOffsetY" value="47.500" step="0.001" class="w-full h-[38px] bg-gray-800 border border-gray-700 rounded-md p-2 pl-3 text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
                                                 <span class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm" data-i18n="tablet_units">mm</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Rectangle Radius - only visible when "Custom Tablet" is selected -->
+                                    <div id="radius-control-group" class="space-y-4">
+                                        <div>
+                                            <label for="areaRadius" class="block text-sm font-medium text-gray-400 mb-1.5" data-i18n="area_radius">
+                                                Rayon de Courbure
+                                            </label>
+                                            <div class="flex items-center gap-3">
+                                                <input type="range" id="areaRadius" min="0" max="100" value="0" class="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                                                <span id="radius-percentage" class="text-sm font-medium text-gray-300 min-w-[40px] text-right">0%</span>
                                             </div>
                                         </div>
                                     </div>
@@ -495,6 +507,14 @@
                                             <span data-i18n="ratio">Ratio:</span>
                                         </p>
                                         <p class="text-gray-300 text-right font-medium" id="ratio-info">...</p>
+                                        
+                                        <p class="flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4a8 8 0 100 16 8 8 0 000-16z" />
+                                            </svg>
+                                            <span data-i18n="area_radius">Rayon de la bordure:</span>
+                                        </p>
+                                        <p class="text-gray-300 text-right font-medium" id="radius-info">0%</p>
                                         
                                         <p class="flex items-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">

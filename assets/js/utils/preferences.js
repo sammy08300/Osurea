@@ -118,6 +118,10 @@ const PreferencesManager = {
         if (tabletWidthInput && tabletHeightInput) {
             tabletWidthInput.addEventListener('change', () => this.saveCurrentState());
             tabletHeightInput.addEventListener('change', () => this.saveCurrentState());
+            
+            // Ajouter aussi des écouteurs d'événements input pour plus de réactivité
+            tabletWidthInput.addEventListener('input', () => this.saveCurrentState());
+            tabletHeightInput.addEventListener('input', () => this.saveCurrentState());
         }
         
         // Monitor changes on the active area
@@ -128,12 +132,31 @@ const PreferencesManager = {
         const customRatioInput = document.getElementById('customRatio');
         const lockRatioCheckbox = document.getElementById('lockRatio');
         
-        if (areaWidthInput) areaWidthInput.addEventListener('change', () => this.saveCurrentState());
-        if (areaHeightInput) areaHeightInput.addEventListener('change', () => this.saveCurrentState());
-        if (areaOffsetXInput) areaOffsetXInput.addEventListener('change', () => this.saveCurrentState());
-        if (areaOffsetYInput) areaOffsetYInput.addEventListener('change', () => this.saveCurrentState());
-        if (customRatioInput) customRatioInput.addEventListener('change', () => this.saveCurrentState());
-        if (lockRatioCheckbox) lockRatioCheckbox.addEventListener('change', () => this.saveCurrentState());
+        // Ajouter des écouteurs d'événements pour les 'change' et 'input' pour plus de réactivité
+        if (areaWidthInput) {
+            areaWidthInput.addEventListener('change', () => this.saveCurrentState());
+            areaWidthInput.addEventListener('input', () => this.saveCurrentState());
+        }
+        if (areaHeightInput) {
+            areaHeightInput.addEventListener('change', () => this.saveCurrentState());
+            areaHeightInput.addEventListener('input', () => this.saveCurrentState());
+        }
+        if (areaOffsetXInput) {
+            areaOffsetXInput.addEventListener('change', () => this.saveCurrentState());
+            areaOffsetXInput.addEventListener('input', () => this.saveCurrentState());
+        }
+        if (areaOffsetYInput) {
+            areaOffsetYInput.addEventListener('change', () => this.saveCurrentState());
+            areaOffsetYInput.addEventListener('input', () => this.saveCurrentState());
+        }
+        if (customRatioInput) {
+            customRatioInput.addEventListener('change', () => this.saveCurrentState());
+            customRatioInput.addEventListener('input', () => this.saveCurrentState());
+        }
+        if (lockRatioCheckbox) {
+            lockRatioCheckbox.addEventListener('change', () => this.saveCurrentState());
+            lockRatioCheckbox.addEventListener('click', () => this.saveCurrentState());
+        }
         
         // Listen to the tablet selection event
         document.addEventListener('tablet:selected', (e) => {
@@ -148,11 +171,33 @@ const PreferencesManager = {
             setTimeout(() => this.saveCurrentState(), 100);
         });
         
+        // Écouter les changements de position de la zone active depuis le menu contextuel
+        document.addEventListener('activearea:positioned', () => {
+            setTimeout(() => this.saveCurrentState(), 100);
+        });
+        
+        // Écouter les déplacements de la zone active par glisser-déposer
+        document.addEventListener('activearea:moved', () => {
+            setTimeout(() => this.saveCurrentState(), 100);
+        });
+        
+        // Écouter le centrage de la zone active
+        document.addEventListener('activearea:centered', () => {
+            setTimeout(() => this.saveCurrentState(), 100);
+        });
+        
         // Save periodically (every 10 seconds)
         setInterval(() => this.saveCurrentState(), 10000);
         
         // Save just before the user leaves the page
         window.addEventListener('beforeunload', () => this.saveCurrentState());
+        
+        // Save when the user uses F5 to refresh
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'F5' || (e.ctrlKey && e.key === 'r')) {
+                this.saveCurrentState();
+            }
+        });
     },
     
     /**
@@ -213,15 +258,26 @@ const PreferencesManager = {
                 offsetX: parseFloatSafe(document.getElementById('areaOffsetX')?.value),
                 offsetY: parseFloatSafe(document.getElementById('areaOffsetY')?.value),
                 ratio: parseFloatSafe(document.getElementById('customRatio')?.value),
-                lockRatio: document.getElementById('lockRatio')?.getAttribute('aria-pressed') === 'true' || false
+                lockRatio: document.getElementById('lockRatio')?.getAttribute('aria-pressed') === 'true' || false,
+                radius: parseInt(document.getElementById('areaRadius')?.value) || 0
             },
             
             // Timestamp
             timestamp: Date.now()
         };
         
+        // S'assurer que les valeurs sont valides pour éviter de sauvegarder des données incorrectes
+        if (preferences.area.width <= 0) preferences.area.width = 1;
+        if (preferences.area.height <= 0) preferences.area.height = 1;
+        if (preferences.area.ratio <= 0) preferences.area.ratio = 1;
+        if (preferences.tablet.width <= 0) preferences.tablet.width = 1;
+        if (preferences.tablet.height <= 0) preferences.tablet.height = 1;
+        
         // Save the preferences
         this.savePreferences(preferences);
+        
+        // Log que l'enregistrement a été effectué
+        console.log('Préférences sauvegardées:', preferences);
     },
     
     /**
@@ -296,6 +352,14 @@ const PreferencesManager = {
                     if (indicator) {
                         indicator.style.transform = area.lockRatio ? 'scale(1)' : 'scale(0)';
                     }
+                }
+                
+                // Apply the radius
+                if (typeof area.radius !== 'undefined' && document.getElementById('areaRadius')) {
+                    document.getElementById('areaRadius').value = area.radius;
+                    window.currentRadius = area.radius;
+                    const radiusPercentage = document.getElementById('radius-percentage');
+                    if (radiusPercentage) radiusPercentage.textContent = `${area.radius}%`;
                 }
             }
             

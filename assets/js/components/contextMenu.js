@@ -300,5 +300,16 @@ const ContextMenu = {
         };
         
         Notifications.success(`Zone active positionnée ${positionNames[position]}`);
+        
+        // Émettre un événement personnalisé pour informer de la modification de la zone active
+        document.dispatchEvent(new CustomEvent('activearea:positioned', {
+            detail: {
+                position: position,
+                offsetX: newX,
+                offsetY: newY,
+                width: areaWidth,
+                height: areaHeight
+            }
+        }));
     }
 };
