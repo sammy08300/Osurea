@@ -310,6 +310,7 @@ input:where([type='button']),
 input:where([type='reset']),
 input:where([type='submit']) {
   -webkit-appearance: button; /* 1 */
+  appearance: button; /* Standard property */
   background-color: transparent; /* 2 */
   background-image: none; /* 2 */
 }
@@ -354,6 +355,7 @@ Correct the cursor style of increment and decrement buttons in Safari.
 
 [type='search'] {
   -webkit-appearance: textfield; /* 1 */
+  appearance: textfield; /* Standard property */
   outline-offset: -2px; /* 2 */
 }
 
@@ -482,7 +484,7 @@ iframe,
 embed,
 object {
   display: block; /* 1 */
-  vertical-align: middle; /* 2 */
+  /* vertical-align removed as it's not applicable with display: block */
 }
 
 /*
@@ -645,7 +647,7 @@ video {
   margin-bottom: 1.5rem;
 }
 .mb-8 {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 .ml-1 {
   margin-left: 0.25rem;
@@ -1510,12 +1512,22 @@ select:disabled {
 
 /* Favorite items styles */
 .favorite-item {
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                box-shadow 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    will-change: transform, box-shadow !important;
+    position: relative !important;
+    z-index: 1 !important;
 }
 
 .favorite-item:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transform: translateY(-8px) !important;
+    box-shadow: 0 12px 16px rgba(59, 130, 246, 0.2) !important;
+    z-index: 10 !important;
+}
+
+.favorite-item:active {
+    transform: translateY(-4px) !important;
+    transition-duration: 0.1s !important;
 }
 
 /* Action buttons styles in favorite cards */

@@ -108,12 +108,22 @@ select:disabled {
 
 /* Favorite items styles */
 .favorite-item {
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                box-shadow 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    will-change: transform, box-shadow;
+    position: relative;
+    z-index: 1;
 }
 
 .favorite-item:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transform: translateY(-8px);
+    box-shadow: 0 12px 16px rgba(59, 130, 246, 0.15);
+    z-index: 10;
+}
+
+.favorite-item:active {
+    transform: translateY(-4px);
+    transition-duration: 0.1s;
 }
 
 /* Action buttons styles in favorite cards */
@@ -847,15 +857,17 @@ body.loading-favorites #favorites-list .favorite-item {
 
 /* Ajouter de l'espace pour éviter le chevauchement des cartes avec l'en-tête */
 #favorites-list {
-    margin-top: 4px;
-    padding-top: 2px;
+    margin-top: 16px;
+    padding-top: 4px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Ajuster le positionnement des favoris pour qu'ils commencent plus bas */
 #favorites-list > .favorite-item:nth-child(1),
 #favorites-list > .favorite-item:nth-child(2),
 #favorites-list > .favorite-item:nth-child(3) {
-    margin-top: 2px;
+    margin-top: 6px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Maintenir l'espace du footer pendant la transition */
@@ -863,19 +875,4 @@ body.loading-favorites #favorites-list .favorite-item {
 #favorites-list.favorites-transition-in {
     min-height: 100px; /* Hauteur minimale pour éviter le saut */
     transition: min-height 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Ajuster le positionnement des favoris pour qu'ils commencent plus bas */
-#favorites-list {
-    margin-top: 4px;
-    padding-top: 2px;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Ajuster le positionnement des favoris pour qu'ils commencent plus bas */
-#favorites-list > .favorite-item:nth-child(1),
-#favorites-list > .favorite-item:nth-child(2),
-#favorites-list > .favorite-item:nth-child(3) {
-    margin-top: 2px;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }

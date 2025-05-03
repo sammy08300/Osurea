@@ -233,8 +233,8 @@ const Favorites = {
         const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
         
         const item = document.createElement('div');
-        // Utilisation de className au lieu d'ajouts multiples par classList pour des performances améliorées
-        item.className = 'favorite-item bg-gray-800 rounded-xl p-3 border border-gray-700 hover:border-blue-500/30 shadow-lg transition-all cursor-pointer hover:shadow-blue-500/10 hover:-translate-y-0.5 hover:shadow-xl active:translate-y-0 active:shadow-md duration-300';
+        // Utilisation de className pour mettre en œuvre l'effet de soulèvement
+        item.className = 'favorite-item bg-gray-800 rounded-xl p-3 border border-gray-700 hover:border-blue-500/30 shadow-lg cursor-pointer transform-gpu';
         item.dataset.id = favorite.id;
         
         // Add the animation class but only if already initialized
@@ -330,6 +330,9 @@ const Favorites = {
                 this.showFavoriteDetails(favorite);
             }
         });
+        
+        // Ajout du margin-top pour éviter que la carte ne soit coupée lors de l'animation
+        item.style.marginTop = '8px';
         
         return item;
     },
