@@ -1,3 +1,7 @@
+/*
+====================================================
+  Tailwind Base Imports
+====================================================*/
 *, ::before, ::after {
   --tw-border-spacing-x: 0;
   --tw-border-spacing-y: 0;
@@ -51,7 +55,6 @@
   --tw-contain-paint:  ;
   --tw-contain-style:  ;
 }
-
 ::backdrop {
   --tw-border-spacing-x: 0;
   --tw-border-spacing-y: 0;
@@ -104,13 +107,13 @@
   --tw-contain-layout:  ;
   --tw-contain-paint:  ;
   --tw-contain-style:  ;
-}/*
-! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com
-*//*
+}
+/*
+! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com*/
+/*
 1. Prevent padding and border from affecting element width. (https://github.com/mozdevs/cssremedy/issues/4)
 2. Allow adding a border to an element by just adding a border-width. (https://github.com/tailwindcss/tailwindcss/pull/116)
 */
-
 *,
 ::before,
 ::after {
@@ -119,12 +122,10 @@
   border-style: solid; /* 2 */
   border-color: #e5e7eb; /* 2 */
 }
-
 ::before,
 ::after {
   --tw-content: '';
 }
-
 /*
 1. Use a consistent sensible line-height in all browsers.
 2. Prevent adjustments of font size after orientation changes in iOS.
@@ -134,7 +135,6 @@
 6. Use the user's configured `sans` font-variation-settings by default.
 7. Disable tap highlights on iOS
 */
-
 html,
 :host {
   line-height: 1.5; /* 1 */
@@ -147,42 +147,34 @@ html,
   font-variation-settings: normal; /* 6 */
   -webkit-tap-highlight-color: transparent; /* 7 */
 }
-
 /*
 1. Remove the margin in all browsers.
 2. Inherit line-height from `html` so users can set them as a class directly on the `html` element.
 */
-
 body {
   margin: 0; /* 1 */
   line-height: inherit; /* 2 */
 }
-
 /*
 1. Add the correct height in Firefox.
 2. Correct the inheritance of border color in Firefox. (https://bugzilla.mozilla.org/show_bug.cgi?id=190655)
 3. Ensure horizontal rules are visible by default.
 */
-
 hr {
   height: 0; /* 1 */
   color: inherit; /* 2 */
   border-top-width: 1px; /* 3 */
 }
-
 /*
 Add the correct text decoration in Chrome, Edge, and Safari.
 */
-
 abbr:where([title]) {
   -webkit-text-decoration: underline dotted;
           text-decoration: underline dotted;
 }
-
 /*
 Remove the default font size and weight for headings.
 */
-
 h1,
 h2,
 h3,
@@ -192,32 +184,26 @@ h6 {
   font-size: inherit;
   font-weight: inherit;
 }
-
 /*
 Reset links to optimize for opt-in styling instead of opt-out.
 */
-
 a {
   color: inherit;
   text-decoration: inherit;
 }
-
 /*
 Add the correct font weight in Edge and Safari.
 */
-
 b,
 strong {
   font-weight: bolder;
 }
-
 /*
 1. Use the user's configured `mono` font-family by default.
 2. Use the user's configured `mono` font-feature-settings by default.
 3. Use the user's configured `mono` font-variation-settings by default.
 4. Correct the odd `em` font sizing in all browsers.
 */
-
 code,
 kbd,
 samp,
@@ -227,19 +213,15 @@ pre {
   font-variation-settings: normal; /* 3 */
   font-size: 1em; /* 4 */
 }
-
 /*
 Add the correct font size in all browsers.
 */
-
 small {
   font-size: 80%;
 }
-
 /*
 Prevent `sub` and `sup` elements from affecting the line height in all browsers.
 */
-
 sub,
 sup {
   font-size: 75%;
@@ -247,33 +229,27 @@ sup {
   position: relative;
   vertical-align: baseline;
 }
-
 sub {
   bottom: -0.25em;
 }
-
 sup {
   top: -0.5em;
 }
-
 /*
 1. Remove text indentation from table contents in Chrome and Safari. (https://bugs.chromium.org/p/chromium/issues/detail?id=999088, https://bugs.webkit.org/show_bug.cgi?id=201297)
 2. Correct table border color inheritance in all Chrome and Safari. (https://bugs.chromium.org/p/chromium/issues/detail?id=935729, https://bugs.webkit.org/show_bug.cgi?id=195016)
 3. Remove gaps between table borders by default.
 */
-
 table {
   text-indent: 0; /* 1 */
   border-color: inherit; /* 2 */
   border-collapse: collapse; /* 3 */
 }
-
 /*
 1. Change the font styles in all browsers.
 2. Remove the margin in Firefox and Safari.
 3. Remove default padding in all browsers.
 */
-
 button,
 input,
 optgroup,
@@ -290,21 +266,17 @@ textarea {
   margin: 0; /* 2 */
   padding: 0; /* 3 */
 }
-
 /*
 Remove the inheritance of text transform in Edge and Firefox.
 */
-
 button,
 select {
   text-transform: none;
 }
-
 /*
 1. Correct the inability to style clickable types in iOS and Safari.
 2. Remove default button styles.
 */
-
 button,
 input:where([type='button']),
 input:where([type='reset']),
@@ -313,80 +285,62 @@ input:where([type='submit']) {
   background-color: transparent; /* 2 */
   background-image: none; /* 2 */
 }
-
 /*
 Use the modern Firefox focus style for all focusable elements.
 */
-
 :-moz-focusring {
   outline: auto;
 }
-
 /*
 Remove the additional `:invalid` styles in Firefox. (https://github.com/mozilla/gecko-dev/blob/2f9eacd9d3d995c937b4251a5557d95d494c9be1/layout/style/res/forms.css#L728-L737)
 */
-
 :-moz-ui-invalid {
   box-shadow: none;
 }
-
 /*
 Add the correct vertical alignment in Chrome and Firefox.
 */
-
 progress {
   vertical-align: baseline;
 }
-
 /*
 Correct the cursor style of increment and decrement buttons in Safari.
 */
-
 ::-webkit-inner-spin-button,
 ::-webkit-outer-spin-button {
   height: auto;
 }
-
 /*
 1. Correct the odd appearance in Chrome and Safari.
 2. Correct the outline style in Safari.
 */
-
 [type='search'] {
   -webkit-appearance: textfield; /* 1 */
   outline-offset: -2px; /* 2 */
 }
-
 /*
 Remove the inner padding in Chrome and Safari on macOS.
 */
-
 ::-webkit-search-decoration {
   -webkit-appearance: none;
 }
-
 /*
 1. Correct the inability to style clickable types in iOS and Safari.
 2. Change font properties to `inherit` in Safari.
 */
-
 ::-webkit-file-upload-button {
   -webkit-appearance: button; /* 1 */
   font: inherit; /* 2 */
 }
-
 /*
 Add the correct display in Chrome and Safari.
 */
-
 summary {
   display: list-item;
 }
-
 /*
 Removes the default spacing and border for appropriate elements.
 */
-
 blockquote,
 dl,
 dd,
@@ -402,16 +356,13 @@ p,
 pre {
   margin: 0;
 }
-
 fieldset {
   margin: 0;
   padding: 0;
 }
-
 legend {
   padding: 0;
 }
-
 ol,
 ul,
 menu {
@@ -419,60 +370,49 @@ menu {
   margin: 0;
   padding: 0;
 }
-
 /*
 Reset default styling for dialogs.
 */
 dialog {
   padding: 0;
 }
-
 /*
 Prevent resizing textareas horizontally by default.
 */
-
 textarea {
   resize: vertical;
 }
-
 /*
 1. Reset the default placeholder opacity in Firefox. (https://github.com/tailwindlabs/tailwindcss/issues/3300)
 2. Set the default placeholder color to the user's configured gray 400 color.
 */
-
 input::-moz-placeholder, textarea::-moz-placeholder {
   opacity: 1; /* 1 */
   color: #9ca3af; /* 2 */
 }
-
 input::placeholder,
 textarea::placeholder {
   opacity: 1; /* 1 */
   color: #9ca3af; /* 2 */
 }
-
 /*
 Set the default cursor for buttons.
 */
-
 button,
 [role="button"] {
   cursor: pointer;
 }
-
 /*
 Make sure disabled buttons don't get the pointer cursor.
 */
 :disabled {
   cursor: default;
 }
-
 /*
 1. Make replaced elements `display: block` by default. (https://github.com/mozdevs/cssremedy/issues/14)
 2. Add `vertical-align: middle` to align replaced elements more sensibly by default. (https://github.com/jensimmons/cssremedy/issues/14#issuecomment-634934210)
    This can trigger a poorly considered lint error in some tools but is included by design.
 */
-
 img,
 svg,
 video,
@@ -484,17 +424,14 @@ object {
   display: block; /* 1 */
   vertical-align: middle; /* 2 */
 }
-
 /*
 Constrain images and videos to the parent width and preserve their intrinsic aspect ratio. (https://github.com/mozdevs/cssremedy/issues/14)
 */
-
 img,
 video {
   max-width: 100%;
   height: auto;
 }
-
 /* Make elements with the HTML hidden attribute stay hidden by default */
 [hidden]:where(:not([hidden="until-found"])) {
   display: none;
@@ -503,31 +440,26 @@ video {
   width: 100%;
 }
 @media (min-width: 640px) {
-
   .container {
     max-width: 640px;
   }
 }
 @media (min-width: 768px) {
-
   .container {
     max-width: 768px;
   }
 }
 @media (min-width: 1024px) {
-
   .container {
     max-width: 1024px;
   }
 }
 @media (min-width: 1280px) {
-
   .container {
     max-width: 1280px;
   }
 }
 @media (min-width: 1536px) {
-
   .container {
     max-width: 1536px;
   }
@@ -1419,8 +1351,13 @@ video {
           appearance: textfield;
 }
 
+/*
+====================================================
+  Global CSS Variables
+====================================================*/
 :root {
     --scrollbar-width: 8px;
+    --scrollbar-radius: 8px;
     --scrollbar-track-bg: rgba(31, 41, 55, 0.3);
     --scrollbar-thumb-bg: rgba(75, 85, 99, 0.8);
     --scrollbar-thumb-hover: rgba(107, 114, 128, 0.9);
@@ -1428,60 +1365,30 @@ video {
     --transition-normal: 0.25s ease;
     --shadow-color: rgba(59, 130, 246, 0.3);
     --focus-ring: 0 0 0 2px rgba(59, 130, 246, 0.5);
+    --bg-main: rgb(3, 7, 18);
+    --blue: #3b82f6;
+    --gray-500: #6b7280;
+    --amber-500: #f59e0b;
+    --red-500: #ef4444;
 }
 
-/* Custom scrollbar */
-.custom-scrollbar::-webkit-scrollbar {
-    width: var(--scrollbar-width);
+/*
+====================================================
+  General Layout & Body
+====================================================*/
+html, body {
+    background-color: var(--bg-main);
+    min-height: 100%;
+    height: 100%;
+}
+html.loading, body.loading {
+    overflow: hidden !important;
 }
 
-.custom-scrollbar::-webkit-scrollbar-track {
-    background: var(--scrollbar-track-bg);
-    border-radius: var(--scrollbar-width);
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-    background: var(--scrollbar-thumb-bg);
-    border-radius: var(--scrollbar-width);
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: var(--scrollbar-thumb-hover);
-}
-
-/* Tablet boundary styling */
-#tablet-boundary {
-    transition: width var(--transition-normal), height var(--transition-normal);
-}
-
-/* Rectangle styling for area */
-.rectangle {
-    cursor: grab;
-    -webkit-user-select: none;
-       -moz-user-select: none;
-            user-select: none;
-    box-shadow: 0 0 15px var(--shadow-color);
-    visibility: visible;
-    /* Retirer toute transition initiale */
-    transition: none;
-}
-
-/* Apply transitions only after initial loading */
-.page-loaded #rectangle {
-    transition: width var(--transition-fast), height var(--transition-fast), transform var(--transition-fast);
-}
-
-#rectangle:active {
-    cursor: grabbing;
-}
-
-/* Prevent "flash" rectangle during charging */
-[data-loading="true"] #rectangle,
-body:not(.page-loaded) #rectangle {
-    pointer-events: none !important;
-}
-
-/* Preventing flash animations during quick refreshments */
+/*
+====================================================
+  Accessibility: Reduce Motion
+====================================================*/
 @media (prefers-reduced-motion: reduce) {
     * {
         transition: none !important;
@@ -1489,309 +1396,143 @@ body:not(.page-loaded) #rectangle {
     }
 }
 
-/* Avoid white flash during repeated refreshments */
-html, body {
-    background-color: rgb(3, 7, 18); /* bg-gray-950 en couleur fixe */
-    min-height: 100%;
-    height: 100%;
+/*
+====================================================
+  Custom Scrollbar Styles
+====================================================*/
+.custom-scrollbar::-webkit-scrollbar {
+    width: var(--scrollbar-width);
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: var(--scrollbar-track-bg);
+    border-radius: var(--scrollbar-radius);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb-bg);
+    border-radius: var(--scrollbar-radius);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
 }
 
-/* Disable scrolling behavior during loading */
-html.loading, body.loading {
-    overflow: hidden !important;
+/*
+====================================================
+  Tablet Boundary & Rectangle (osu! zone viewer)
+====================================================*/
+#tablet-boundary {
+    transition: width var(--transition-normal), height var(--transition-normal);
 }
-
-/* Tablet preset select */
-select {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-    background-position: right 0.5rem center;
-    background-repeat: no-repeat;
-    background-size: 1.5em 1.5em;
-    padding-right: 2.5rem;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-}
-
-select:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-/* Context menu styles */
-#context-menu hr {
-    border-color: rgba(75, 85, 99, 0.6);
-    margin-top: 0.25rem;
-    margin-bottom: 0.25rem;
-}
-
-/* Favorite items styles */
-.favorite-item {
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), 
-                box-shadow 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-                z-index 0.3s ease;
-    will-change: transform, box-shadow;
-    position: relative;
-    top: 4px;
-    z-index: 1;
-}
-
-.favorite-item:hover {
-    transform: translateY(-12px) !important;
-    box-shadow: 0 14px 20px rgba(59, 130, 246, 0.2) !important;
-    z-index: 10 !important;
-}
-
-.favorite-item:active {
-    transform: translateY(-4px);
-    transition-duration: 0.1s;
-}
-
-/* Action buttons styles in favorite cards */
-.load-favorite-btn,
-.edit-favorite-btn,
-.delete-favorite-btn {
-    position: relative;
-    overflow: hidden;
-}
-
-.load-favorite-btn::before,
-.edit-favorite-btn::before,
-.delete-favorite-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 0.1);
-    opacity: 0;
-    transition: opacity 0.2s ease;
-    border-radius: 0.375rem;
-    z-index: 1;
-}
-
-.load-favorite-btn:hover::before,
-.edit-favorite-btn:hover::before,
-.delete-favorite-btn:hover::before {
-    opacity: 1;
-}
-
-.load-favorite-btn svg,
-.edit-favorite-btn svg,
-.delete-favorite-btn svg {
-    position: relative;
-    z-index: 2;
-}
-
-/* Notifications */
-.notification {
-    animation: slide-in 0.3s ease forwards, fade-out 0.3s ease 3s forwards;
-    max-width: 300px;
-    pointer-events: auto;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
-
-@keyframes slide-in {
-    0% {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    100% {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-@keyframes fade-out {
-    0% {
-        transform: translateX(0);
-        opacity: 1;
-    }
-    100% {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-}
-
-/* Focus styling improvements */
-input:focus, select:focus, button:focus {
-    outline: none;
-    box-shadow: var(--focus-ring);
-}
-
-/* Number input arrows styling */
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-    opacity: 1;
-    background: rgba(31, 41, 55, 0.1);
-    border-left: 1px solid rgba(75, 85, 99, 0.4);
-    height: 100%;
-}
-
-/* Highlight effect for recently updated favorites */
-.highlight-effect {
-    animation: highlight-pulse 1.5s ease-in-out;
-}
-
-@keyframes highlight-pulse {
-    0% {
-        background-color: rgba(59, 130, 246, 0.3);
-    }
-    100% {
-        background-color: rgba(55, 65, 81, 0.5);
-    }
-}
-
-/* Styles for osu! tablet zone viewer */
-
-/* Context menu */
-#context-menu {
-    transform-origin: top left;
-    animation: appear 0.15s ease-out;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+.rectangle, #rectangle {
+    cursor: grab;
     -webkit-user-select: none;
        -moz-user-select: none;
             user-select: none;
-    pointer-events: auto;
+    box-shadow: 0 0 15px var(--shadow-color);
+    transition: none;
+    visibility: visible;
 }
-
-@keyframes appear {
-    from {
-        opacity: 0;
-        transform: scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
+.page-loaded #rectangle {
+    transition: width var(--transition-fast), height var(--transition-fast), transform var(--transition-fast);
 }
-
-/* Prevent browser context menu on key elements */
-#rectangle, #tablet-boundary, #visual-container {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    user-select: none;
-}
-
-/* Cursor to indicate that the rectangle can be moved */
-#rectangle {
-    cursor: grab;
-}
-
 #rectangle:active {
     cursor: grabbing;
 }
-
-/* custom scrollbar */
-.custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
+[data-loading="true"] #rectangle,
+body:not(.page-loaded) #rectangle {
+    pointer-events: none !important;
+}
+#rectangle.invisible {
+    visibility: hidden;
 }
 
-.custom-scrollbar::-webkit-scrollbar-track {
-    background: rgba(75, 85, 99, 0.3);
-    border-radius: 6px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(59, 130, 246, 0.6);
-    border-radius: 6px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(59, 130, 246, 0.8);
-}
-
-/* Styles for tablet selector */
+/*
+====================================================
+  Tablet Selector & Search
+====================================================*/
 .tablet-selector-container {
     position: relative;
 }
-
 #tabletSelectorButton {
     cursor: pointer;
     transition: all 0.2s ease;
 }
-
 #tabletSelectorButton:hover {
     background-color: rgb(55, 65, 81);
 }
-
+#tabletSelectorButton.updating {
+    animation: buttonUpdate 0.3s ease;
+}
 #tabletSelectorPopup {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
     animation: fadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     max-height: 450px;
     border-radius: 8px;
     overflow: hidden;
+    transform-origin: top;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
+#tabletSelectorPopup.hidden {
+    transform: scaleY(0.95);
+    opacity: 0;
+    pointer-events: none;
+}
 #tabletBrandsList, #tabletModelsList {
     max-height: 400px;
 }
-
-.brand-item {
-    transition: all 0.2s ease;
-    padding: 10px 14px;
-    cursor: pointer;
+.brand-item, .model-item {
     position: relative;
+    overflow: hidden;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+.brand-item {
+    padding: 10px 14px;
     font-size: 0.95rem;
 }
-
-.brand-item:hover {
+.brand-item:hover, .model-item:hover {
     background-color: rgba(75, 85, 99, 0.5);
 }
-
 .brand-item.active {
     background-color: rgba(59, 130, 246, 0.15);
-    color: rgba(59, 130, 246, 1);
+    color: var(--blue);
     font-weight: 500;
 }
-
 .brand-item.active::before {
     content: '';
     position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
+    left: 0; top: 0; bottom: 0;
     width: 3px;
-    background-color: rgba(59, 130, 246, 1);
+    background-color: var(--blue);
+    animation: slideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
 .model-item {
-    transition: all 0.2s ease;
     padding: 7px 14px;
     display: flex;
     flex-direction: column;
     gap: 2px;
-    cursor: pointer;
     border-left: 3px solid transparent;
 }
-
 .model-item > div:first-child {
     font-size: 0.9rem;
 }
-
 .model-item > div:last-child {
     font-size: 0.75rem;
     color: rgba(156, 163, 175, 1);
 }
-
-.model-item:hover {
-    background-color: rgba(75, 85, 99, 0.5);
-    border-left-color: rgba(59, 130, 246, 0.5);
+.model-item.active {
+    background-color: rgba(59, 130, 246, 0.15);
+    border-left-color: var(--blue);
 }
-
-/* Style for search field */
 #tabletSearch, #tabletSearchMobile {
     transition: all 0.2s ease;
     font-size: 0.9rem;
 }
-
 #tabletSearch:focus, #tabletSearchMobile:focus {
     background-color: rgba(55, 65, 81, 1);
+    box-shadow: 0 0 0 2px var(--shadow-color);
 }
 
-/* Style for custom dimensions button */
+/* Custom dimensions button */
 #customTabletButton {
     width: 100%;
     color: rgba(209, 213, 219, 1);
@@ -1805,27 +1546,10 @@ input[type="number"]::-webkit-outer-spin-button {
     padding: 12px 14px;
     background-color: rgba(31, 41, 55, 0.5);
 }
-
 #customTabletButton span {
     color: rgba(209, 213, 219, 1);
     font-weight: 500;
 }
-
-#customTabletSection {
-    position: relative;
-    width: 100%;
-}
-
-#customTabletSection::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 1px;
-    background: linear-gradient(90deg, rgba(59, 130, 246, 0.3), transparent);
-}
-
 #customTabletButton svg {
     flex-shrink: 0;
     width: 16px;
@@ -1833,181 +1557,299 @@ input[type="number"]::-webkit-outer-spin-button {
     color: rgba(156, 163, 175, 1);
     transition: color 0.2s ease;
 }
-
 #customTabletButton:hover {
     background-color: rgba(55, 65, 81, 0.9);
 }
-
 #customTabletButton:hover svg {
     color: rgba(209, 213, 219, 1);
 }
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(8px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+#customTabletSection {
+    position: relative;
+    width: 100%;
+}
+#customTabletSection::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, var(--blue), transparent);
 }
 
-/* Improvement of the custom scrollbar */
-.custom-scrollbar::-webkit-scrollbar {
-    width: 4px;
+/*
+====================================================
+  Context Menu
+====================================================*/
+#context-menu {
+    transform-origin: top left;
+    animation: appear 0.15s ease-out;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+    -webkit-user-select: none;
+       -moz-user-select: none;
+            user-select: none;
+    pointer-events: auto;
+}
+#context-menu hr {
+    border-color: rgba(75, 85, 99, 0.6);
+    margin: 0.25rem 0;
 }
 
-.custom-scrollbar::-webkit-scrollbar-track {
-    background: rgba(75, 85, 99, 0.2);
+/*
+====================================================
+  Favorite Items (Cards)
+====================================================*/
+.favorite-item {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), z-index 0.3s ease;
+    will-change: transform, box-shadow;
+    position: relative;
+    top: 4px;
+    z-index: 1;
+}
+.favorite-item:hover {
+    transform: translateY(-12px) !important;
+    box-shadow: 0 14px 20px var(--shadow-color) !important;
+    z-index: 10 !important;
+}
+.favorite-item:active {
+    transform: translateY(-4px);
+    transition-duration: 0.1s;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(59, 130, 246, 0.4);
-    border-radius: 4px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(59, 130, 246, 0.6);
-}
-
-/* Animations for tablet selector */
-#tabletSelectorButton.updating {
-    animation: buttonUpdate 0.3s ease;
-}
-
-.model-item.active {
-    background-color: rgba(59, 130, 246, 0.15);
-    border-left-color: rgba(59, 130, 246, 1);
-}
-
-@keyframes buttonUpdate {
-    0% {
-        transform: scale(1);
-        opacity: 1;
-    }
-    50% {
-        transform: scale(0.98);
-        opacity: 0.8;
-    }
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-
-/* Transitions for dimension groups */
-#tablet-width-group,
-#tablet-height-group,
-#tablet-manual-hr {
-    transition: opacity 0.2s ease;
-}
-
-/* Animation of dropdown menu */
-#tabletSelectorPopup {
-    transform-origin: top;
-    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
-                opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-#tabletSelectorPopup.hidden {
-    transform: scaleY(0.95);
-    opacity: 0;
-    pointer-events: none;
-}
-
-/* Improvement of input appearance */
-#tabletSearch,
-#tabletSearchMobile {
-    transition: all 0.2s ease;
-}
-
-#tabletSearch:focus,
-#tabletSearchMobile:focus {
-    background-color: rgba(55, 65, 81, 1);
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
-}
-
-/* Improved hover effect for list items */
-.brand-item,
-.model-item {
+/* Favorite action buttons */
+.load-favorite-btn, .edit-favorite-btn, .delete-favorite-btn {
     position: relative;
     overflow: hidden;
 }
-
-.brand-item::after,
-.model-item::after {
+.load-favorite-btn::before, .edit-favorite-btn::before, .delete-favorite-btn::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(255, 255, 255, 0.1);
     opacity: 0;
     transition: opacity 0.2s ease;
+    border-radius: 0.375rem;
+    z-index: 1;
 }
-
-.brand-item:hover::after,
-.model-item:hover::after {
+.load-favorite-btn:hover::before, .edit-favorite-btn:hover::before, .delete-favorite-btn:hover::before {
     opacity: 1;
 }
-
-/* Active state of elements */
-.brand-item.active,
-.model-item.active {
+.load-favorite-btn svg, .edit-favorite-btn svg, .delete-favorite-btn svg {
     position: relative;
+    z-index: 2;
 }
 
-.brand-item.active::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background-color: rgba(59, 130, 246, 1);
-    transform-origin: left;
-    animation: slideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+/*
+====================================================
+  Notifications
+====================================================*/
+.notification {
+    animation: slide-in 0.3s ease forwards, fade-out 0.3s ease 3s forwards;
+    max-width: 300px;
+    pointer-events: auto;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
-@keyframes slideIn {
-    from {
-        transform: scaleY(0);
-    }
-    to {
-        transform: scaleY(1);
-    }
+/*
+====================================================
+  Inputs, Selects, Focus Styles
+====================================================*/
+input:focus, select:focus, button:focus {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+select:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    opacity: 1;
+    background: rgba(31, 41, 55, 0.1);
+    border-left: 1px solid rgba(75, 85, 99, 0.4);
+    height: 100%;
 }
 
-/* Animation for favorites appearance */
+/*
+====================================================
+  Loading Overlay & Spinner
+====================================================*/
+#loading-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100vw; height: 100vh;
+    background-color: rgba(17, 24, 39, 0.98);
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.2s ease;
+    will-change: opacity;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+.loading-spinner {
+    position: relative;
+    width: 50px;
+    height: 50px;
+}
+.spinner-track {
+    stroke: rgba(75, 85, 99, 0.3);
+    transform-origin: center;
+}
+.spinner-circle {
+    stroke: var(--blue);
+    stroke-linecap: round;
+    transform-origin: center;
+    stroke-dasharray: 125;
+    stroke-dashoffset: 125;
+    animation: spinner-sweep 1.4s ease-in-out infinite, spinner-rotate 2s linear infinite;
+}
+
+/*
+====================================================
+  Modal Dialogs (Comment, Delete)
+====================================================*/
+#comment-dialog, #delete-dialog {
+    pointer-events: auto;
+    transition: opacity 0.2s ease-out;
+}
+#comment-dialog > div, #delete-dialog > div {
+    transition: transform 0.2s ease-out;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+#comment-dialog h3, #delete-dialog h3 {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+#save-comment-btn, #confirm-delete-btn {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    font-weight: 500;
+}
+
+/*
+====================================================
+  Inputs & Textareas (Comment, Description)
+====================================================*/
+#comment-input, #description-input {
+    transition: all 0.2s ease;
+}
+#comment-input:focus, #description-input:focus {
+    border-color: var(--blue);
+    background-color: rgba(30, 41, 59, 0.8);
+    box-shadow: 0 0 0 2px var(--focus-ring), 0 0 0 4px rgba(59, 130, 246, 0.1);
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+/*
+====================================================
+  Character Counters
+====================================================*/
+#title-counter, #description-counter {
+    transition: color 0.2s ease;
+}
+#title-counter.near-limit, #description-counter.near-limit {
+    color: var(--amber-500);
+}
+#title-counter.at-limit, #description-counter.at-limit {
+    color: var(--red-500);
+    animation: pulse 1s infinite;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/*
+====================================================
+  Favorites List Layout
+====================================================*/
+#favorites-list {
+    margin-top: 16px;
+    padding-top: 0px;
+    position: relative;
+    z-index: 5;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    padding-bottom: 16px;
+}
+#favorites-list.custom-scrollbar {
+    overflow: visible !important;
+    overflow-y: auto !important;
+    clip-path: inset(0 0 -100px 0);
+}
+#favorites-list > .favorite-item:nth-child(-n+3) {
+    margin-top: 0px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+#favorites-list.favorites-transition-out,
+#favorites-list.favorites-transition-in {
+    min-height: 100px;
+    transition: min-height 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/*
+====================================================
+  Animations & Keyframes
+====================================================*/
+@keyframes slide-in {
+    0% { transform: translateX(100%); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
+}
+@keyframes fade-out {
+    0% { transform: translateX(0); opacity: 1; }
+    100% { transform: translateX(100%); opacity: 0; }
+}
+@keyframes appear {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(8px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
 }
-
-.animate-fadeIn {
-    animation: fadeIn 0.3s ease-out forwards;
-}
-
-/* Animation for language change - smoother version */
 @keyframes fadeInSmooth {
-    from {
-        opacity: 0;
-        transform: translateY(5px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-5px); }
+}
+@keyframes spinner-rotate {
+    100% { transform: rotate(360deg); }
+}
+@keyframes spinner-sweep {
+    0% { stroke-dashoffset: 125; }
+    50% { stroke-dashoffset: 0; }
+    100% { stroke-dashoffset: -125; }
+}
+@keyframes buttonUpdate {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(0.98); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+@keyframes slideIn {
+    from { transform: scaleY(0); }
+    to { transform: scaleY(1); }
+}
+@keyframes highlight-pulse {
+    0% { background-color: rgba(59, 130, 246, 0.3); }
+    100% { background-color: rgba(55, 65, 81, 0.5); }
 }
 
+/*
+====================================================
+  Animation Utility Classes
+====================================================*/
+.animate-fadeIn { animation: fadeIn 0.3s ease-out forwards; }
 .animate-fadeIn-smooth {
     animation: fadeInSmooth 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     will-change: opacity, transform;
@@ -2015,53 +1857,31 @@ input[type="number"]::-webkit-outer-spin-button {
     -webkit-backface-visibility: hidden;
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
-    opacity: 0; /* Commencer invisible */
+    opacity: 0;
 }
-
-/* Animation pour la transition de sortie des favoris */
 .favorites-transition-out {
     animation: fadeOut 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     will-change: opacity, transform;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
 }
-
-@keyframes fadeOut {
-    from {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    to {
-        opacity: 0;
-        transform: translateY(-5px);
-    }
-}
-
-/* Animation pour la transition d'entrée des favoris */
 .favorites-transition-in {
     animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     will-change: opacity, transform;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
 }
-
-/* Hide favorites during loading */
-.favorites-loading > .favorite-item {
-    opacity: 0 !important;
-    visibility: hidden !important;
-    animation: none !important;
-    transition: none !important;
-}
-
-/* Animation de fadeIn uniquement lorsque nécessaire */
 .favorite-item.animate-fadeIn {
     animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     will-change: opacity, transform;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
 }
-
-/* Délais d'animation plus progressifs pour éviter le clignotement */
+.favorite-item.animate-fadeIn-smooth.animation-complete {
+    opacity: 1;
+    transform: translateY(0);
+}
+/* Staggered animation delays for smooth fade-in */
 .favorite-item.animate-fadeIn-smooth:nth-child(1) { animation-delay: 0s; }
 .favorite-item.animate-fadeIn-smooth:nth-child(2) { animation-delay: 0.05s; }
 .favorite-item.animate-fadeIn-smooth:nth-child(3) { animation-delay: 0.1s; }
@@ -2073,239 +1893,63 @@ input[type="number"]::-webkit-outer-spin-button {
 .favorite-item.animate-fadeIn-smooth:nth-child(9) { animation-delay: 0.4s; }
 .favorite-item.animate-fadeIn-smooth:nth-child(10) { animation-delay: 0.45s; }
 
-/* Animation plus douce pour l'entrée */
-@keyframes fadeInSmooth {
-    from {
-        opacity: 0;
-        transform: translateY(5px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Assurer que les cartes restent visibles après l'animation */
-.favorite-item.animate-fadeIn-smooth.animation-complete {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* Loading overlay */
-#loading-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgb(3, 7, 18);
-    z-index: 10;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: opacity 0.3s ease;
-}
-
-/* Loading overlay */
-#loading-overlay {
-    background-color: rgba(17, 24, 39, 0.98);
-    z-index: 100;
-    transition: opacity 0.2s ease;
-    /* Prevent white flash during repeated refreshments */
-    will-change: opacity;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100vw;
-    height: 100vh;
-}
-
-/* Elegant loading spinner animation */
-.loading-spinner {
-    position: relative;
-    width: 50px;
-    height: 50px;
-}
-
-.spinner-track {
-    stroke: rgba(75, 85, 99, 0.3);
-    transform-origin: center;
-}
-
-.spinner-circle {
-    stroke: #3b82f6; /* Blue */
-    stroke-linecap: round;
-    transform-origin: center;
-    stroke-dasharray: 125;
-    stroke-dashoffset: 125;
-    animation: spinner-sweep 1.4s ease-in-out infinite, spinner-rotate 2s linear infinite;
-}
-
-@keyframes spinner-rotate {
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-@keyframes spinner-sweep {
-    0% {
-        stroke-dashoffset: 125;
-    }
-    50% {
-        stroke-dashoffset: 0;
-    }
-    100% {
-        stroke-dashoffset: -125;
-    }
-}
-
-/* Rectangle hidden visibility handling - using invisible instead of opacity */
-#rectangle.invisible {
-    visibility: hidden;
-}
-
-/* Styles for modal dialogues */
-#comment-dialog, #delete-dialog {
-    pointer-events: auto;
-    transition: opacity 0.2s ease-out;
-}
-
-#comment-dialog > div, #delete-dialog > div {
-    transition: transform 0.2s ease-out;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-}
-
-/* Styles for character counters */
-#title-counter, #description-counter {
-    transition: color 0.2s ease;
-}
-
-/* Styles for inputs and textarea with improved visual focus */
-#comment-input:focus, #description-input:focus {
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5), 0 0 0 4px rgba(59, 130, 246, 0.1);
-    background-color: rgba(30, 41, 59, 0.8); /* légèrement plus clair pour indiquer le focus */
-}
-/* Style for inputs and textarea with improved visual focus - without bounce effect */
-#comment-input:focus, #description-input:focus {
-    border-color: #4287f5;
-    background-color: rgba(30, 41, 59, 0.8); 
-    box-shadow: none;
-    transition: border-color 0.2s ease, background-color 0.2s ease;
-}
-
-/* Style for SVG icons in the favorite details popup */
-#favorite-details-popup svg {
-    fill: none;
-    stroke: white;
-    color: white;
-}
-
-/* Style for SVG icons in the summary */
-#recap-content svg, #recap-toggle svg:not(#recap-arrow) {
-    fill: none;
-    stroke: white;
-    color: white;
-}
-
-/* Styles for modal dialogues */
-#comment-dialog, #delete-dialog {
-    pointer-events: auto;
-    transition: opacity 0.2s ease-out;
-}
-
-#comment-dialog > div, #delete-dialog > div {
-    transition: transform 0.2s ease-out;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-}
-
-/* Styles for character counters */
-#title-counter, #description-counter {
-    transition: all 0.2s ease;
-}
-
-#title-counter.near-limit, #description-counter.near-limit {
-    color: #f59e0b; /* amber-500 */
-}
-
-#title-counter.at-limit, #description-counter.at-limit {
-    color: #ef4444; /* red-500 */
-    animation: pulse 1s infinite;
-}
-
-/* Pulse animation for limit counters */
-@keyframes pulse {
-    0%, 100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.7;
-    }
-}
-
-/* Improvements of input fields */
-#comment-input, #description-input {
-    transition: all 0.2s ease;
-}
-
-#comment-input:focus, #description-input:focus {
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5), 0 0 0 4px rgba(59, 130, 246, 0.1);
-    background-color: rgba(30, 41, 59, 0.8); 
-}
-
-/* Style for dialog titles */
-#comment-dialog h3, #delete-dialog h3 {
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-/* Improved style for action buttons */
-#save-comment-btn, #confirm-delete-btn {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-    font-weight: 500;
-}
-
-/* Empêcher toutes les animations pendant le chargement initial */
+/*
+====================================================
+  Utility: Hide Favorites During Loading
+====================================================*/
 body.loading-favorites #favorites-list * {
     animation: none !important;
     transition: none !important;
 }
-
 body.loading-favorites #favorites-list .favorite-item {
     opacity: 0 !important;
 }
 
-/* Ajouter de l'espace pour éviter le chevauchement des cartes avec l'en-tête */
-#favorites-list {
-    margin-top: 16px;
-    padding-top: 0px;
-    position: relative;
-    z-index: 5; /* Augmenter le z-index pour tout le conteneur */
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+/*
+====================================================
+  Utility: Prevent Context Menu & User Select
+====================================================*/
+#rectangle, #tablet-boundary, #visual-container {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
 }
 
-/* Modifier l'overflow pour que les cartes puissent sortir du conteneur pendant l'animation */
-#favorites-list.custom-scrollbar {
-    overflow: visible !important; /* Permettre aux éléments de sortir de la zone */
-    overflow-y: auto !important; /* Mais garder le défilement vertical */
-    clip-path: inset(0 0 -100px 0); /* Créer un clipping qui laisse de l'espace en haut */
+/*
+====================================================
+  SVG Icon Styling
+====================================================*/
+#favorite-details-popup svg,
+#recap-content svg,
+#recap-toggle svg:not(#recap-arrow) {
+    fill: none;
+    stroke: white;
+    color: white;
 }
 
-/* Ajuster le positionnement des favoris pour qu'ils commencent plus bas */
-#favorites-list > .favorite-item:nth-child(1),
-#favorites-list > .favorite-item:nth-child(2),
-#favorites-list > .favorite-item:nth-child(3) {
-    margin-top: 0px;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+/*
+====================================================
+  Favorite Button Interactions
+====================================================*/
+.load-favorite-btn:active, .edit-favorite-btn:active, .delete-favorite-btn:active {
+    transform: translateY(0) !important;
 }
 
-/* Maintenir l'espace du footer pendant la transition */
-#favorites-list.favorites-transition-out,
-#favorites-list.favorites-transition-in {
-    min-height: 100px; /* Hauteur minimale pour éviter le saut */
-    transition: min-height 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+.favorite-item:has(.load-favorite-btn:active),
+.favorite-item:has(.edit-favorite-btn:active) {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    transition: none !important;
+}
+
+/*
+====================================================
+  Highlight Effect for Updated Favorites
+====================================================*/
+.highlight-effect {
+    animation: highlight-pulse 1.5s ease-in-out;
 }
 .after\:absolute::after {
   content: var(--tw-content);
@@ -2512,44 +2156,35 @@ body.loading-favorites #favorites-list .favorite-item {
   --tw-ring-color: rgb(59 130 246 / var(--tw-ring-opacity, 1));
 }
 @media (min-width: 640px) {
-
   .sm\:grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-
   .sm\:justify-start {
     justify-content: flex-start;
   }
-
   .sm\:text-left {
     text-align: left;
   }
 }
 @media (min-width: 768px) {
-
   .md\:block {
     display: block;
   }
-
   .md\:hidden {
     display: none;
   }
-
   .md\:text-3xl {
     font-size: 1.875rem;
     line-height: 2.25rem;
   }
 }
 @media (min-width: 1024px) {
-
   .lg\:col-span-1 {
     grid-column: span 1 / span 1;
   }
-
   .lg\:col-span-2 {
     grid-column: span 2 / span 2;
   }
-
   .lg\:grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }

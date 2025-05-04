@@ -484,97 +484,61 @@ const appState = {
         const areaOffsetXInput = document.getElementById('areaOffsetX');
         const areaOffsetYInput = document.getElementById('areaOffsetY');
         
+        // Ajout d'un debounce pour l'updateDisplay sur l'offset
+        const debouncedUpdateDisplayOffset = debounce(() => {
+            updateDisplay();
+        }, 700);
+
         areaOffsetXInput.addEventListener('input', () => {
             if (!appState.editingFavoriteId) {
                 this.cancelEditMode();
             }
-            
-            // Get the necessary dimensions
+            // On laisse l'utilisateur écrire ce qu'il veut, même si c'est temporairement invalide
+            debouncedUpdateDisplayOffset();
+        });
+
+        areaOffsetXInput.addEventListener('blur', () => {
+            // Ici, on applique la contrainte si besoin
             const tabletWidth = parseFloatSafe(tabletWidthInput.value);
             const tabletHeight = parseFloatSafe(tabletHeightInput.value);
             const areaWidth = parseFloatSafe(areaWidthInput.value);
             const areaHeight = parseFloatSafe(areaHeightInput.value);
-            
-            // Get the offset value
-            let offsetX = areaOffsetXInput.value.trim();
+            let offsetX = parseFloatSafe(areaOffsetXInput.value);
             const offsetY = parseFloatSafe(areaOffsetYInput.value);
-            
-            // If the field is empty, allow the input
-            if (offsetX === '') {
-                // Do nothing to let the user finish his input
-                return;
-            }
-            
-            // Otherwise convert to a number and constrain
-            offsetX = parseFloatSafe(offsetX);
-            
-            // If the value is invalid, do not continue
-            if (!isValidNumber(offsetX)) {
-                return;
-            }
-            
-            // Constrain the offset within the tablet limits
-            const constrainedOffsets = constrainAreaOffset(
-                offsetX,
-                offsetY,
-                areaWidth,
-                areaHeight,
-                tabletWidth,
-                tabletHeight
-            );
-            
-            // Update the value if it has been constrained
-            if (constrainedOffsets.x !== offsetX) {
-                areaOffsetXInput.value = formatNumber(constrainedOffsets.x, 3);
-            }
-            
+
+            // Si la valeur est vide ou invalide, on ne fait rien
+            if (!isValidNumber(offsetX)) return;
+
+            // Ici, tu peux décider si tu veux vraiment contraindre ou non.
+            // Si tu veux autoriser n'importe quelle valeur, ne fais rien.
+            // Sinon, décommente la ligne suivante pour contraindre :
+            // const constrainedOffsets = constrainAreaOffset(offsetX, offsetY, areaWidth, areaHeight, tabletWidth, tabletHeight);
+            // areaOffsetXInput.value = formatNumber(constrainedOffsets.x, 3);
+
             updateDisplay();
         });
-        
+
         areaOffsetYInput.addEventListener('input', () => {
             if (!appState.editingFavoriteId) {
                 this.cancelEditMode();
             }
-            
-            // Get the necessary dimensions
+            debouncedUpdateDisplayOffset();
+        });
+
+        areaOffsetYInput.addEventListener('blur', () => {
             const tabletWidth = parseFloatSafe(tabletWidthInput.value);
             const tabletHeight = parseFloatSafe(tabletHeightInput.value);
             const areaWidth = parseFloatSafe(areaWidthInput.value);
             const areaHeight = parseFloatSafe(areaHeightInput.value);
             const offsetX = parseFloatSafe(areaOffsetXInput.value);
-            
-            // Get the offset value
-            let offsetY = areaOffsetYInput.value.trim();
-            
-            // If the field is empty, allow the input
-            if (offsetY === '') {
-                // Do nothing to let the user finish his input
-                return;
-            }
-            
-            // Otherwise convert to a number and constrain
-            offsetY = parseFloatSafe(offsetY);
-            
-            // If the value is invalid, do not continue
-            if (!isValidNumber(offsetY)) {
-                return;
-            }
-            
-            // Constrain the offset within the tablet limits
-            const constrainedOffsets = constrainAreaOffset(
-                offsetX,
-                offsetY,
-                areaWidth,
-                areaHeight,
-                tabletWidth,
-                tabletHeight
-            );
-            
-            // Update the value if it has been constrained
-            if (constrainedOffsets.y !== offsetY) {
-                areaOffsetYInput.value = formatNumber(constrainedOffsets.y, 3);
-            }
-            
+            let offsetY = parseFloatSafe(areaOffsetYInput.value);
+
+            if (!isValidNumber(offsetY)) return;
+
+            // Si tu veux contraindre, décommente :
+            // const constrainedOffsets = constrainAreaOffset(offsetX, offsetY, areaWidth, areaHeight, tabletWidth, tabletHeight);
+            // areaOffsetYInput.value = formatNumber(constrainedOffsets.y, 3);
+
             updateDisplay();
         });
         
