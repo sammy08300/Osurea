@@ -8,6 +8,7 @@ const Favorites = {
     currentSortCriteria: 'date',
     isInitialized: false,
     cachedFavorites: null, // Ajout d'un cache pour les favoris
+    popupOpenTimestamp: 0, // Timestamp d'ouverture de la popup pour éviter la fermeture immédiate
     
     /**
      * Initialize the favorites component
@@ -20,7 +21,7 @@ const Favorites = {
             return;
         }
         
-        // IMPORTANT: Prevent any type of animation during initial loading
+        // ! IMPORTANT: Prevent any type of animation during initial loading
         document.body.classList.add('loading-favorites');
         
         // Immediately hide the complete favorites list
@@ -47,7 +48,7 @@ const Favorites = {
             // Load favorites with animation instead of without animation
             this.loadFavoritesWithAnimation();
             
-            // IMPORTANT: Listen for locale changes to refresh the favorites
+            // ! IMPORTANT: Listen for locale changes to refresh the favorites
             document.removeEventListener('localeChanged', this.handleLocaleChange);
             this.boundHandleLocaleChange = this.handleLocaleChange.bind(this);
             document.addEventListener('localeChanged', this.boundHandleLocaleChange);
@@ -317,9 +318,19 @@ const Favorites = {
             // Gérer les clics sur les boutons
             if (target.closest('.load-favorite-btn')) {
                 e.stopPropagation();
+                e.preventDefault();
+                // Désactiver temporairement toutes les animations sur l'élément parent pour éviter tout effet indésirable
+                item.style.animation = 'none';
+                // Assurer que l'opacité reste à 1 pour éviter tout effet de fondu
+                item.style.opacity = '1';
                 this.loadFavorite(favorite.id);
             } else if (target.closest('.edit-favorite-btn')) {
                 e.stopPropagation();
+                e.preventDefault();
+                // Désactiver temporairement toutes les animations sur l'élément parent pour éviter tout effet indésirable
+                item.style.animation = 'none';
+                // Assurer que l'opacité reste à 1 pour éviter tout effet de fondu
+                item.style.opacity = '1';
                 this.editFavorite(favorite.id);
             } else if (target.closest('.delete-favorite-btn')) {
                 e.stopPropagation();
@@ -327,6 +338,8 @@ const Favorites = {
             } else {
                 // Clic sur la carte elle-même
                 console.log("[DEBUG] Clic sur favori détecté", favorite.id);
+                // Arrêter la propagation de l'événement pour éviter tout clic parasite
+                e.stopPropagation();
                 // Conserver le titre original non-traduit dans l'objet favori
                 favorite._originalTitle = title;
                 this.showFavoriteDetails(favorite);
@@ -451,6 +464,97 @@ const Favorites = {
         document.body.appendChild(commentDialog);
         document.body.appendChild(deleteDialog);
         
+        // Ajouter les styles d'animation pour les pop-ups
+        if (!document.getElementById('comment-delete-popup-styles')) {
+            const style = document.createElement('style');
+            style.id = 'comment-delete-popup-styles';
+            style.textContent = `
+                /* Animations keyframe explicites */
+                @keyframes popupFadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+                
+                @keyframes popupFadeOut {
+                    from { opacity: 1; }
+                    to { opacity: 0; }
+                }
+                
+                @keyframes popupScaleIn {
+                    from { transform: scale(0.8); }
+                    to { transform: scale(1); }
+                }
+                
+                @keyframes popupScaleOut {
+                    from { transform: scale(1); }
+                    to { transform: scale(0.8); }
+                }
+                
+                /* Styles d'animation */
+                .popup-opening {
+                    animation: popupFadeIn 0.25s forwards !important;
+                }
+                
+                .popup-opening > div {
+                    animation: popupScaleIn 0.25s forwards !important;
+                }
+                
+                .popup-closing {
+                    animation: popupFadeOut 0.25s forwards !important;
+                    pointer-events: none !important;
+                }
+                
+                .popup-closing > div {
+                    animation: popupScaleOut 0.25s forwards !important;
+                }
+                
+                #title-counter.at-limit, #description-counter.at-limit {
+                    color: #ef4444;
+                    animation: pulse 1s infinite;
+                }
+                
+                #title-counter.near-limit, #description-counter.near-limit {
+                    color: #f59e0b;
+                }
+                
+                @keyframes pulse {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.6; }
+                }
+            `;
+            document.head.appendChild(style);
+            console.log("[DEBUG] Styles des pop-ups de sauvegarde et suppression ajoutés");
+        }
+        
+        // Ajout : fermer la pop-up de sauvegarde si on clique en dehors du contenu
+        commentDialog.addEventListener('click', (e) => {
+            if (e.target === commentDialog) {
+                closeCommentDialogWithAnimation(() => {
+                    this.commentDialogCallback = null;
+                });
+            }
+        });
+        
+        // Ajout : fermer la pop-up de sauvegarde avec la touche Échap
+        const handleCommentEscape = (e) => {
+            if (e.key === 'Escape' && commentDialog && !commentDialog.classList.contains('hidden')) {
+                closeCommentDialogWithAnimation(() => {
+                    this.commentDialogCallback = null;
+                });
+            }
+        };
+        document.addEventListener('keydown', handleCommentEscape);
+        
+        // Ajout : fermer la pop-up de suppression avec la touche Échap
+        const handleDeleteEscape = (e) => {
+            if (e.key === 'Escape' && deleteDialog && !deleteDialog.classList.contains('hidden')) {
+                closeDeleteDialogWithAnimation(() => {
+                    this.deleteDialogCallback = null;
+                });
+            }
+        };
+        document.addEventListener('keydown', handleDeleteEscape);
+        
         // Comment dialog event listeners
         const commentInput = document.getElementById('comment-input');
         const descriptionInput = document.getElementById('description-input');
@@ -460,24 +564,19 @@ const Favorites = {
         
         // Function to close the comment dialog with animation
         const closeCommentDialogWithAnimation = (callback) => {
-            const dialogContent = commentDialog.querySelector('div');
-            
-            // Start the closing animation
-            commentDialog.classList.add('hidden');
-            commentDialog.classList.remove('flex');
-            commentDialog.style.opacity = '0';
-            if (dialogContent) {
-                dialogContent.style.transform = 'scale(0.95)';
-            }
+            // Appliquer la classe d'animation de fermeture
+            commentDialog.classList.remove('popup-opening');
+            commentDialog.classList.add('popup-closing');
             
             // After the animation, hide the dialog and execute the callback
             setTimeout(() => {
                 commentDialog.classList.add('hidden');
-                commentDialog.classList.remove('flex');
+                commentDialog.classList.remove('flex', 'popup-closing');
                 if (typeof callback === 'function') {
                     callback();
                 }
-            }, 150); // Réduit de 200ms à 150ms
+                console.log("[DEBUG] Popup de sauvegarde complètement fermé");
+            }, 270); // Légèrement plus que la durée d'animation pour s'assurer qu'elle est terminée
         };
         
         // Event handler for the cancel button
@@ -524,24 +623,19 @@ const Favorites = {
         
         // Function to close the delete dialog with animation
         const closeDeleteDialogWithAnimation = (callback) => {
-            const dialogContent = deleteDialog.querySelector('div');
-            
-            // Start the closing animation
-            deleteDialog.classList.add('hidden');
-            deleteDialog.classList.remove('flex');
-            deleteDialog.style.opacity = '0';
-            if (dialogContent) {
-                dialogContent.style.transform = 'scale(0.95)';
-            }
+            // Appliquer la classe d'animation de fermeture
+            deleteDialog.classList.remove('popup-opening');
+            deleteDialog.classList.add('popup-closing');
             
             // After the animation, hide the dialog and execute the callback
             setTimeout(() => {
                 deleteDialog.classList.add('hidden');
-                deleteDialog.classList.remove('flex');
+                deleteDialog.classList.remove('flex', 'popup-closing');
                 if (typeof callback === 'function') {
                     callback();
                 }
-            }, 150); // Réduit de 200ms à 150ms
+                console.log("[DEBUG] Popup de suppression complètement fermé");
+            }, 270); // Légèrement plus que la durée d'animation pour s'assurer qu'elle est terminée
         };
         
         cancelDeleteBtn.addEventListener('click', () => {
@@ -643,27 +737,13 @@ const Favorites = {
         this.commentDialogCallback = callback;
         
         // Show dialog with animation
-        commentDialog.classList.remove('hidden');
-        commentDialog.classList.add('flex');
-        commentDialog.style.opacity = '0';
-        const dialogContent = commentDialog.querySelector('div');
-        if (dialogContent) {
-            dialogContent.style.transform = 'scale(0.95)';
-        }
-        
-        // Force reflow to ensure animation plays
-        void commentDialog.offsetWidth;
-        
-        // Start animation
-        commentDialog.style.opacity = '1';
-        if (dialogContent) {
-            dialogContent.style.transform = 'scale(1)';
-        }
+        commentDialog.classList.remove('hidden', 'popup-closing');
+        commentDialog.classList.add('flex', 'popup-opening');
         
         // Focus input after animation
         setTimeout(() => {
             commentInput.focus();
-        }, 150); // Réduit de 200ms à 150ms
+        }, 150);
     },
     
     /**
@@ -685,22 +765,8 @@ const Favorites = {
         this.deleteDialogCallback = callback;
         
         // Show dialog with animation
-        deleteDialog.classList.remove('hidden');
-        deleteDialog.classList.add('flex');
-        deleteDialog.style.opacity = '0';
-        const dialogContent = deleteDialog.querySelector('div');
-        if (dialogContent) {
-            dialogContent.style.transform = 'scale(0.95)';
-        }
-        
-        // Force reflow to ensure animation plays
-        void deleteDialog.offsetWidth;
-        
-        // Start animation
-        deleteDialog.style.opacity = '1';
-        if (dialogContent) {
-            dialogContent.style.transform = 'scale(1)';
-        }
+        deleteDialog.classList.remove('hidden', 'popup-closing');
+        deleteDialog.classList.add('flex', 'popup-opening');
     },
     
     /**
@@ -996,9 +1062,33 @@ const Favorites = {
         const favoriteItem = this.favoritesList.querySelector(`[data-id="${id}"]`);
         if (!favoriteItem) return;
         
-        favoriteItem.classList.add('highlight-effect', 'border-blue-500');
+        // Préserver l'opacité et désactiver temporairement toute animation
+        favoriteItem.style.animation = 'none';
+        favoriteItem.style.opacity = '1';
+        favoriteItem.style.transform = 'translateY(0)';
+        
+        // Forcer un reflow pour s'assurer que le reset d'animation prend effet
+        void favoriteItem.offsetWidth;
+        
+        // Ajouter uniquement l'effet de surbrillance sans autres animations
+        favoriteItem.classList.add('border-blue-500');
+        
+        // Créer un effet de surbrillance personnalisé sans animation fadeOut
+        favoriteItem.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
+        
         setTimeout(() => {
-            favoriteItem.classList.remove('highlight-effect', 'border-blue-500');
+            // Nettoyer l'effet de surbrillance
+            favoriteItem.classList.remove('border-blue-500');
+            
+            // Transition douce pour revenir à la couleur de fond normale
+            favoriteItem.style.transition = 'background-color 0.5s ease-out';
+            favoriteItem.style.backgroundColor = '';
+            
+            // Après la transition, réactiver les animations normales
+            setTimeout(() => {
+                favoriteItem.style.animation = '';
+                favoriteItem.style.transition = '';
+            }, 500);
         }, 1500);
     },
     
@@ -1269,6 +1359,9 @@ const Favorites = {
         // Store the ID of the currently displayed favorite
         this.currentDetailedFavoriteId = favorite.id;
         
+        // Enregistrer le timestamp d'ouverture pour éviter la fermeture immédiate
+        this.popupOpenTimestamp = Date.now();
+        
         // Title and date
         const date = new Date(favorite.id);
         const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
@@ -1414,24 +1507,15 @@ const Favorites = {
             return;
         }
         
-        // Ensure all classes are correct before displaying
-        this.detailsPopup.className = 'fixed inset-0 items-center justify-center bg-black bg-opacity-50 z-50 transition-opacity duration-300 opacity-0';
+        // Affichage avec animation - UTILISE UNIQUEMENT LA CLASSE D'ANIMATION
+        this.detailsPopup.className = 'fixed inset-0 items-center justify-center bg-black bg-opacity-50 z-50 flex popup-opening';
         
-        // Make the popup visible - first remove hidden
-        this.detailsPopup.classList.remove('hidden');
-        this.detailsPopup.classList.add('flex');
-        
-        // Force a reflow before adding the show class for the animation to work properly 
-        void this.detailsPopup.offsetWidth;
-        
-        // Then add the show class for the animation
-        this.detailsPopup.classList.add('show');
-        
-        // Apply the styles to the inner div
-        const dialogContent = this.detailsPopup.querySelector('div');
-        if (dialogContent) {
-            dialogContent.style.transform = 'scale(1)';
-        }
+        // Désactiver temporairement les clics sur l'arrière-plan pour éviter les fermetures accidentelles
+        const backdropDiv = this.detailsPopup;
+        backdropDiv.style.pointerEvents = 'none';
+        setTimeout(() => {
+            backdropDiv.style.pointerEvents = 'auto';
+        }, 300);
         
         console.log("[DEBUG] Popup affiché avec succès");
     },
@@ -1445,21 +1529,16 @@ const Favorites = {
             // Automatic save before closing
             this.saveChangesIfNeeded();
             
-            // Ensure the animation works correctly
-            const dialogContent = this.detailsPopup.querySelector('div');
-            if (dialogContent) {
-                dialogContent.style.transform = 'scale(0.95)';
-            }
-            
-            this.detailsPopup.classList.remove('show');
-            this.detailsPopup.style.opacity = '0';
+            // Appliquer la classe d'animation de fermeture
+            this.detailsPopup.classList.remove('popup-opening');
+            this.detailsPopup.classList.add('popup-closing');
             
             // Hide after the animation
             setTimeout(() => {
                 this.detailsPopup.classList.add('hidden');
-                this.detailsPopup.classList.remove('flex');
+                this.detailsPopup.classList.remove('flex', 'popup-closing');
                 console.log("[DEBUG] Popup complètement fermé");
-            }, 300);
+            }, 270); // Légèrement plus que la durée d'animation pour s'assurer qu'elle est terminée
         } else {
             console.error("[ERROR] Tentative de fermeture du popup mais this.detailsPopup est null");
         }
@@ -1572,10 +1651,10 @@ const Favorites = {
 
         const popup = document.createElement('div');
         popup.id = 'favorite-details-popup';
-        popup.className = 'fixed inset-0 items-center justify-center bg-black bg-opacity-50 z-50 hidden transition-opacity duration-300 opacity-0';
+        popup.className = 'fixed inset-0 items-center justify-center bg-black bg-opacity-50 z-50 hidden';
         
         popup.innerHTML = `
-            <div class="bg-gray-900 rounded-xl p-6 shadow-xl max-w-md w-full border border-gray-800 transform transition-all duration-300 scale-95 mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="bg-gray-900 rounded-xl p-6 shadow-xl max-w-md w-full border border-gray-800 mx-4 max-h-[90vh] overflow-y-auto">
                 <!-- En-tête avec bouton de fermeture -->
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-semibold text-white flex items-center">
@@ -1850,7 +1929,23 @@ const Favorites = {
         if (overlay) {
             overlay.addEventListener('click', (e) => {
                 if (e.target === overlay) {
-                    this.closeDetailsPopup();
+                    // Vérifier si assez de temps s'est écoulé depuis l'ouverture pour éviter les fermetures accidentelles
+                    const now = Date.now();
+                    if (now - this.popupOpenTimestamp > 300) { // Attendre au moins 300ms après l'ouverture
+                        this.closeDetailsPopup();
+                    } else {
+                        console.log("[DEBUG] Clic ignoré - popup ouverte trop récemment", now - this.popupOpenTimestamp);
+                    }
+                }
+            });
+            
+            // Fermer la pop-up de détails avec la touche Échap
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && this.detailsPopup && !this.detailsPopup.classList.contains('hidden')) {
+                    const now = Date.now();
+                    if (now - this.popupOpenTimestamp > 300) { // Protection similaire pour la touche Échap
+                        this.closeDetailsPopup();
+                    }
                 }
             });
         }
@@ -1893,28 +1988,31 @@ const Favorites = {
             const style = document.createElement('style');
             style.id = 'favorite-details-popup-styles';
             style.textContent = `
-                #favorite-details-popup {
-                    transition: opacity 0.3s ease;
+                /* Utilisation des mêmes animations que les autres popups */
+                #favorite-details-popup.popup-opening {
+                    animation: popupFadeIn 0.25s forwards !important;
                 }
-                #favorite-details-popup.show {
-                    opacity: 1 !important;
+                
+                #favorite-details-popup.popup-opening > div {
+                    animation: popupScaleIn 0.25s forwards !important;
                 }
-                #favorite-details-popup > div {
-                    transition: transform 0.3s ease;
+                
+                #favorite-details-popup.popup-closing {
+                    animation: popupFadeOut 0.25s forwards !important;
+                    pointer-events: none !important;
                 }
-                #favorite-details-popup.show > div {
-                    transform: scale(1) !important;
+                
+                #favorite-details-popup.popup-closing > div {
+                    animation: popupScaleOut 0.25s forwards !important;
                 }
+                
                 #details-title-counter.at-limit, #details-description-counter.at-limit {
                     color: #ef4444;
                     animation: pulse 1s infinite;
                 }
+                
                 #details-title-counter.near-limit, #details-description-counter.near-limit {
                     color: #f59e0b;
-                }
-                @keyframes pulse {
-                    0%, 100% { opacity: 1; }
-                    50% { opacity: 0.6; }
                 }
             `;
             document.head.appendChild(style);
