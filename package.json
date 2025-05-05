@@ -4,7 +4,12 @@
   "description": "Un outil interactif pour les joueurs d'osu! permettant de visualiser et configurer la zone active de leur tablette graphique.",
   "author": "",
   "license": "ISC",
-  "keywords": ["osu", "tablet", "configuration", "gaming"],
+  "keywords": [
+    "osu",
+    "tablet",
+    "configuration",
+    "gaming"
+  ],
   "homepage": "https://github.com/sammy08300/Areasu#readme",
   "repository": {
     "type": "git",
