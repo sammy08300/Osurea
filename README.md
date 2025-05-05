@@ -5,7 +5,7 @@
     <img src="https://img.shields.io/badge/version-2.0-blue.svg" alt="Version">
   </a>
   <br />
-  <a href="README.fr.md">🇫🇷 Lire en français</a>
+  <a href="https://github.com/sammy08300/Osurea/blob/refacto/README-FR.md">🇫🇷 Lire en français</a>
 </div>
 
 ---
