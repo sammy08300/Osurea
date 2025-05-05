@@ -441,6 +441,18 @@ const ContextMenu = {
      * @param {string} position - The position name
      */
     showSuccessNotification(position) {
+        const translationKey = `area_position_${position}`;
+        
+        // Try to use the translation system
+        if (typeof window.__ === 'function') {
+            const translatedMessage = window.__(translationKey);
+            if (translatedMessage !== translationKey) {
+                this.showSuccess(translatedMessage);
+                return;
+            }
+        }
+        
+        // Fallback if translation is not available
         const positionNames = {
             'left': 'left',
             'right': 'right',

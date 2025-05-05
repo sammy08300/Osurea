@@ -114,7 +114,7 @@ const es = {
     "favorite_not_found": "Favorito no encontrado",
     "configuration_loaded": "Configuración cargada",
     "error_loading_config": "Error al cargar la configuración",
-    "edit_mode_activated": "Modo de edición activado - Modifique los parámetros y luego haga clic en \"Confirmar modificación\"",
+    "edit_mode_activated": "Modo de edición activado - Modifique los parámetros y luego haga clic en \"Aplicar modificación\"",
     "edit_mode_canceled": "Modo de edición cancelado",
     "favorite_deleted": "Favorito eliminado",
     "error_deleting_favorite": "Error al eliminar el favorito",
@@ -123,7 +123,20 @@ const es = {
     "title_truncated": "El título ha sido truncado a 32 caracteres",
     "description_truncated": "La descripción ha sido truncada a 144 caracteres",
     "configuration_saved": "Configuración guardada",
-    "error_saving_config": "Error al guardar la configuración"
+    "error_saving_config": "Error al guardar la configuración",
+    
+    // Position notifications
+    "area_position_center": "Área activa posicionada en el centro",
+    "area_position_left": "Área activa posicionada a la izquierda",
+    "area_position_right": "Área activa posicionada a la derecha",
+    "area_position_top": "Área activa posicionada arriba",
+    "area_position_bottom": "Área activa posicionada abajo",
+    "area_position_top-left": "Área activa posicionada arriba a la izquierda",
+    "area_position_top-right": "Área activa posicionada arriba a la derecha",
+    "area_position_bottom-left": "Área activa posicionada abajo a la izquierda",
+    "area_position_bottom-right": "Área activa posicionada abajo a la derecha",
+    "copied_info": "¡Información copiada!",
+    "copy_error": "Error al copiar la información"
 };
 
 export default es; 

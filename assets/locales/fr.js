@@ -114,7 +114,7 @@ const fr = {
     "favorite_not_found": "Favori introuvable",
     "configuration_loaded": "Configuration chargée",
     "error_loading_config": "Erreur lors du chargement de la configuration",
-    "edit_mode_activated": "Mode édition activé - Modifiez les paramètres puis cliquez sur \"Confirmer la modification\"",
+    "edit_mode_activated": "Mode édition activé - Modifiez les paramètres puis cliquez sur \"Valider la modification\"",
     "edit_mode_canceled": "Mode édition annulé",
     "favorite_deleted": "Favori supprimé",
     "error_deleting_favorite": "Erreur lors de la suppression du favori",
@@ -123,7 +123,20 @@ const fr = {
     "title_truncated": "Le titre a été tronqué à 32 caractères",
     "description_truncated": "La description a été tronquée à 144 caractères",
     "configuration_saved": "Configuration sauvegardée",
-    "error_saving_config": "Erreur lors de la sauvegarde de la configuration"
+    "error_saving_config": "Erreur lors de la sauvegarde de la configuration",
+    
+    // Position notifications
+    "area_position_center": "Zone active positionnée au centre",
+    "area_position_left": "Zone active positionnée à gauche",
+    "area_position_right": "Zone active positionnée à droite",
+    "area_position_top": "Zone active positionnée en haut",
+    "area_position_bottom": "Zone active positionnée en bas",
+    "area_position_top-left": "Zone active positionnée en haut à gauche",
+    "area_position_top-right": "Zone active positionnée en haut à droite",
+    "area_position_bottom-left": "Zone active positionnée en bas à gauche",
+    "area_position_bottom-right": "Zone active positionnée en bas à droite",
+    "copied_info": "Informations copiées !",
+    "copy_error": "Erreur lors de la copie"
 };
 
 export default fr; 

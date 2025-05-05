@@ -599,10 +599,10 @@ Centre Y: ${formatNumber(offsetY, 3)} mm`;
             
             navigator.clipboard.writeText(info)
                 .then(() => {
-                    Notifications.success('Informations copiées !');
+                    Notifications.success('copied_info');
                 })
                 .catch(() => {
-                    Notifications.error('Erreur lors de la copie'); 
+                    Notifications.error('copy_error'); 
                     console.error('Failed to copy text: ', info);
                 });
         });

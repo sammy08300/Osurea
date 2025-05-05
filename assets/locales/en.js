@@ -113,7 +113,7 @@ const en = {
     "favorite_not_found": "Favorite not found",
     "configuration_loaded": "Configuration loaded",
     "error_loading_config": "Error loading the configuration",
-    "edit_mode_activated": "Edit mode activated - Modify the parameters then click \"Confirm modification\"",
+    "edit_mode_activated": "Edit mode activated - Modify parameters then click \"Apply modification\"",
     "edit_mode_canceled": "Edit mode canceled",
     "favorite_deleted": "Favorite deleted",
     "error_deleting_favorite": "Error deleting favorite",
@@ -122,7 +122,20 @@ const en = {
     "title_truncated": "Title has been truncated to 32 characters",
     "description_truncated": "Description has been truncated to 144 characters",
     "configuration_saved": "Configuration saved",
-    "error_saving_config": "Error saving configuration"
+    "error_saving_config": "Error saving configuration",
+    
+    // Position notifications
+    "area_position_center": "Active area positioned at center",
+    "area_position_left": "Active area positioned at left",
+    "area_position_right": "Active area positioned at right",
+    "area_position_top": "Active area positioned at top",
+    "area_position_bottom": "Active area positioned at bottom",
+    "area_position_top-left": "Active area positioned at top-left",
+    "area_position_top-right": "Active area positioned at top-right",
+    "area_position_bottom-left": "Active area positioned at bottom-left",
+    "area_position_bottom-right": "Active area positioned at bottom-right",
+    "copied_info": "Information copied!",
+    "copy_error": "Error copying information"
 };
 
 export default en; 
