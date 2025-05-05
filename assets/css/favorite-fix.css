@@ -1,0 +1,101 @@
+/*
+====================================================
+  Fix for Favorite Item Bounce Issue
+====================================================*/
+
+/* Stabiliser les cartes avec une largeur de base pour éviter les rétrécissements */
+.favorite-item {
+    transform-box: border-box !important;
+    box-sizing: border-box !important;
+    will-change: none !important; /* Désactiver les optimisations qui peuvent causer des problèmes */
+}
+
+/* Exception pour permettre l'effet de clic sur les cartes */
+.favorite-item.card-click-effect {
+    will-change: transform !important;
+    transition: transform 0.08s ease, box-shadow 0.08s ease !important;
+}
+
+/* Ajout de z-index et position pour éviter que les boutons soient affectés par l'animation de la carte */
+.load-favorite-btn:active, .edit-favorite-btn:active, .delete-favorite-btn:active {
+    transform: translateY(0) !important;
+    transform-style: flat !important;
+    transform-origin: center !important;
+    position: relative;
+    z-index: 5;
+    scale: 1 !important;
+    transition-property: background-color, color !important; /* Permettre uniquement les transitions de couleur */
+}
+
+/* S'assurer que les icônes SVG dans les boutons ne bougent pas non plus */
+.load-favorite-btn:active svg, .edit-favorite-btn:active svg, .delete-favorite-btn:active svg {
+    transform: none !important;
+    transition: none !important;
+}
+
+/* Stabiliser les conteneurs parents dans la carte */
+.favorite-item > div,
+.favorite-item > p,
+.favorite-item > span {
+    width: 100% !important;
+    max-width: 100% !important;
+    transition: none !important;
+    transform: none !important;
+}
+
+/* Empêcher spécifiquement l'effet de rebond sur la carte parente quand on clique sur les boutons */
+.favorite-item:has(.load-favorite-btn:active),
+.favorite-item:has(.edit-favorite-btn:active),
+.favorite-item:has(.delete-favorite-btn:active) {
+    transform: none !important;
+    width: 100% !important; /* Empêcher le rétrécissement */
+    max-width: 100% !important;
+    min-width: initial !important;
+    height: auto !important;
+    top: 4px !important; /* Maintenir la position initiale */
+    animation: none !important;
+    transition: none !important;
+    box-shadow: inherit !important; /* Conserver l'ombre actuelle */
+    outline: none !important;
+    perspective: none !important; /* Désactiver les effets 3D potentiels */
+    backface-visibility: visible !important;
+    transform-style: flat !important;
+    display: block !important; /* Empêcher les changements de display */
+    margin-right: 0 !important; /* Maintenir les marges */
+    border-radius: inherit !important; /* Conserver les coins arrondis */
+    right: 0 !important; /* Fixer le côté droit */
+    left: 0 !important; /* Fixer le côté gauche */
+    scale: 1 !important; /* Empêcher toute mise à l'échelle */
+}
+
+/* Empêcher les déformations sur tous les éléments enfants de la carte */
+.favorite-item:has(.load-favorite-btn:active) *,
+.favorite-item:has(.edit-favorite-btn:active) *,
+.favorite-item:has(.delete-favorite-btn:active) * {
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+    scale: 1 !important;
+} 
+
+/*
+====================================================
+  Animation de la popup des détails - SIMPLIFIÉE
+====================================================*/
+
+/* Animation simple pour la popup */
+#favorite-details-popup {
+    transition: opacity 0.18s ease !important;
+}
+
+#favorite-details-popup > div {
+    transition: transform 0.18s ease !important;
+}
+
+#favorite-details-popup.show {
+    opacity: 1 !important;
+}
+
+#favorite-details-popup.show > div {
+    transform: scale(1) !important;
+} 

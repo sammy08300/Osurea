@@ -1,96 +1,102 @@
-const fs = require('fs');
+const fs = require('fs').promises;
+const fsSync = require('fs');
 const path = require('path');
 
-try {
-  // Create public directory if it doesn't exist
-  if (!fs.existsSync('public')) {
-    fs.mkdirSync('public');
-    console.log("Created public directory.");
-  }
-
-  // List of all files to copy to public
-  const filesToCopy = [
+// Configuration
+const CONFIG = {
+  publicDir: 'public',
+  rootFiles: [
     'index.html',
     '404.html',
     'service-worker.js',
     'manifest.webmanifest'
-  ];
+  ],
+  dirsToCopy: ['assets', 'data']
+};
 
-  // Copy each file to public
+// Create directory if it doesn't exist
+async function ensureDir(dirPath) {
+  try {
+    await fs.mkdir(dirPath, { recursive: true });
+    console.log(`Created directory ${dirPath}`);
+  } catch (err) {
+    if (err.code !== 'EEXIST') {
+      throw err;
+    }
+  }
+}
+
+// Copy a single file
+async function copyFile(src, dest) {
+  try {
+    await fs.copyFile(src, dest);
+    console.log(`- Copied ${src} to ${dest}`);
+  } catch (err) {
+    console.error(`Error copying file ${src} to ${dest}:`, err);
+  }
+}
+
+// Copy all root files to public directory
+async function copyRootFiles() {
   console.log("Copying root files to public...");
-  filesToCopy.forEach(file => {
-    try {
-      fs.copyFileSync(file, path.join('public', file));
-      console.log(`- Copied ${file}`);
-    } catch (err) {
-      console.error(`Error copying file ${file}:`, err);
-    }
+  
+  const copyPromises = CONFIG.rootFiles.map(file => {
+    return copyFile(file, path.join(CONFIG.publicDir, file));
   });
+  
+  await Promise.allSettled(copyPromises);
+}
 
-  // Create directories in public if they don't exist
-  const directories = ['assets'];
-  directories.forEach(dir => {
-    const publicDirPath = path.join('public', dir);
-    if (!fs.existsSync(publicDirPath)) {
-      try {
-        fs.mkdirSync(publicDirPath, { recursive: true });
-        console.log(`Created directory ${publicDirPath}`);
-      } catch (err) {
-        console.error(`Error creating directory ${publicDirPath}:`, err);
+// Recursively copy directory
+async function copyDir(src, dest) {
+  try {
+    // Create destination directory
+    await ensureDir(dest);
+    
+    // Read source directory
+    const entries = await fs.readdir(src, { withFileTypes: true });
+    
+    // Process each entry
+    const copyPromises = entries.map(async entry => {
+      const srcPath = path.join(src, entry.name);
+      const destPath = path.join(dest, entry.name);
+      
+      if (entry.isDirectory()) {
+        await copyDir(srcPath, destPath);
+      } else {
+        await copyFile(srcPath, destPath);
       }
-    }
-  });
+    });
+    
+    await Promise.allSettled(copyPromises);
+  } catch (err) {
+    console.error(`Error copying directory ${src} to ${dest}:`, err);
+  }
+}
 
-  // Copy assets recursively
-  function copyDir(src, dest) {
-    try {
-      fs.mkdirSync(dest, { recursive: true });
-    } catch (err) {
-      // Ignore error if directory already exists, otherwise log
-      if (err.code !== 'EEXIST') {
-        console.error(`Error creating directory ${dest}:`, err);
-        return; // Stop copying this directory if creation failed
+// Main build function
+async function build() {
+  try {
+    // Ensure public directory exists
+    await ensureDir(CONFIG.publicDir);
+    
+    // Copy root files
+    await copyRootFiles();
+    
+    // Copy directories
+    for (const dir of CONFIG.dirsToCopy) {
+      if (fsSync.existsSync(dir)) {
+        console.log(`Copying ${dir} directory...`);
+        await copyDir(dir, path.join(CONFIG.publicDir, dir));
       }
     }
     
-    let entries;
-    try {
-        entries = fs.readdirSync(src, { withFileTypes: true });
-    } catch (err) {
-        console.error(`Error reading directory ${src}:`, err);
-        return; // Stop processing this directory
-    }
-
-
-    for (let entry of entries) {
-      const srcPath = path.join(src, entry.name);
-      const destPath = path.join(dest, entry.name);
-
-      try {
-        if (entry.isDirectory()) {
-          copyDir(srcPath, destPath);
-        } else {
-          fs.copyFileSync(srcPath, destPath);
-        }
-      } catch (err) {
-        console.error(`Error copying ${entry.isDirectory() ? 'directory' : 'file'} from ${srcPath} to ${destPath}:`, err);
-      }
-    }
+    console.log('\nBuild completed successfully!');
+  } catch (err) {
+    console.error('\nBuild failed:', err);
+    process.exit(1);
   }
+}
 
-  // Copy assets directory to public
-  console.log("Copying assets directory...");
-  copyDir('assets', path.join('public', 'assets'));
-
-  // Copy data directory if it exists
-  if (fs.existsSync('data')) {
-    console.log("Copying data directory...");
-    copyDir('data', path.join('public', 'data'));
-  }
-
-  console.log('\nBuild completed successfully!');
-
-} catch (err) {
-  console.error('\nBuild failed:', err);
-  process.exit(1); // Exit with error code
-} 
+// Run the build
+build(); 

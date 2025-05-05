@@ -1,105 +1,160 @@
 const fr = {
-    // Navigation elements and header
-    "app_title": "Area Visualizer",
-    "app_description": "Visualiseur d'area pour les joueurs d'osu! Configurez et visualisez votre zone active précisément, sauvegardez vos configurations dans des favoris et partagez-les.",
+    // Informations générales de l'application
+    app: {
+        title: "Area Visualizer",
+        description: "Visualiseur d'area pour les joueurs d'osu! Configurez et visualisez votre zone active précisément, sauvegardez vos configurations dans des favoris et partagez-les."
+    },
     
-    // Tablet settings
-    "tablet_settings": "Paramètres Tablette",
-    "tablet_model": "Modèle de Tablette",
-
-    "search_tablet": "Rechercher une tablette...",
-    "search": "Rechercher...",
-    "custom_tablet": "Tablette personnalisée",
-    "tablet_width": "Largeur de la tablette",
-    "tablet_height": "Hauteur de la tablette",
-    "tablet_units": "mm",
+    // Paramètres de la tablette
+    tablet: {
+        settings: "Paramètres Tablette",
+        model: "Modèle de Tablette",
+        selectModel: "Sélectionner un modèle",
+        search: "Rechercher...",
+        searchTablet: "Rechercher une tablette...",
+        custom: "Tablette personnalisée",
+        customDimensions: "Dimensions personnalisées",
+        width: "Largeur de la tablette",
+        height: "Hauteur de la tablette",
+        units: "mm",
+        rotation: "Rotation de la tablette",
+        degrees: "degrés"
+    },
     
-    // Area settings
-    "area_settings": "Configuration de la zone",
-    "area_width": "Largeur de la zone",
-    "area_height": "Hauteur de la zone",
-    "area_radius": "Rayon de la bordure",
-    "ratio": "Ratio",
-    "lock_ratio": "Verrouiller le ratio",
-    "area_position": "Position de la zone",
-    "position_x": "Position X",
-    "position_y": "Position Y",
-    "center": "Centrer",
-    "swap": "Inverser",
+    // Configuration de la zone active
+    area: {
+        settings: "Configuration de la zone",
+        width: "Largeur de la zone",
+        height: "Hauteur de la zone",
+        radius: "Rayon de la bordure",
+        ratio: "Ratio",
+        lockRatio: "Verrouiller le ratio",
+        position: "Position de la zone",
+        positionX: "Position X",
+        positionY: "Position Y",
+        center: "Centrer",
+        swap: "Inverser",
+        drag: "Glissez la zone pour la positionner",
+        rightClick: "Clic droit pour plus d'options"
+    },
     
-    // Visual options
-    "visual_options": "Options visuelles",
-    "show_grid": "Grille",
-    "snap_grid": "Aligner sur la grille",
-    "tablet_rotation": "Rotation de la tablette",
-    "degrees": "degrés",
+    // Options visuelles
+    visual: {
+        options: "Options visuelles",
+        showGrid: "Grille",
+        snapGrid: "Aligner sur la grille",
+        visualization: "Visualisation"
+    },
     
-    // Display and visualization
-    "tablet_visualization": "Visualisation",
-    "drag_area": "Glissez la zone pour la positionner",
-    "right_click_options": "Clic droit pour plus d'options",
+    // Système de favoris
+    favorites: {
+        title: "Favoris",
+        noFavorites: "Aucun favori enregistré. Sauvegardez une configuration pour la retrouver ici.",
+        save: "Enregistrer la configuration actuelle",
+        name: "Nom du favori",
+        namePlaceholder: "Nom du favori (optionnel)",
+        description: "Description",
+        descriptionPlaceholder: "Description (optionnelle)",
+        defaultName: "Configuration sauvegardée",
+        saveButton: "Sauvegarder",
+        cancelButton: "Annuler",
+        deleteButton: "Supprimer",
+        editButton: "Modifier",
+        sortBy: "Trier par",
+        sortDate: "Date",
+        sortName: "Nom",
+        sortSize: "Taille",
+        sortModified: "Modifié",
+        creationDate: "Création:",
+        lastModified: "Dernière modification:",
+        dimensions: "Dimensions:",
+        surfaceArea: "Surface:",
+        load: "Charger",
+        deleteConfirm: "Confirmer la suppression",
+        warning: "Attention",
+        confirmModification: "Valider la modification",
+        deleteWarning: "Êtes-vous sûr de vouloir supprimer cette configuration ? Cette action est irréversible et ne peut pas être annulée.",
+        itemTitle: "Titre"
+    },
     
-    // Favorites
-    "favorites": "Favoris",
-    "no_favorites": "Aucun favori enregistré. Sauvegardez une configuration pour la retrouver ici.",
-    "save_favorite": "Enregistrer la configuratio actuelle",
-    "favorite_name": "Nom du favori",
-    "favorite_name_placeholder": "Nom du favori (optionnel)",
-    "favorite_description": "Description",
-    "favorite_description_placeholder": "Description (optionnelle)",
-    "default_favorite_name": "Configuration sauvegardée",
-    "save": "Sauvegarder",
-    "cancel": "Annuler",
-    "delete": "Supprimer",
-    "edit": "Modifier",
-    "sort_by": "Trier par",
-    "sort_date": "Date",
-    "sort_name": "Nom",
-    "sort_size": "Taille",
+    // Résumé et informations
+    summary: {
+        title: "Récapitulatif",
+        currentConfig: "Configuration actuelle",
+        copyInfo: "Copier",
+        copied: "Copié !"
+    },
     
-    // Summary
-    "summary": "Récapitulatif",
-    "current_config": "Configuration actuelle",
-    "copy_info": "Copier",
-    "copied": "Copié !",
+    // Alignement et positionnement
+    alignment: {
+        title: "Positionnement de la zone active",
+        center: "Centrer",
+        left: "Gauche",
+        right: "Droite",
+        top: "Haut",
+        bottom: "Bas",
+        topLeft: "Haut-Gauche",
+        topRight: "Haut-Droite",
+        bottomLeft: "Bas-Gauche",
+        bottomRight: "Bas-Droite"
+    },
     
-    // Alignment
-    "alignment": "Positionnement de la zone active",
-    "align_center": "Centrer",
-    "align_left": "Gauche",
-    "align_right": "Droite",
-    "align_top": "Haut",
-    "align_bottom": "Bas",
-    "align_topleft": "Haut-Gauche",
-    "align_topright": "Haut-Droite",
-    "align_bottomleft": "Bas-Gauche",
-    "align_bottomright": "Bas-Droite",
+    // Messages généraux
+    messages: {
+        confirmDelete: "Êtes-vous sûr de vouloir supprimer ce favori ?",
+        yes: "Oui",
+        no: "Non",
+        somethingWrong: "Une erreur est survenue.",
+        noConnection: "Vous êtes hors ligne, mais Osu!rea fonctionne toujours !",
+        offlineFeature: "Cette fonctionnalité nécessite une connexion internet."
+    },
     
-    // Messages 
-    "confirm_delete": "Êtes-vous sûr de vouloir supprimer ce favori ?",
-    "yes": "Oui",
-    "no": "Non",
-    "something_wrong": "Une erreur est survenue.",
-    "no_connection": "Vous êtes hors ligne, mais Osu!rea fonctionne toujours !",
-    "offline_feature": "Cette fonctionnalité nécessite une connexion internet.",
+    // Langue et paramètres linguistiques
+    language: {
+        title: "Langue",
+        fr: "Français",
+        en: "English",
+        es: "Español",
+        autoDetect: "Détecter automatiquement"
+    },
     
-    // Favorite details
-    "creation_date": "Création:",
-    "last_modified": "Dernière modification:",
-    "dimensions": "Dimensions:",
-    "surface_area": "Surface:",
-    "load": "Charger",
+    // Pied de page
+    footer: {
+        credit: "Conçu pour la communauté osu! par Yuzuctus",
+        description: "Utilisez cet outil pour visualiser et sauvegarder votre zone active de tablette graphique."
+    },
     
-    // Language selector
-    "language": "Langue",
-    "language_fr": "Français",
-    "language_en": "English",
-    "language_es": "Español",
-    "auto_detect_language": "Détecter automatiquement",
-    
-    // Footer
-    "footer_credit": "Conçu pour la communauté osu! par Yuzuctus",
-    "footer_description": "Utilisez cet outil pour visualiser et sauvegarder votre zone active de tablette graphique."
+    // Messages de notification
+    notifications: {
+        favoriteNotFound: "Favori introuvable",
+        configurationLoaded: "Configuration chargée",
+        errorLoadingConfig: "Erreur lors du chargement de la configuration",
+        editModeActivated: "Mode édition activé - Modifiez les paramètres puis cliquez sur \"Valider la modification\"",
+        editModeCanceled: "Mode édition annulé",
+        favoriteDeleted: "Favori supprimé",
+        errorDeletingFavorite: "Erreur lors de la suppression du favori",
+        configurationUpdated: "Configuration mise à jour",
+        errorUpdatingConfig: "Erreur lors de la mise à jour de la configuration",
+        titleTruncated: "Le titre a été tronqué à 32 caractères",
+        descriptionTruncated: "La description a été tronquée à 144 caractères",
+        configurationSaved: "Configuration sauvegardée",
+        errorSavingConfig: "Erreur lors de la sauvegarde de la configuration",
+        areaPositionCenter: "Zone active positionnée au centre",
+        areaPositionLeft: "Zone active positionnée à gauche",
+        areaPositionRight: "Zone active positionnée à droite",
+        areaPositionTop: "Zone active positionnée en haut",
+        areaPositionBottom: "Zone active positionnée en bas",
+        areaPositionTopLeft: "Zone active positionnée en haut à gauche",
+        areaPositionTopRight: "Zone active positionnée en haut à droite",
+        areaPositionBottomLeft: "Zone active positionnée en bas à gauche",
+        areaPositionBottomRight: "Zone active positionnée en bas à droite",
+        copiedInfo: "Informations copiées !",
+        copyError: "Erreur lors de la copie",
+        invalidDimensions: "Dimensions invalides pour l'alignement",
+        tabletDataError: "Erreur de chargement des données tablettes",
+        errorSavingPreferences: "Impossible de sauvegarder vos préférences",
+        preferencesReset: "Préférences réinitialisées"
+    }
 };
 
 export default fr; 

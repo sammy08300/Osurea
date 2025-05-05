@@ -1,105 +1,156 @@
 const en = {
-    // Navigation and header elements
-    "app_title": "Area Visualizer",
-    "app_description": "Area visualizer for osu! players who use a graphics tablet. Configure and precisely visualize your active area, save your configurations as favorites and share them.",
+    // Informations générales de l'application
+    app: {
+        title: "Area Visualizer",
+        description: "Area visualizer for osu! players who use a graphics tablet. Configure and precisely visualize your active area, save your configurations as favorites and share them."
+    },
     
-    // Tablet Settings
-    "tablet_settings": "Tablet Settings",
-    "tablet_model": "Tablet Model",
-    "select_model": "Select a model",
-    "search_tablet": "Search for a tablet...",
-    "search": "Search...",
-    "custom_tablet": "Custom tablet",
-    "tablet_width": "Tablet width",
-    "tablet_height": "Tablet height",
-    "tablet_units": "mm",
+    // Paramètres de la tablette
+    tablet: {
+        settings: "Tablet Settings",
+        model: "Tablet Model",
+        selectModel: "Select a model",
+        search: "Search...",
+        searchTablet: "Search for a tablet...",
+        custom: "Custom tablet",
+        customDimensions: "Custom dimensions",
+        width: "Tablet width",
+        height: "Tablet height",
+        units: "mm",
+        rotation: "Tablet rotation",
+        degrees: "degrees"
+    },
     
-    // Area Configuration
-    "area_settings": "Area Configuration",
-    "area_width": "Area width",
-    "area_height": "Area height",
-    "area_radius": "Border radius",
-    "ratio": "Ratio",
-    "lock_ratio": "Lock ratio",
-    "area_position": "Area position",
-    "position_x": "X Position",
-    "position_y": "Y Position",
-    "center": "Center",
-    "swap": "Reverse",
+    // Configuration de la zone active
+    area: {
+        settings: "Area Configuration",
+        width: "Area width",
+        height: "Area height",
+        radius: "Border radius",
+        ratio: "Ratio",
+        lockRatio: "Lock ratio",
+        position: "Area position",
+        positionX: "X Position",
+        positionY: "Y Position",
+        center: "Center",
+        swap: "Reverse",
+        drag: "Drag the area to position it",
+        rightClick: "Right-click for more options"
+    },
     
-    // Visual Options
-    "visual_options": "Visual Options",
-    "show_grid": "Grid",
-    "snap_grid": "Snap to grid",
-    "tablet_rotation": "Tablet rotation",
-    "degrees": "degrees",
+    // Options visuelles
+    visual: {
+        options: "Visual Options",
+        showGrid: "Grid",
+        snapGrid: "Snap to grid",
+        visualization: "Visualization"
+    },
     
-    // Display and Visualization
-    "tablet_visualization": "Visualization",
-    "drag_area": "Drag the area to position it",
-    "right_click_options": "Right-click for more options",
+    // Système de favoris
+    favorites: {
+        title: "Favorites",
+        noFavorites: "No favorites saved. Save a configuration to find it here.",
+        save: "Save configuration",
+        name: "Favorite name",
+        namePlaceholder: "Favorite name (optional)",
+        description: "Description",
+        descriptionPlaceholder: "Description (optional)",
+        defaultName: "Saved configuration",
+        saveButton: "Save",
+        cancelButton: "Cancel",
+        deleteButton: "Delete",
+        editButton: "Edit",
+        sortBy: "Sort by",
+        sortDate: "Date",
+        sortName: "Name",
+        sortSize: "Size",
+        sortModified: "Modified",
+        creationDate: "Creation:",
+        lastModified: "Last modified:",
+        dimensions: "Dimensions:",
+        surfaceArea: "Surface:",
+        load: "Load",
+        deleteConfirm: "Confirm deletion",
+        warning: "Warning",
+        confirmModification: "Confirm modification",
+        deleteWarning: "Are you sure you want to delete this configuration? This action cannot be undone.",
+        itemTitle: "Title"
+    },
     
-    // Favorites
-    "favorites": "Favorites",
-    "no_favorites": "No favorites saved. Save a configuration to find it here.",
-    "save_favorite": "Save configuration",
-    "favorite_name": "Favorite name",
-    "favorite_name_placeholder": "Favorite name (optional)",
-    "favorite_description": "Description",
-    "favorite_description_placeholder": "Description (optional)",
-    "default_favorite_name": "Saved configuration",
-    "save": "Save",
-    "cancel": "Cancel",
-    "delete": "Delete",
-    "edit": "Edit",
-    "sort_by": "Sort by",
-    "sort_date": "Date",
-    "sort_name": "Name",
-    "sort_size": "Size",
+    // Résumé et informations
+    summary: {
+        title: "Summary",
+        currentConfig: "Current configuration",
+        copyInfo: "Copy",
+        copied: "Copied!"
+    },
     
-    // Summary
-    "summary": "Summary",
-    "current_config": "Current configuration",
-    "copy_info": "Copy",
-    "copied": "Copied!",
+    // Alignement et positionnement
+    alignment: {
+        title: "Area Positioning",
+        center: "Center",
+        left: "Left",
+        right: "Right",
+        top: "Top",
+        bottom: "Bottom",
+        topLeft: "Top-Left",
+        topRight: "Top-Right",
+        bottomLeft: "Bottom-Left",
+        bottomRight: "Bottom-Right"
+    },
     
-    // Alignment
-    "alignment": "Area Positioning",
-    "align_center": "Center",
-    "align_left": "Left",
-    "align_right": "Right",
-    "align_top": "Top",
-    "align_bottom": "Bottom",
-    "align_topleft": "Top-Left",
-    "align_topright": "Top-Right",
-    "align_bottomleft": "Bottom-Left",
-    "align_bottomright": "Bottom-Right",
+    // Messages généraux
+    messages: {
+        confirmDelete: "Are you sure you want to delete this favorite?",
+        yes: "Yes",
+        no: "No",
+        somethingWrong: "Something went wrong.",
+        noConnection: "You are offline, but Osu!rea still works!",
+        offlineFeature: "This feature requires an internet connection."
+    },
     
-    // Messages
-    "confirm_delete": "Are you sure you want to delete this favorite?",
-    "yes": "Yes",
-    "no": "No",
-    "something_wrong": "Something went wrong.",
-    "no_connection": "You are offline, but Osu!rea still works!",
-    "offline_feature": "This feature requires an internet connection.",
+    // Langue et paramètres linguistiques
+    language: {
+        title: "Language",
+        fr: "Français",
+        en: "English",
+        es: "Español",
+        autoDetect: "Auto-detect language"
+    },
     
-    // Favorite details
-    "creation_date": "Creation:",
-    "last_modified": "Last modified:",
-    "dimensions": "Dimensions:",
-    "surface_area": "Surface:",
-    "load": "Load",
+    // Pied de page
+    footer: {
+        credit: "Designed for the osu! community by Yuzuctus",
+        description: "Use this tool to visualize and save your graphics tablet's active area."
+    },
     
-    // Language Selector
-    "language": "Language",
-    "language_fr": "Français",
-    "language_en": "English",
-    "language_es": "Español",
-    "auto_detect_language": "Auto-detect language",
-    
-    // Footer
-    "footer_credit": "Designed for the osu! community by Yuzuctus",
-    "footer_description": "Use this tool to visualize and save your graphics tablet's active area."
+    // Messages de notification
+    notifications: {
+        favoriteNotFound: "Favorite not found",
+        configurationLoaded: "Configuration loaded",
+        errorLoadingConfig: "Error loading the configuration",
+        editModeActivated: "Edit mode activated - Modify parameters then click \"Apply modification\"",
+        editModeCanceled: "Edit mode canceled",
+        favoriteDeleted: "Favorite deleted",
+        errorDeletingFavorite: "Error deleting favorite",
+        configurationUpdated: "Configuration updated",
+        errorUpdatingConfig: "Error updating configuration",
+        titleTruncated: "Title has been truncated to 32 characters",
+        descriptionTruncated: "Description has been truncated to 144 characters",
+        configurationSaved: "Configuration saved",
+        errorSavingConfig: "Error saving configuration",
+        areaPositionCenter: "Active area positioned at center",
+        areaPositionLeft: "Active area positioned at left",
+        areaPositionRight: "Active area positioned at right",
+        areaPositionTop: "Active area positioned at top",
+        areaPositionBottom: "Active area positioned at bottom",
+        areaPositionTopLeft: "Active area positioned at top-left",
+        areaPositionTopRight: "Active area positioned at top-right",
+        areaPositionBottomLeft: "Active area positioned at bottom-left",
+        areaPositionBottomRight: "Active area positioned at bottom-right",
+        copiedInfo: "Information copied!",
+        copyError: "Error copying information"
+    }
 };
 
 export default en; 

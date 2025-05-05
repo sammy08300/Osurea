@@ -4,6 +4,11 @@
   <a href="https://github.com/sammy08300/Areasu/tree/v2git">
     <img src="https://img.shields.io/badge/version-2.0-blue.svg" alt="Version">
   </a>
+  <a href="https://osurea.vercel.app/">
+    <img src="https://img.shields.io/badge/Visiter%20le%20site-Osu!rea-green.svg" alt="Visiter le site" style="margin-left: 8px;">
+  </a>
+  <br />
+  <a href="README-FR.md">🇫🇷 Lire en français</a> | <a href="README-ES.md">🇪🇸 Leer en español</a>
 </div>
 
 ---
