@@ -31,103 +31,48 @@ const cachedElements = {
     areaOffsetYInput: document.getElementById('areaOffsetY')
 };
 
-// Scaling and display variables 
+// State variables
 let currentScale = 1;
 let isDragging = false;
 let dragStartX = 0;
 let dragStartY = 0;
 let dragStartOffsetX = 0;
 let dragStartOffsetY = 0;
-
-// Rayon de courbure - défini comme une variable globale pour l'accès externe
 window.currentRadius = 0;
 let currentRadius = window.currentRadius;
-
-// Variables to avoid frequent recalculations
 let containerSize = { width: 0, height: 0 };
 let tabletSize = { width: 0, height: 0 };
-let containerPadding = 40;
+const containerPadding = 40;
 
 // Throttled update function to limit frequency
 const throttledUpdateDisplay = throttle(updateDisplay, 16); // ~60fps
 
-// Update the container size when it changes
+/**
+ * Updates the container size when it changes
+ */
 function updateContainerSize() {
     containerSize.width = visualContainer.clientWidth - containerPadding;
     containerSize.height = visualContainer.clientHeight - containerPadding;
 }
 
 /**
- * Updates the visual display of the tablet and area
+ * Gets current tablet and area dimensions
  */
-function updateDisplay() {
-    // Use cached elements and parseFloatSafe which is optimized
-    const tabletWidth = parseFloatSafe(cachedElements.tabletWidthInput.value);
-    const tabletHeight = parseFloatSafe(cachedElements.tabletHeightInput.value);
-    const areaWidth = parseFloatSafe(cachedElements.areaWidthInput.value);
-    const areaHeight = parseFloatSafe(cachedElements.areaHeightInput.value);
-    
-    // Check if the offset inputs are focused (manual editing)
-    const isOffsetXFocused = document.activeElement === cachedElements.areaOffsetXInput;
-    const isOffsetYFocused = document.activeElement === cachedElements.areaOffsetYInput;
-    
-    // Don't process empty or invalid offset values if they are being edited
-    let areaOffsetX, areaOffsetY;
-    
-    if (isOffsetXFocused && cachedElements.areaOffsetXInput.value.trim() === '') {
-        // Use a temporary value at the center for the visualization
-        areaOffsetX = tabletWidth / 2;
-    } else {
-        areaOffsetX = parseFloatSafe(cachedElements.areaOffsetXInput.value);
-    }
-    
-    if (isOffsetYFocused && cachedElements.areaOffsetYInput.value.trim() === '') {
-        // Use a temporary value at the center for the visualization
-        areaOffsetY = tabletHeight / 2;
-    } else {
-        areaOffsetY = parseFloatSafe(cachedElements.areaOffsetYInput.value);
-    }
-    
-    if (!isValidNumber(tabletWidth, 10) || !isValidNumber(tabletHeight, 10)) {
-        console.warn('Invalid tablet dimensions');
-        return;
-    }
-    
-    // Don't constrain values if the fields are being edited
-    if (!isOffsetXFocused && !isOffsetYFocused) {
-        // Constrain the offsets within the tablet boundaries
-        const constrainedOffsets = constrainAreaOffset(
-            areaOffsetX, 
-            areaOffsetY, 
-            areaWidth, 
-            areaHeight, 
-            tabletWidth, 
-            tabletHeight
-        );
-        
-        areaOffsetX = constrainedOffsets.x;
-        areaOffsetY = constrainedOffsets.y;
-        
-        // Update the values if they have been constrained
-        if (!isOffsetXFocused && areaOffsetX !== parseFloatSafe(cachedElements.areaOffsetXInput.value)) {
-            cachedElements.areaOffsetXInput.value = formatNumber(areaOffsetX, DECIMAL_PRECISION_POSITION);
-        }
-        
-        if (!isOffsetYFocused && areaOffsetY !== parseFloatSafe(cachedElements.areaOffsetYInput.value)) {
-            cachedElements.areaOffsetYInput.value = formatNumber(areaOffsetY, DECIMAL_PRECISION_POSITION);
-        }
-    }
-    
-    // Determine if it's the first render
-    const isFirstRender = tabletSize.width === 0 && tabletSize.height === 0;
-    
-    // Update the tablet dimensions if they have changed
-    if (tabletSize.width !== tabletWidth || tabletSize.height !== tabletHeight) {
-        tabletSize.width = tabletWidth;
-        tabletSize.height = tabletHeight;
-    }
-    
-    // Update the container size if necessary
+function getCurrentDimensions() {
+    return {
+        tabletWidth: parseFloatSafe(cachedElements.tabletWidthInput.value),
+        tabletHeight: parseFloatSafe(cachedElements.tabletHeightInput.value),
+        areaWidth: parseFloatSafe(cachedElements.areaWidthInput.value),
+        areaHeight: parseFloatSafe(cachedElements.areaHeightInput.value),
+        areaOffsetX: parseFloatSafe(cachedElements.areaOffsetXInput.value),
+        areaOffsetY: parseFloatSafe(cachedElements.areaOffsetYInput.value)
+    };
+}
+
+/**
+ * Updates display sizes based on dimensions
+ */
+function updateDisplaySizes(tabletWidth, tabletHeight) {
     if (containerSize.width === 0) {
         updateContainerSize();
     }
@@ -149,95 +94,185 @@ function updateDisplay() {
     // Update scale for converting mm to px
     currentScale = displayWidth / tabletWidth;
     
-    // Update tablet boundary display with transform pour meilleures performances
+    // Update tablet boundary display
     tabletBoundary.style.width = `${displayWidth}px`;
     tabletBoundary.style.height = `${displayHeight}px`;
     
-    // Get area rectangle dimensions and position in pixels
+    return { displayWidth, displayHeight };
+}
+
+/**
+ * Updates rectangle display
+ */
+function updateRectangleDisplay(areaWidth, areaHeight, areaOffsetX, areaOffsetY) {
     const rectWidth = mmToPx(areaWidth, currentScale);
     const rectHeight = mmToPx(areaHeight, currentScale);
     
-    // Get center position and convert to top-left for CSS
     const rectCenterX = mmToPx(areaOffsetX, currentScale);
     const rectCenterY = mmToPx(areaOffsetY, currentScale);
     
     const rectLeft = rectCenterX - rectWidth / 2;
     const rectTop = rectCenterY - rectHeight / 2;
     
-    // Update rectangle display immediately without transition on initial loading
     rectangle.style.width = `${rectWidth}px`;
     rectangle.style.height = `${rectHeight}px`;
     rectangle.style.transform = `translate(${rectLeft}px, ${rectTop}px)`;
     
-    // Update border radius based on the current setting
+    // Update border radius
     const radiusValue = window.currentRadius;
     currentRadius = radiusValue;
     
-    // Calculate the appropriate border radius
     let borderRadius;
     if (radiusValue === 0) {
-        borderRadius = '0px'; // Aucun rayon
+        borderRadius = '0px';
     } else if (radiusValue === 100) {
-        // Pour un cercle parfait, le rayon doit être la moitié de la dimension la plus petite
         borderRadius = `${Math.min(rectWidth, rectHeight) / 2}px`;
     } else {
-        // Pour les valeurs intermédiaires, calculer un rayon proportionnel
         const maxRadius = Math.min(rectWidth, rectHeight) / 2;
         borderRadius = `${maxRadius * (radiusValue / 100)}px`;
     }
     
-    // Appliquer le rayon à l'élément
     rectangle.style.borderRadius = borderRadius;
+}
+
+/**
+ * Handle first render operations
+ */
+function handleFirstRender() {
+    requestAnimationFrame(() => {
+        // Remove the loading overlay
+        const loadingOverlay = document.getElementById('loading-overlay');
+        if (loadingOverlay) {
+            loadingOverlay.style.opacity = '0';
+            loadingOverlay.style.transition = 'opacity 0.15s ease';
+            setTimeout(() => {
+                loadingOverlay.style.display = 'none';
+            }, 150);
+        }
+        
+        // Make the rectangle visible
+        if (rectangle.classList.contains('invisible')) {
+            rectangle.classList.remove('invisible');
+        }
+    });
+}
+
+/**
+ * Save current state with debounce
+ */
+function saveCurrentState() {
+    if (typeof PreferencesManager !== 'undefined' && typeof debounce === 'function') {
+        if (!updateDisplay.debouncedSave) {
+            updateDisplay.debouncedSave = debounce(() => {
+                PreferencesManager.saveCurrentState();
+            }, 1000);
+        }
+        
+        updateDisplay.debouncedSave();
+    }
+}
+
+/**
+ * Get constrained offsets if needed
+ */
+function getConstrainedOffsets(areaOffsetX, areaOffsetY, isOffsetXFocused, isOffsetYFocused, dims) {
+    // Temporary values for visual updates during editing
+    if (isOffsetXFocused && cachedElements.areaOffsetXInput.value.trim() === '') {
+        areaOffsetX = dims.tabletWidth / 2;
+    }
+    
+    if (isOffsetYFocused && cachedElements.areaOffsetYInput.value.trim() === '') {
+        areaOffsetY = dims.tabletHeight / 2;
+    }
+    
+    // Don't constrain values if the fields are being edited
+    if (!isOffsetXFocused && !isOffsetYFocused) {
+        return constrainAreaOffset(
+            areaOffsetX, 
+            areaOffsetY, 
+            dims.areaWidth, 
+            dims.areaHeight, 
+            dims.tabletWidth, 
+            dims.tabletHeight
+        );
+    }
+    
+    return { x: areaOffsetX, y: areaOffsetY };
+}
+
+/**
+ * Updates the visual display of the tablet and area
+ */
+function updateDisplay() {
+    const dims = getCurrentDimensions();
+    
+    // Check if the offset inputs are focused (manual editing)
+    const isOffsetXFocused = document.activeElement === cachedElements.areaOffsetXInput;
+    const isOffsetYFocused = document.activeElement === cachedElements.areaOffsetYInput;
+    
+    if (!isValidNumber(dims.tabletWidth, 10) || !isValidNumber(dims.tabletHeight, 10)) {
+        console.warn('Invalid tablet dimensions');
+        return;
+    }
+    
+    // Get constrained offsets
+    const constrainedOffsets = getConstrainedOffsets(
+        dims.areaOffsetX, 
+        dims.areaOffsetY, 
+        isOffsetXFocused, 
+        isOffsetYFocused, 
+        dims
+    );
+    
+    // Update input values if they were constrained
+    if (!isOffsetXFocused && constrainedOffsets.x !== dims.areaOffsetX) {
+        cachedElements.areaOffsetXInput.value = formatNumber(constrainedOffsets.x, DECIMAL_PRECISION_POSITION);
+    }
+    
+    if (!isOffsetYFocused && constrainedOffsets.y !== dims.areaOffsetY) {
+        cachedElements.areaOffsetYInput.value = formatNumber(constrainedOffsets.y, DECIMAL_PRECISION_POSITION);
+    }
+    
+    // Update dimensions with constrained values
+    dims.areaOffsetX = constrainedOffsets.x;
+    dims.areaOffsetY = constrainedOffsets.y;
+    
+    // Determine if it's the first render
+    const isFirstRender = tabletSize.width === 0 && tabletSize.height === 0;
+    
+    // Update the tablet dimensions if they have changed
+    if (tabletSize.width !== dims.tabletWidth || tabletSize.height !== dims.tabletHeight) {
+        tabletSize.width = dims.tabletWidth;
+        tabletSize.height = dims.tabletHeight;
+    }
+    
+    // Update display sizes
+    updateDisplaySizes(dims.tabletWidth, dims.tabletHeight);
+    
+    // Update rectangle display
+    updateRectangleDisplay(dims.areaWidth, dims.areaHeight, dims.areaOffsetX, dims.areaOffsetY);
     
     // Update info displays
-    updateInfoDisplays(tabletWidth, tabletHeight, areaWidth, areaHeight, areaOffsetX, areaOffsetY);
+    updateInfoDisplays(dims);
     
-    // Update grid visibility without recalculation if state hasn't changed
+    // Update grid visibility
     const showGrid = toggleGridCheckbox.checked;
     if (backgroundGrid.classList.contains('hidden') === showGrid) {
         backgroundGrid.classList.toggle('hidden', !showGrid);
     }
     
-    // If it's the first render, wait for a tick to ensure all updates have been applied
-    // then reveal the rectangle and hide the loading overlay
+    // Handle first render
     if (isFirstRender) {
-        requestAnimationFrame(() => {
-            // Remove the loading overlay
-            const loadingOverlay = document.getElementById('loading-overlay');
-            if (loadingOverlay) {
-                loadingOverlay.style.opacity = '0';
-                loadingOverlay.style.transition = 'opacity 0.15s ease';
-                setTimeout(() => {
-                    loadingOverlay.style.display = 'none';
-                }, 150);
-            }
-            
-            // Make the rectangle visible
-            if (rectangle.classList.contains('invisible')) {
-                rectangle.classList.remove('invisible');
-            }
-        });
+        handleFirstRender();
     } else {
-        // Si ce n'est pas le premier rendu, sauvegarder l'état actuel
-        // Utiliser un debounce pour éviter les sauvegardes trop fréquentes
-        if (typeof PreferencesManager !== 'undefined' && typeof debounce === 'function') {
-            // Utiliser une variable statique pour stocker la fonction debounce
-            if (!updateDisplay.debouncedSave) {
-                updateDisplay.debouncedSave = debounce(() => {
-                    PreferencesManager.saveCurrentState();
-                }, 1000); // Sauvegarder seulement après 1 seconde d'inactivité
-            }
-            
-            // Appeler la fonction debounce
-            updateDisplay.debouncedSave();
-        }
+        saveCurrentState();
     }
 }
 
 /**
  * Update information displays with current dimensions
  */
-function updateInfoDisplays(tabletWidth, tabletHeight, areaWidth, areaHeight, areaOffsetX, areaOffsetY) {
+function updateInfoDisplays(dims) {
     // Get the elements from the cache
     const { 
         tabletDimensionsInfo, tabletRatioInfo, 
@@ -246,10 +281,10 @@ function updateInfoDisplays(tabletWidth, tabletHeight, areaWidth, areaHeight, ar
     } = cachedElements;
     
     // Tablet info
-    const tabletRatio = calculateRatio(tabletWidth, tabletHeight);
+    const tabletRatio = calculateRatio(dims.tabletWidth, dims.tabletHeight);
     
     // Avoid unnecessary DOM rewrites by checking changes
-    const newTabletDimensions = `${formatNumber(tabletWidth)} × ${formatNumber(tabletHeight)} mm`;
+    const newTabletDimensions = `${formatNumber(dims.tabletWidth)} × ${formatNumber(dims.tabletHeight)} mm`;
     if (tabletDimensionsInfo.textContent !== newTabletDimensions) {
         tabletDimensionsInfo.textContent = newTabletDimensions;
     }
@@ -259,22 +294,22 @@ function updateInfoDisplays(tabletWidth, tabletHeight, areaWidth, areaHeight, ar
     }
     
     // Area info
-    const areaRatio = formatNumber(calculateRatio(areaWidth, areaHeight), 3);
-    const areaSurface = formatNumber(areaWidth * areaHeight);
+    const areaRatio = formatNumber(calculateRatio(dims.areaWidth, dims.areaHeight), 3);
+    const areaSurface = formatNumber(dims.areaWidth * dims.areaHeight);
     
-    // Update the ratio only if the lock is activated (to avoid too frequent updates)
+    // Update the ratio only if the lock is activated
     const isLocked = lockRatioCheckbox.getAttribute('aria-pressed') === 'true';
     
     if (isLocked) {
         // Don't update the customRatioInput if the user is editing it
         if (!customRatioInput.matches(':focus') && !customRatioInput.dataset.editing) {
-            const newRatio = formatNumber(areaWidth / areaHeight, 3);
+            const newRatio = formatNumber(dims.areaWidth / dims.areaHeight, 3);
             if (customRatioInput.value !== newRatio) {
                 customRatioInput.value = newRatio;
                 
                 // Update the currentRatio variable in appState if it exists
                 if (typeof appState !== 'undefined') {
-                    appState.currentRatio = areaWidth / areaHeight;
+                    appState.currentRatio = dims.areaWidth / dims.areaHeight;
                 }
             }
         }
@@ -283,8 +318,8 @@ function updateInfoDisplays(tabletWidth, tabletHeight, areaWidth, areaHeight, ar
         appState.debouncedUpdateRatio();
     }
     
-    // Avoid unnecessary DOM rewrites by checking changes
-    const newDimensions = `${formatNumber(areaWidth)} × ${formatNumber(areaHeight)} mm`;
+    // Update area info displays
+    const newDimensions = `${formatNumber(dims.areaWidth)} × ${formatNumber(dims.areaHeight)} mm`;
     if (dimensionsInfo.textContent !== newDimensions) {
         dimensionsInfo.textContent = newDimensions;
     }
@@ -297,12 +332,13 @@ function updateInfoDisplays(tabletWidth, tabletHeight, areaWidth, areaHeight, ar
         ratioInfo.textContent = areaRatio;
     }
     
-    const newPosition = `X: ${formatNumber(areaOffsetX, DECIMAL_PRECISION_POSITION)}, Y: ${formatNumber(areaOffsetY, DECIMAL_PRECISION_POSITION)}`;
+    // Update position info
+    const newPosition = `X: ${formatNumber(dims.areaOffsetX, DECIMAL_PRECISION_POSITION)}, Y: ${formatNumber(dims.areaOffsetY, DECIMAL_PRECISION_POSITION)}`;
     if (positionInfo.textContent !== newPosition) {
         positionInfo.textContent = newPosition;
     }
     
-    // Ajout de l'affichage du radius
+    // Update radius info
     if (radiusInfo) {
         const radiusValue = window.currentRadius || 0;
         const radiusText = `${radiusValue}%`;
@@ -317,15 +353,9 @@ function updateInfoDisplays(tabletWidth, tabletHeight, areaWidth, areaHeight, ar
  * Used during drag operations to avoid resizing based on ratio lock
  */
 function updateDisplayWithoutRatio() {
-    // Use cached elements and parseFloatSafe which is optimized
-    const tabletWidth = parseFloatSafe(cachedElements.tabletWidthInput.value);
-    const tabletHeight = parseFloatSafe(cachedElements.tabletHeightInput.value);
-    const areaWidth = parseFloatSafe(cachedElements.areaWidthInput.value);
-    const areaHeight = parseFloatSafe(cachedElements.areaHeightInput.value);
-    const areaOffsetX = parseFloatSafe(cachedElements.areaOffsetXInput.value);
-    const areaOffsetY = parseFloatSafe(cachedElements.areaOffsetYInput.value);
+    const dims = getCurrentDimensions();
     
-    if (!isValidNumber(tabletWidth, 10) || !isValidNumber(tabletHeight, 10)) {
+    if (!isValidNumber(dims.tabletWidth, 10) || !isValidNumber(dims.tabletHeight, 10)) {
         console.warn('Invalid tablet dimensions');
         return;
     }
@@ -334,87 +364,31 @@ function updateDisplayWithoutRatio() {
     const isFirstRender = tabletSize.width === 0 && tabletSize.height === 0;
     
     // Update the tablet dimensions if they have changed
-    if (tabletSize.width !== tabletWidth || tabletSize.height !== tabletHeight) {
-        tabletSize.width = tabletWidth;
-        tabletSize.height = tabletHeight;
+    if (tabletSize.width !== dims.tabletWidth || tabletSize.height !== dims.tabletHeight) {
+        tabletSize.width = dims.tabletWidth;
+        tabletSize.height = dims.tabletHeight;
     }
     
-    // Update the container size if necessary
-    if (containerSize.width === 0) {
-        updateContainerSize();
-    }
-    
-    const tabletRatio = tabletWidth / tabletHeight;
-    
-    let displayWidth, displayHeight;
-    
-    if (containerSize.width / tabletRatio <= containerSize.height) {
-        // Width constrained
-        displayWidth = containerSize.width;
-        displayHeight = displayWidth / tabletRatio;
-    } else {
-        // Height constrained
-        displayHeight = containerSize.height;
-        displayWidth = displayHeight * tabletRatio;
-    }
-    
-    // Update scale for converting mm to px
-    currentScale = displayWidth / tabletWidth;
-    
-    // Update tablet boundary display with transform for better performance
-    tabletBoundary.style.width = `${displayWidth}px`;
-    tabletBoundary.style.height = `${displayHeight}px`;
-    
-    // Get area rectangle dimensions and position in pixels
-    const rectWidth = mmToPx(areaWidth, currentScale);
-    const rectHeight = mmToPx(areaHeight, currentScale);
-    
-    // Get center position and convert to top-left for CSS
-    const rectCenterX = mmToPx(areaOffsetX, currentScale);
-    const rectCenterY = mmToPx(areaOffsetY, currentScale);
-    
-    const rectLeft = rectCenterX - rectWidth / 2;
-    const rectTop = rectCenterY - rectHeight / 2;
+    // Update display sizes
+    updateDisplaySizes(dims.tabletWidth, dims.tabletHeight);
     
     // Update rectangle display
-    rectangle.style.width = `${rectWidth}px`;
-    rectangle.style.height = `${rectHeight}px`;
-    rectangle.style.transform = `translate(${rectLeft}px, ${rectTop}px)`;
+    updateRectangleDisplay(dims.areaWidth, dims.areaHeight, dims.areaOffsetX, dims.areaOffsetY);
     
-    // Update info displays
-    updateInfoDisplaysWithoutRatio(tabletWidth, tabletHeight, areaWidth, areaHeight, areaOffsetX, areaOffsetY);
+    // Update simplified info displays
+    updateInfoDisplaysWithoutRatio(dims);
     
-    // If it's the first render, wait for a tick to ensure all updates have been applied
-    // then reveal the rectangle and hide the loading overlay
+    // Handle first render
     if (isFirstRender) {
-        requestAnimationFrame(() => {
-            // Remove the loading overlay
-            const loadingOverlay = document.getElementById('loading-overlay');
-            if (loadingOverlay) {
-                loadingOverlay.style.opacity = '0';
-                loadingOverlay.style.transition = 'opacity 0.15s ease';
-                setTimeout(() => {
-                    loadingOverlay.style.display = 'none';
-                }, 150);
-            }
-            
-            // Make the rectangle visible
-            if (rectangle.classList.contains('invisible')) {
-                rectangle.classList.remove('invisible');
-            }
-        });
+        handleFirstRender();
     } else {
-        // Si ce n'est pas le premier rendu, sauvegarder l'état actuel
-        // Utiliser un debounce pour éviter les sauvegardes trop fréquentes
+        // Save state with its own debounce
         if (typeof PreferencesManager !== 'undefined' && typeof debounce === 'function') {
-            // Utiliser une variable statique pour stocker la fonction debounce
             if (!updateDisplayWithoutRatio.debouncedSave) {
                 updateDisplayWithoutRatio.debouncedSave = debounce(() => {
                     PreferencesManager.saveCurrentState();
-                }, 1000); // Sauvegarder seulement après 1 seconde d'inactivité
+                }, 1000);
             }
-            
-            // Appeler la fonction debounce
             updateDisplayWithoutRatio.debouncedSave();
         }
     }
@@ -423,7 +397,7 @@ function updateDisplayWithoutRatio() {
 /**
  * Update information displays with current dimensions without updating the ratio input
  */
-function updateInfoDisplaysWithoutRatio(tabletWidth, tabletHeight, areaWidth, areaHeight, areaOffsetX, areaOffsetY) {
+function updateInfoDisplaysWithoutRatio(dims) {
     // Get the elements from the cache
     const { 
         tabletDimensionsInfo, tabletRatioInfo, 
@@ -431,10 +405,10 @@ function updateInfoDisplaysWithoutRatio(tabletWidth, tabletHeight, areaWidth, ar
     } = cachedElements;
     
     // Tablet info
-    const tabletRatio = calculateRatio(tabletWidth, tabletHeight);
+    const tabletRatio = calculateRatio(dims.tabletWidth, dims.tabletHeight);
     
-    // Avoid unnecessary DOM rewrites by checking changes
-    const newTabletDimensions = `${formatNumber(tabletWidth)} × ${formatNumber(tabletHeight)} mm`;
+    // Update tablet info
+    const newTabletDimensions = `${formatNumber(dims.tabletWidth)} × ${formatNumber(dims.tabletHeight)} mm`;
     if (tabletDimensionsInfo.textContent !== newTabletDimensions) {
         tabletDimensionsInfo.textContent = newTabletDimensions;
     }
@@ -444,14 +418,11 @@ function updateInfoDisplaysWithoutRatio(tabletWidth, tabletHeight, areaWidth, ar
     }
     
     // Area info
-    const areaRatio = formatNumber(calculateRatio(areaWidth, areaHeight), 3);
-    const areaSurface = formatNumber(areaWidth * areaHeight);
+    const areaRatio = formatNumber(calculateRatio(dims.areaWidth, dims.areaHeight), 3);
+    const areaSurface = formatNumber(dims.areaWidth * dims.areaHeight);
     
-    // Don't update the ratio input field here
-    // The ratio will be updated after the delay via the debouncedUpdateRatio function
-    
-    // Avoid unnecessary DOM rewrites by checking changes
-    const newDimensions = `${formatNumber(areaWidth)} × ${formatNumber(areaHeight)} mm`;
+    // Update area info displays
+    const newDimensions = `${formatNumber(dims.areaWidth)} × ${formatNumber(dims.areaHeight)} mm`;
     if (dimensionsInfo.textContent !== newDimensions) {
         dimensionsInfo.textContent = newDimensions;
     }
@@ -464,12 +435,13 @@ function updateInfoDisplaysWithoutRatio(tabletWidth, tabletHeight, areaWidth, ar
         ratioInfo.textContent = areaRatio;
     }
     
-    const newPosition = `X: ${formatNumber(areaOffsetX, DECIMAL_PRECISION_POSITION)}, Y: ${formatNumber(areaOffsetY, DECIMAL_PRECISION_POSITION)}`;
+    // Update position info
+    const newPosition = `X: ${formatNumber(dims.areaOffsetX, DECIMAL_PRECISION_POSITION)}, Y: ${formatNumber(dims.areaOffsetY, DECIMAL_PRECISION_POSITION)}`;
     if (positionInfo.textContent !== newPosition) {
         positionInfo.textContent = newPosition;
     }
     
-    // Ajout de l'affichage du radius
+    // Update radius info
     if (radiusInfo) {
         const radiusValue = window.currentRadius || 0;
         const radiusText = `${radiusValue}%`;
@@ -489,7 +461,7 @@ function setupDragFunctionality() {
         return;
     }
     
-    // Clean up old listeners if they exist (to avoid duplicates during reinitializations)
+    // Clean up old listeners
     rectangle.removeEventListener('mousedown', handleDragStart);
     document.removeEventListener('mousemove', handleDragMove);
     document.removeEventListener('mouseup', handleDragEnd);
@@ -497,7 +469,7 @@ function setupDragFunctionality() {
     document.removeEventListener('touchmove', handleTouchMove);
     document.removeEventListener('touchend', handleDragEnd);
     
-    // Add the new listeners
+    // Add new listeners
     rectangle.addEventListener('mousedown', handleDragStart);
     document.addEventListener('mousemove', handleDragMove);
     document.addEventListener('mouseup', handleDragEnd);
@@ -510,14 +482,11 @@ function setupDragFunctionality() {
 
 /**
  * Handle start of mouse drag
- * @param {MouseEvent} e - Mouse event
  */
 function handleDragStart(e) {
     e.preventDefault();
     
     isDragging = true;
-    // Don't change the cursor
-    // rectangle.style.cursor = 'grabbing';
     
     dragStartX = e.clientX;
     dragStartY = e.clientY;
@@ -527,8 +496,7 @@ function handleDragStart(e) {
 }
 
 /**
- * Handle start of touch drag (continued)
- * @param {TouchEvent} e - Touch event
+ * Handle start of touch drag
  */
 function handleTouchStart(e) {
     if (e.touches.length === 1) {
@@ -546,24 +514,20 @@ function handleTouchStart(e) {
 }
 
 /**
- * Handle mouse movement during drag
- * @param {MouseEvent} e - Mouse event
+ * Handle movement during drag (mouse or touch)
  */
-function handleDragMove(e) {
+function handleMovement(clientX, clientY) {
     if (!isDragging) return;
     
-    const tabletWidth = parseFloatSafe(cachedElements.tabletWidthInput.value);
-    const tabletHeight = parseFloatSafe(cachedElements.tabletHeightInput.value);
-    const areaWidth = parseFloatSafe(cachedElements.areaWidthInput.value);
-    const areaHeight = parseFloatSafe(cachedElements.areaHeightInput.value);
+    const dims = getCurrentDimensions();
     
     // Check if the inputs are focused (manual editing)
     const isOffsetXFocused = document.activeElement === cachedElements.areaOffsetXInput;
     const isOffsetYFocused = document.activeElement === cachedElements.areaOffsetYInput;
     
     // Calculate movement in millimeters
-    const deltaXPx = e.clientX - dragStartX;
-    const deltaYPx = e.clientY - dragStartY;
+    const deltaXPx = clientX - dragStartX;
+    const deltaYPx = clientY - dragStartY;
     
     const deltaXMm = pxToMm(deltaXPx, currentScale);
     const deltaYMm = pxToMm(deltaYPx, currentScale);
@@ -576,10 +540,10 @@ function handleDragMove(e) {
     const constrainedOffsets = constrainAreaOffset(
         newOffsetX, 
         newOffsetY, 
-        areaWidth, 
-        areaHeight, 
-        tabletWidth, 
-        tabletHeight
+        dims.areaWidth, 
+        dims.areaHeight, 
+        dims.tabletWidth, 
+        dims.tabletHeight
     );
     
     // Update inputs only if the user is not editing them
@@ -596,8 +560,14 @@ function handleDragMove(e) {
 }
 
 /**
+ * Handle mouse movement during drag
+ */
+function handleDragMove(e) {
+    handleMovement(e.clientX, e.clientY);
+}
+
+/**
  * Handle touch movement during drag
- * @param {TouchEvent} e - Touch event
  */
 function handleTouchMove(e) {
     if (!isDragging || e.touches.length !== 1) return;
@@ -605,47 +575,7 @@ function handleTouchMove(e) {
     e.preventDefault();
     const touch = e.touches[0];
     
-    const tabletWidth = parseFloatSafe(cachedElements.tabletWidthInput.value);
-    const tabletHeight = parseFloatSafe(cachedElements.tabletHeightInput.value);
-    const areaWidth = parseFloatSafe(cachedElements.areaWidthInput.value);
-    const areaHeight = parseFloatSafe(cachedElements.areaHeightInput.value);
-    
-    // Check if the inputs are focused (manual editing)
-    const isOffsetXFocused = document.activeElement === cachedElements.areaOffsetXInput;
-    const isOffsetYFocused = document.activeElement === cachedElements.areaOffsetYInput;
-    
-    // Calculate movement in millimeters
-    const deltaXPx = touch.clientX - dragStartX;
-    const deltaYPx = touch.clientY - dragStartY;
-    
-    const deltaXMm = pxToMm(deltaXPx, currentScale);
-    const deltaYMm = pxToMm(deltaYPx, currentScale);
-    
-    // Calculate new offset values
-    let newOffsetX = dragStartOffsetX + deltaXMm;
-    let newOffsetY = dragStartOffsetY + deltaYMm;
-    
-    // Constrain within the tablet boundaries
-    const constrainedOffsets = constrainAreaOffset(
-        newOffsetX, 
-        newOffsetY, 
-        areaWidth, 
-        areaHeight, 
-        tabletWidth, 
-        tabletHeight
-    );
-    
-    // Update inputs only if the user is not editing them
-    if (!isOffsetXFocused) {
-        cachedElements.areaOffsetXInput.value = formatNumber(constrainedOffsets.x, DECIMAL_PRECISION_POSITION);
-    }
-    
-    if (!isOffsetYFocused) {
-        cachedElements.areaOffsetYInput.value = formatNumber(constrainedOffsets.y, DECIMAL_PRECISION_POSITION);
-    }
-    
-    // Update display with throttle to limit calls
-    throttledUpdateDisplay();
+    handleMovement(touch.clientX, touch.clientY);
 }
 
 /**
@@ -655,11 +585,8 @@ function handleDragEnd() {
     if (!isDragging) return;
     
     isDragging = false;
-    // Don't change the cursor
-    // rectangle.style.cursor = 'grab';
     
     // Ensure the body has the page-loaded class to activate transitions
-    // after the first user interaction
     if (!document.body.classList.contains('page-loaded')) {
         document.body.classList.add('page-loaded');
     }
@@ -667,18 +594,19 @@ function handleDragEnd() {
     // Force a final update without throttle
     updateDisplay();
     
-    // Sauvegarder les préférences après le déplacement
+    // Save preferences after movement
     if (typeof PreferencesManager !== 'undefined') {
         setTimeout(() => PreferencesManager.saveCurrentState(), 50);
     }
     
-    // Émettre un événement personnalisé pour informer du déplacement de la zone active
+    // Dispatch event to inform about active area movement
+    const dims = getCurrentDimensions();
     document.dispatchEvent(new CustomEvent('activearea:moved', {
         detail: {
-            offsetX: parseFloatSafe(cachedElements.areaOffsetXInput.value),
-            offsetY: parseFloatSafe(cachedElements.areaOffsetYInput.value),
-            width: parseFloatSafe(cachedElements.areaWidthInput.value),
-            height: parseFloatSafe(cachedElements.areaHeightInput.value)
+            offsetX: dims.areaOffsetX,
+            offsetY: dims.areaOffsetY,
+            width: dims.areaWidth,
+            height: dims.areaHeight
         }
     }));
 }
@@ -687,11 +615,10 @@ function handleDragEnd() {
  * Center the active area in the tablet
  */
 function centerArea() {
-    const tabletWidth = parseFloatSafe(cachedElements.tabletWidthInput.value);
-    const tabletHeight = parseFloatSafe(cachedElements.tabletHeightInput.value);
+    const dims = getCurrentDimensions();
     
     // Avoid redundant calculations
-    if (tabletWidth <= 0 || tabletHeight <= 0) return;
+    if (dims.tabletWidth <= 0 || dims.tabletHeight <= 0) return;
     
     // Check if the inputs are focused (manual editing)
     const isOffsetXFocused = document.activeElement === cachedElements.areaOffsetXInput;
@@ -699,27 +626,27 @@ function centerArea() {
     
     // Update only the fields that are not being edited
     if (!isOffsetXFocused) {
-        cachedElements.areaOffsetXInput.value = formatNumber(tabletWidth / 2, DECIMAL_PRECISION_POSITION);
+        cachedElements.areaOffsetXInput.value = formatNumber(dims.tabletWidth / 2, DECIMAL_PRECISION_POSITION);
     }
     
     if (!isOffsetYFocused) {
-        cachedElements.areaOffsetYInput.value = formatNumber(tabletHeight / 2, DECIMAL_PRECISION_POSITION);
+        cachedElements.areaOffsetYInput.value = formatNumber(dims.tabletHeight / 2, DECIMAL_PRECISION_POSITION);
     }
     
     updateDisplay();
     
-    // Sauvegarder les préférences après le centrage
+    // Save preferences after centering
     if (typeof PreferencesManager !== 'undefined') {
         setTimeout(() => PreferencesManager.saveCurrentState(), 100);
     }
     
-    // Émettre un événement personnalisé pour informer du centrage de la zone active
+    // Dispatch event to inform about active area centering
     document.dispatchEvent(new CustomEvent('activearea:centered', {
         detail: {
-            offsetX: tabletWidth / 2,
-            offsetY: tabletHeight / 2,
-            width: parseFloatSafe(cachedElements.areaWidthInput.value),
-            height: parseFloatSafe(cachedElements.areaHeightInput.value)
+            offsetX: dims.tabletWidth / 2,
+            offsetY: dims.tabletHeight / 2,
+            width: dims.areaWidth,
+            height: dims.areaHeight
         }
     }));
 }
@@ -734,6 +661,55 @@ function setupResizeObserver() {
     }, 100));
     
     resizeObserver.observe(visualContainer);
+}
+
+/**
+ * Setup border radius control
+ */
+function setupRadiusControl() {
+    if (areaRadiusInput && radiusInputField) {
+        // Slider change event
+        areaRadiusInput.addEventListener('input', function() {
+            currentRadius = parseInt(this.value, 10);
+            window.currentRadius = currentRadius;
+            radiusInputField.value = currentRadius;
+            
+            // Update the radius info in the summary
+            const radiusInfo = document.getElementById('radius-info');
+            if (radiusInfo) {
+                radiusInfo.textContent = `${currentRadius}%`;
+            }
+            
+            updateDisplay();
+        });
+
+        // Manual input change event
+        radiusInputField.addEventListener('input', function() {
+            let value = parseInt(this.value, 10);
+            
+            // Ensure value is within bounds
+            if (isNaN(value) || value < 0) value = 0;
+            if (value > 100) value = 100;
+            
+            // Update both the display value and the slider
+            currentRadius = value;
+            window.currentRadius = currentRadius;
+            areaRadiusInput.value = value;
+            
+            // Update the radius info in the summary
+            const radiusInfo = document.getElementById('radius-info');
+            if (radiusInfo) {
+                radiusInfo.textContent = `${currentRadius}%`;
+            }
+            
+            // Only update the input value if it's different from what was entered
+            if (parseInt(this.value, 10) !== value && !isNaN(parseInt(this.value, 10))) {
+                this.value = value;
+            }
+            
+            updateDisplay();
+        });
+    }
 }
 
 /**
@@ -756,7 +732,6 @@ function initVisualizer() {
     updateDisplay();
     
     // Add the page-loaded class to the body to activate CSS transitions after initial loading
-    // A delay ensures that the initial position is established before activating transitions
     setTimeout(() => {
         // Activate CSS transitions
         document.body.classList.add('page-loaded');
@@ -764,7 +739,7 @@ function initVisualizer() {
         // Reactivate interactions with the rectangle
         rectangle.style.pointerEvents = 'auto';
         
-        // Set the normal cursor on the rectangle (instead of grab)
+        // Set the normal cursor on the rectangle
         rectangle.style.cursor = 'default';
         
         // Indicate that the loading is finished
@@ -782,9 +757,10 @@ function initVisualizer() {
             }, 150);
         }
         
-        // Configure the event listeners only after everything is ready
+        // Setup all event listeners and controls
         setupDragFunctionality();
         setupResizeObserver();
+        setupRadiusControl();
         
         // Center button
         const centerBtn = document.getElementById('center-btn');
@@ -797,52 +773,6 @@ function initVisualizer() {
             toggleGridCheckbox.addEventListener('change', throttle(() => {
                 backgroundGrid.classList.toggle('hidden', !toggleGridCheckbox.checked);
             }, 50));
-        }
-        
-        // Setup border radius control
-        if (areaRadiusInput && radiusInputField) {
-            // Slider change event
-            areaRadiusInput.addEventListener('input', function() {
-                currentRadius = parseInt(this.value, 10);
-                window.currentRadius = currentRadius;
-                radiusInputField.value = currentRadius;
-                
-                // Update the radius info in the summary
-                const radiusInfo = document.getElementById('radius-info');
-                if (radiusInfo) {
-                    radiusInfo.textContent = `${currentRadius}%`;
-                }
-                
-                updateDisplay();
-            });
-
-            // Manual input change event
-            radiusInputField.addEventListener('input', function() {
-                let value = parseInt(this.value, 10);
-                
-                // Ensure value is within bounds
-                if (isNaN(value) || value < 0) value = 0;
-                if (value > 100) value = 100;
-                
-                // Update both the display value and the slider
-                currentRadius = value;
-                window.currentRadius = currentRadius;
-                areaRadiusInput.value = value;
-                
-                // Update the radius info in the summary
-                const radiusInfo = document.getElementById('radius-info');
-                if (radiusInfo) {
-                    radiusInfo.textContent = `${currentRadius}%`;
-                }
-                
-                // Only update the input value if it's different from what was entered
-                // This prevents cursor jumping during typing
-                if (parseInt(this.value, 10) !== value && !isNaN(parseInt(this.value, 10))) {
-                    this.value = value;
-                }
-                
-                updateDisplay();
-            });
         }
         
         // Listen for tablet selection to show/hide radius control
@@ -862,8 +792,6 @@ function initVisualizer() {
 // Call init when window loads
 window.addEventListener('load', initVisualizer);
 
-// Exposer updateDisplayWithoutRatio globalement
+// Expose functions globally
 window.updateDisplayWithoutRatio = updateDisplayWithoutRatio;
-
-// Exposer centerArea globalement
 window.centerArea = centerArea;
