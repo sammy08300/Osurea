@@ -18,7 +18,7 @@
 
 ---
 
-## 🎮 Overview test
+## 🎮 Overview
 
 Osu!rea is an active area visualizer for osu! players who use a graphics tablet. This tool allows you to configure, visualize, and precisely save your active area to optimize your gaming experience.
 
