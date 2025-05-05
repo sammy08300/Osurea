@@ -226,13 +226,18 @@ export const UIManager = {
         const offsetX = NumberUtils.parseFloatSafe(elements.areaOffsetX.value);
         const offsetY = NumberUtils.parseFloatSafe(elements.areaOffsetY.value);
         const ratio = (height > 0) ? (width / height).toFixed(3) : 'N/A';
+        const areaRadius = parseInt(elements.areaRadius?.value) || 0;
         
-        const info = `-- Zone Active Réelle --
-Largeur: ${NumberUtils.formatNumber(width)} mm
-Hauteur: ${NumberUtils.formatNumber(height)} mm
-Ratio: ${ratio}
-Centre X: ${NumberUtils.formatNumber(offsetX, 3)} mm
-Centre Y: ${NumberUtils.formatNumber(offsetY, 3)} mm`;
+        // Traductions des labels
+        const titleLabel = translateWithFallback('summary.currentConfig') || '-- Zone Active Réelle --';
+        const widthLabel = translateWithFallback('area.width') || 'Largeur';
+        const heightLabel = translateWithFallback('area.height') || 'Hauteur';
+        const ratioLabel = translateWithFallback('area.ratio') || 'Ratio';
+        const centerXLabel = translateWithFallback('area.positionX') || 'Centre X';
+        const centerYLabel = translateWithFallback('area.positionY') || 'Centre Y';
+        const borderRadiusLabel = translateWithFallback('area.radius') || 'Rayon de la bordure';
+
+        const info = `${titleLabel}\n${widthLabel}: ${NumberUtils.formatNumber(width)} mm\n${heightLabel}: ${NumberUtils.formatNumber(height)} mm\n${ratioLabel}: ${ratio}\n${centerXLabel}: ${NumberUtils.formatNumber(offsetX, 3)} mm\n${centerYLabel}: ${NumberUtils.formatNumber(offsetY, 3)} mm\n${borderRadiusLabel}: ${areaRadius}%`;
         
         DOMUtils.copyToClipboard(info);
         

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html class="loading">
 <head>
+    <!-- Meta tags -->
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -16,124 +17,28 @@
     <meta property="og:description" content="Visualiseur de zone active pour les joueurs d'osu!. Configurez et partagez vos zones actives facilement.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://areasu.netlify.app/">
-    
+
     <title>Osu!rea - Area Visualizer</title>
     <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
     <link rel="manifest" href="manifest.webmanifest">
-    
-    <!-- Préchargement des ressources critiques -->
     <link rel="preload" href="assets/img/favicon.svg" as="image" type="image/svg+xml" fetchpriority="high">
     <link rel="preload" href="assets/css/styles.css" as="style" fetchpriority="high">
     <link rel="stylesheet" href="assets/css/styles.css">
-    
-    <script>
-        // Immediately apply a background color to prevent white flashes
-        (function() {
-            try {
-                document.documentElement.style.backgroundColor = 'rgb(3, 7, 18)';
-                document.documentElement.classList.add('loading');
-                
-                // Optimisation: préparer visuellement la page le plus tôt possible
-                if ("requestIdleCallback" in window) {
-                    requestIdleCallback(() => {
-                        // Précharger les ressources critiques pendant les temps morts du navigateur
-                        const resourcesToPrefetch = [
-                            'assets/js/app.js',
-                            'assets/js/components/visualizer.js',
-                            'assets/js/components/favorites/favoritesModule.js'
-                        ];
-                        
-                        resourcesToPrefetch.forEach(url => {
-                            const link = document.createElement('link');
-                            link.rel = 'prefetch';
-                            link.href = url;
-                            document.head.appendChild(link);
-                        });
-                    });
-                }
-            } catch (e) {
-                console.warn('Error during style initialization:', e);
-            }
-        })();
-        
-        // Add a script for periodic cache cleanup
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                try {
-                    // Periodically send a message to clear the cache
-                    setInterval(() => {
-                        navigator.serviceWorker.ready.then(registration => {
-                            if (registration && registration.active) {
-                                registration.active.postMessage({ type: 'CACHE_CLEANUP' });
-                            }
-                        }).catch(err => {
-                            console.warn('Service worker error:', err);
-                        });
-                    }, 24 * 60 * 60 * 1000); // 24 hours
-                } catch (e) {
-                    console.warn('Error initializing service worker:', e);
-                }
-            });
-        }
-    </script>
+
     <style>
-        .custom-checkbox:checked ~ .checkbox-indicator {
-            transform: scale(1);
-        }
-        .checkbox-indicator {
-            transform: scale(0);
-            transition: transform 0.25s ease-out;
-        }
-        
-        /* Styles for the ratio field */
-        .ratio-editable {
-            background-color: #1F2937; /* bg-gray-800 - same color as normal inputs */
-            color: #E5E7EB;
-        }
-        .ratio-locked {
-            background-color: #1F2937; /* bg-gray-800 - same color as other inputs */
-            color: #E5E7EB;
-        }
-        
-        /* Support for lazy loading */
-        .lazy-image {
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-        }
-        .lazy-image.loaded {
-            opacity: 1;
-        }
-        
-        /* Style for the language selector */
-        .locale-option {
-            transition: background-color 0.2s ease-in-out;
-        }
-        
-        /* Style pour l'apparition du contenu principal - OPTIMISÉ */
-        main {
-            opacity: 0;
-            transition: opacity 0.25s ease-out; /* Transition plus rapide */
-        }
-        
-        body.page-loaded main {
-            opacity: 1;
-        }
-        
-        /* Optimiser l'effet de fondu des éléments avec une séquence d'apparition */
-        body.page-loaded .fade-in-sequence > * {
-            opacity: 0;
-            transform: translateY(4px); /* Déplacement plus subtil */
-            animation: fadeInUp 0.25s forwards; /* Animation plus rapide */
-        }
-        
-        /* Décalage progressif de l'animation pour chaque élément */
-        @keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+        .custom-checkbox:checked ~ .checkbox-indicator { transform: scale(1); }
+        .checkbox-indicator { transform: scale(0); transition: transform 0.25s ease-out; }
+        .ratio-editable, .ratio-locked { background-color: #1F2937; color: #E5E7EB; }
+        .lazy-image { opacity: 0; transition: opacity 0.3s ease-in-out; }
+        .lazy-image.loaded { opacity: 1; }
+        .locale-option { transition: background-color 0.2s ease-in-out; }
+        main { opacity: 0; transition: opacity 0.25s ease-out; }
+        body.page-loaded main { opacity: 1; }
+        body.page-loaded .fade-in-sequence > * { opacity: 0; transform: translateY(4px); animation: fadeInUp 0.25s forwards; }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
     </style>
+
+    <script type="module" src="assets/js/init/backgroundAndPrefetch.js"></script>
 </head>
 <body class="dark bg-gray-950 text-gray-200 font-sans antialiased min-h-screen loading">
     <header class="py-4 bg-gray-900 shadow-xl mb-6 border-b border-gray-800">
@@ -161,39 +66,10 @@
         </div>
     </header>
 
-    <!-- Script for lazy loading images -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Function to lazy load images
-            function lazyLoadImages() {
-                const lazyImages = document.querySelectorAll('img.lazy-image:not(.loaded)');
-                
-                lazyImages.forEach(img => {
-                    if (isInViewport(img)) {
-                        img.classList.add('loaded');
-                    }
-                });
-            }
-            
-            // Check if an element is in the viewport
-            function isInViewport(element) {
-                const rect = element.getBoundingClientRect();
-                return (
-                    rect.top <= (window.innerHeight || document.documentElement.clientHeight) &&
-                    rect.left <= (window.innerWidth || document.documentElement.clientWidth) &&
-                    rect.bottom >= 0 &&
-                    rect.right >= 0
-                );
-            }
-            
-            // Trigger initial loading
-            lazyLoadImages();
-            
-            // Add event listeners to detect scroll
-            window.addEventListener('scroll', lazyLoadImages);
-            window.addEventListener('resize', lazyLoadImages);
-            window.addEventListener('orientationchange', lazyLoadImages);
-        });
+    <!-- Script pour lazy loading des images -->
+    <script type="module">
+        import { setupLazyLoadListeners } from './assets/js/utils/lazyLoadImages.js';
+        document.addEventListener('DOMContentLoaded', setupLazyLoadListeners);
     </script>
 
     <main class="py-4 mb-6">
@@ -604,40 +480,7 @@
     <div id="footer-container" style="opacity: 0; transition: opacity 0.4s ease-out;"></div>
 
     <!-- Footer and loading script -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Create footer element
-            const footer = document.createElement('footer');
-            footer.className = "bg-gray-900 py-4 mt-8 border-t border-gray-800";
-            footer.innerHTML = `
-                <div class="container mx-auto text-center text-gray-400 text-sm">
-                    <p>Osu!rea - Area Visualizer v2.0 - <span data-i18n="footer.credit">Conçu pour la communauté osu! par Yuzuctus</span></p>
-                    <p class="mt-1" data-i18n="footer.description">Utilisez cet outil pour visualiser et sauvegarder votre zone active de tablette graphique.</p>
-                </div>
-            `;
-            
-            // Get footer container
-            const footerContainer = document.getElementById('footer-container');
-            
-            // Add a listener to load the footer after the page content is loaded
-            window.addEventListener('load', function() {
-                setTimeout(function() {
-                    if (footerContainer) {
-                        footerContainer.appendChild(footer);
-                        // Fade in the footer only after everything else is loaded
-                        setTimeout(function() {
-                            footerContainer.style.opacity = '1';
-                            
-                            // Apply any translations to the footer
-                            if (typeof updateAllTranslations === 'function') {
-                                updateAllTranslations();
-                            }
-                        }, 300);
-                    }
-                }, 150);
-            });
-        });
-    </script>
+    <script type="module" src="assets/js/components/footer.js"></script>
 
     <!-- Context Menu -->
     <div id="context-menu" class="fixed hidden bg-gray-900 border border-blue-500 rounded-lg p-3 shadow-xl z-[9999] min-w-[220px]">
@@ -722,11 +565,10 @@
         <!-- Notifications will be added here dynamically -->
     </div>
 
-    <!-- JavaScript Scripts -->
+    <!-- SCRIPTS EN FIN DE BODY -->
     <script type="module" src="assets/locales/index.js" defer></script>
     <script type="module" defer>
         import initializeI18n from './assets/js/i18n-init.js';
-        // Initialize translation system
         document.addEventListener('DOMContentLoaded', initializeI18n);
     </script>
     <script type="module" src="assets/js/locale-switcher.js" defer></script>
@@ -739,172 +581,17 @@
     <script src="assets/js/components/visualizer.js" defer></script>
     <script type="module" src="assets/js/components/favorites/favoritesModule.js" defer></script>
     <script type="module" src="assets/js/components/tabletSelector.js" defer></script>
-    
-    <script>
-        // Function to handle the ratio lock toggle
-        function toggleLockRatio(button) {
-            const isActive = button.getAttribute('aria-pressed') === 'true';
-            const newState = !isActive;
-            button.setAttribute('aria-pressed', newState.toString());
-            
-            const indicator = document.getElementById('lockRatioIndicator').firstElementChild;
-            if (newState) {
-                indicator.style.transform = 'scale(1)';
-            } else {
-                indicator.style.transform = 'scale(0)';
-            }
-            
-            // Update the visual state of the ratio field
-            if (typeof window.updateRatioFieldState === 'function') {
-                window.updateRatioFieldState();
-            }
-            
-            // Update application logic
-            if (typeof appState !== 'undefined') {
-                if (newState) {
-                    const width = parseFloatSafe(document.getElementById('areaWidth')?.value);
-                    const height = parseFloatSafe(document.getElementById('areaHeight')?.value);
-                    
-                    if (height > 0) {
-                        appState.currentRatio = width / height;
-                        document.getElementById('customRatio').value = formatNumber(appState.currentRatio, 3);
-                    }
-                }
-                
-                if (typeof updateDisplay === 'function') {
-                    updateDisplay();
-                }
-            }
-        }
-    </script>
-    
-    <script type="module" src="assets/js/app.js"></script>
-    
-    <!-- Initial rectangle positioning script -->
-    <script>
-        // Initialize position immediately to prevent any unwanted or unexpected flashing
-        (() => {
-            // Safe initialization function that could cause a white page
-            const safeInit = () => {
-                try {
-                    // Add an indicator to prevent multiple initializations on quick refreshes
-                    if (document.body.hasAttribute('data-initialized')) {
-                        return;
-                    }
-                    document.body.setAttribute('data-initialized', 'true');
-                    document.body.classList.add('loading');
-                    
-                    // Disable CSS animations before the DOM is fully loaded
-                    document.documentElement.style.setProperty('--transition-fast', '0s');
-                    document.documentElement.style.setProperty('--transition-normal', '0s');
-                    
-                    // Access the rectangle and configure it in one go
-                    const rectangle = document.getElementById('rectangle');
-                    if (rectangle) {
-                        // Make the rectangle invisible immediately
-                        rectangle.classList.add('invisible');
-                        
-                        // Position the rectangle to the center by default to prevent movement
-                        const defaultStyles = {
-                            position: 'absolute',
-                            left: '0',
-                            top: '0',
-                            width: '75px',
-                            height: '75px',
-                            pointerEvents: 'none' // Disable interactions during loading
-                        };
-                        
-                        // Apply all styles in one go
-                        Object.assign(rectangle.style, defaultStyles);
-                    }
-                    
-                    // Remove loading overlay correctly after page load completes - OPTIMISÉ
-                    window.addEventListener('load', () => {
-                        // Supprimer complètement le délai initial
-                        const loadingOverlay = document.getElementById('loading-overlay');
-                        if (loadingOverlay) {
-                            loadingOverlay.style.opacity = '0';
-                            loadingOverlay.style.transition = 'opacity 0.075s cubic-bezier(0.4, 0, 0.2, 1)';
-                        }
-                        
-                        // Réduire considérablement le délai de transition
-                        setTimeout(() => {
-                            document.documentElement.style.removeProperty('--transition-fast');
-                            document.documentElement.style.removeProperty('--transition-normal');
-                            
-                            if (loadingOverlay) {
-                                loadingOverlay.style.display = 'none';
-                            }
-                            
-                            // Remove loading classes
-                            document.documentElement.classList.remove('loading');
-                            document.body.classList.add('page-loaded');
-                            document.body.classList.remove('loading');
-                            
-                            // Accélérer l'animation séquentielle des cartes
-                            const cards = document.querySelectorAll('.card, .section');
-                            cards.forEach((card, index) => {
-                                card.style.animationDelay = `${Math.min(index * 0.01, 0.02)}s`;
-                            });
-                        }, 20); // Délai minimal pour permettre le rendu initial
-                    });
-                } catch (error) {
-                    console.error('Error during initialization:', error);
-                    // Ensure that the UI is not blocked in case of error
-                    const loadingOverlay = document.getElementById('loading-overlay');
-                    if (loadingOverlay) {
-                        loadingOverlay.style.display = 'none';
-                    }
-                    // Remove loading classes in case of error
-                    document.documentElement.classList.remove('loading');
-                    document.body.classList.remove('loading');
-                }
-            };
-            
-            // Safely execute initialization
-            safeInit();
-            
-            // Backup: If the page remains blocked, ensure the overlay disappears
-            setTimeout(() => {
-                const loadingOverlay = document.getElementById('loading-overlay');
-                if (loadingOverlay && loadingOverlay.style.display !== 'none') {
-                    loadingOverlay.style.display = 'none';
-                }
-                // Always remove loading classes after the safety delay
-                document.documentElement.classList.remove('loading');
-                document.body.classList.add('page-loaded');
-                document.body.classList.remove('loading');
-            }, 400); // Réduire le délai de sécurité à moins d'une seconde
-        })();
-    </script>
-    
-    <!-- Register Service Worker -->
-    <script>
-        // Wait until the page is loaded before registering the service worker to avoid performance issues
-        window.addEventListener('load', function() {
-            // Check if the service worker is supported
-            if ('serviceWorker' in navigator) {
-                try {
-                    // Register the service worker
-                    navigator.serviceWorker.register('/service-worker.js')
-                        .then(function(registration) {
-                            console.log('Service Worker registered successfully:', registration.scope);
-                        })
-                        .catch(function(error) {
-                            console.warn('Service Worker registration failed:', error);
-                        });
-                    
-                    // Handle service worker update
-                    navigator.serviceWorker.addEventListener('controllerchange', function() {
-                        console.log('Service Worker updated');
-                    });
-                } catch (e) {
-                    console.warn('Error registering Service Worker:', e);
-                }
-            } else {
-                console.log('Service Workers not supported by this browser');
+    <script type="module">
+        import { toggleLockRatio } from './assets/js/components/toggleLockRatio.js';
+        document.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById('lockRatio');
+            if (btn) {
+                btn.onclick = function() { toggleLockRatio(this); };
             }
         });
     </script>
+    <script type="module" src="assets/js/app.js"></script>
+    <script type="module" src="assets/js/init/rectangleInit.js"></script>
+    <script type="module" src="assets/js/init/serviceWorkerRegister.js"></script>
 </body>
 </html>
