@@ -20,11 +20,36 @@ const PreferencesManager = {
         this._preferences = this.loadPreferences();
         console.log('DEBUG: Préférences chargées depuis localStorage:', this._preferences);
         
+        // Vérifier et nettoyer les références aux favoris qui n'existent plus
+        this._cleanupFavoriteReferences();
+        
         this.createResetDialog();
         this.applyPreferences();
         this.setupEventListeners();
         
         console.log('Gestionnaire de préférences initialisé');
+    },
+    
+    /**
+     * Nettoie les références aux favoris supprimés dans les préférences
+     */
+    _cleanupFavoriteReferences() {
+        if (!this._preferences) return;
+        
+        // Si pas de StorageManager ou pas de favoris référencés, rien à faire
+        if (typeof window.StorageManager === 'undefined' || !this._preferences.lastLoadedFavoriteId) {
+            return;
+        }
+        
+        console.log(`Vérification des références aux favoris: ${this._preferences.lastLoadedFavoriteId}`);
+        
+        // Vérifier si le favori existe
+        if (window.StorageManager.getFavoriteById && 
+            !window.StorageManager.getFavoriteById(this._preferences.lastLoadedFavoriteId)) {
+            console.log(`Suppression de la référence au favori ${this._preferences.lastLoadedFavoriteId} (supprimé)`);
+            delete this._preferences.lastLoadedFavoriteId;
+            this.savePreferences(this._preferences);
+        }
     },
     
     /**
@@ -236,6 +261,16 @@ const PreferencesManager = {
             area: this._collectAreaSettings(),
             timestamp: Date.now()
         };
+        
+        // Si une préférence fait référence à un favori, vérifier qu'il existe toujours
+        if (preferences.lastLoadedFavoriteId) {
+            // Vérifier que le favori existe encore
+            if (typeof StorageManager !== 'undefined' && 
+                (!StorageManager.getFavoriteById || !StorageManager.getFavoriteById(preferences.lastLoadedFavoriteId))) {
+                // Le favori n'existe plus, supprimer la référence
+                delete preferences.lastLoadedFavoriteId;
+            }
+        }
         
         this._validatePreferences(preferences);
         this.savePreferences(preferences);

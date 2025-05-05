@@ -76,6 +76,19 @@ class AppState {
         // Initialize notification system
         Notifications.init();
         
+        // Lancer un diagnostic avant de charger les favoris
+        if (typeof StorageManager !== 'undefined') {
+            console.log("Running initial storage diagnostic...");
+            
+            // Réinitialiser complètement le stockage pour résoudre les problèmes potentiels
+            if (typeof StorageManager.forceReset === 'function') {
+                console.log("Performing full storage reset during initialization");
+                StorageManager.forceReset();
+            } else if (typeof StorageManager.diagnoseFavorites === 'function') {
+                StorageManager.diagnoseFavorites();
+            }
+        }
+        
         // Preload favorites during the loading of other data
         if (typeof FavoritesUI !== 'undefined') {
             FavoritesUI.init();
@@ -84,6 +97,19 @@ class AppState {
         // Initialize the preferences manager if it exists
         if (typeof PreferencesManager !== 'undefined') {
             PreferencesManager.init();
+        }
+        
+        // S'assurer que les préférences ne font pas référence à des favoris supprimés
+        if (typeof PreferencesManager !== 'undefined' && 
+            typeof PreferencesManager._cleanupFavoriteReferences === 'function') {
+            console.log("Performing preferences cleanup during initialization");
+            PreferencesManager._cleanupFavoriteReferences();
+        }
+        
+        // Lancer un second diagnostic après que les favoris et préférences soient chargés
+        if (typeof StorageManager !== 'undefined' && typeof StorageManager.diagnoseFavorites === 'function') {
+            console.log("Running post-init storage diagnostic...");
+            setTimeout(() => StorageManager.diagnoseFavorites(), 500);
         }
         
         // Load tablet data
@@ -134,4 +160,51 @@ document.addEventListener('DOMContentLoaded', () => {
             ContextMenu.init();
         }
     }, 500);
+    
+    // Gestionnaire spécial pour F5 et Ctrl+R qui assure que les favoris sont correctement sauvegardés
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'F5' || (e.ctrlKey && e.key === 'r')) {
+            console.log("Page refresh detected (F5/Ctrl+R)");
+            
+            // Forcer le nettoyage du cache des favoris avant le rechargement
+            if (typeof StorageManager !== 'undefined') {
+                console.log("Cleaning StorageManager cache before refresh");
+                if (typeof StorageManager.clearCache === 'function') {
+                    StorageManager.clearCache();
+                }
+                
+                // Vérifier et récupérer la dernière liste de favoris disponible
+                if (typeof StorageManager.getFavorites === 'function') {
+                    const currentFavorites = StorageManager.getFavorites();
+                    console.log(`Current favorites before refresh: ${currentFavorites.length} items`);
+                }
+            }
+            
+            // Nettoyer le cache des favoris dans l'initialisation
+            if (typeof FavoritesInit !== 'undefined') {
+                console.log("Cleaning FavoritesInit cache before refresh");
+                FavoritesInit.cachedFavorites = null;
+                
+                // Forcer un rafraîchissement complet en dernier recours
+                if (typeof FavoritesInit.updateFavoriteCache === 'function') {
+                    FavoritesInit.updateFavoriteCache(true);
+                }
+            }
+            
+            // S'assurer que les préférences sont mises à jour
+            if (typeof PreferencesManager !== 'undefined') {
+                console.log("Saving and cleaning preferences before refresh");
+                
+                // Nettoyer les références aux favoris supprimés
+                if (typeof PreferencesManager._cleanupFavoriteReferences === 'function') {
+                    PreferencesManager._cleanupFavoriteReferences();
+                }
+                
+                // Sauvegarder l'état actuel
+                if (typeof PreferencesManager.saveCurrentState === 'function') {
+                    PreferencesManager.saveCurrentState();
+                }
+            }
+        }
+    });
 });

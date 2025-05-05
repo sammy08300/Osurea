@@ -289,8 +289,10 @@ function updateInfoDisplays(dims) {
         tabletDimensionsInfo.textContent = newTabletDimensions;
     }
     
-    if (tabletRatioInfo.textContent !== tabletRatio) {
-        tabletRatioInfo.textContent = tabletRatio;
+    // Toujours formater le ratio de la tablette avec 3 décimales
+    const formattedTabletRatio = formatNumber(tabletRatio, 3);
+    if (tabletRatioInfo.textContent !== formattedTabletRatio) {
+        tabletRatioInfo.textContent = formattedTabletRatio;
     }
     
     // Area info
@@ -328,6 +330,7 @@ function updateInfoDisplays(dims) {
         areaInfo.textContent = `${areaSurface} mm²`;
     }
     
+    // S'assurer que le ratio est toujours affiché avec 3 décimales
     if (ratioInfo.textContent !== areaRatio) {
         ratioInfo.textContent = areaRatio;
     }
@@ -413,8 +416,10 @@ function updateInfoDisplaysWithoutRatio(dims) {
         tabletDimensionsInfo.textContent = newTabletDimensions;
     }
     
-    if (tabletRatioInfo.textContent !== tabletRatio) {
-        tabletRatioInfo.textContent = tabletRatio;
+    // Toujours formater le ratio de la tablette avec 3 décimales
+    const formattedTabletRatio = formatNumber(tabletRatio, 3);
+    if (tabletRatioInfo.textContent !== formattedTabletRatio) {
+        tabletRatioInfo.textContent = formattedTabletRatio;
     }
     
     // Area info
@@ -431,6 +436,7 @@ function updateInfoDisplaysWithoutRatio(dims) {
         areaInfo.textContent = `${areaSurface} mm²`;
     }
     
+    // S'assurer que le ratio est toujours affiché avec 3 décimales
     if (ratioInfo.textContent !== areaRatio) {
         ratioInfo.textContent = areaRatio;
     }

@@ -30,6 +30,27 @@ export const FavoritesInit = {
         this.favoritesList.style.visibility = 'hidden';
         this.favoritesList.style.opacity = '0';
         
+        // Force le nettoyage du cache local des favoris et du StorageManager
+        this.cachedFavorites = null;
+        
+        // S'assurer que le StorageManager est réinitialisé pour obtenir des données propres
+        if (typeof StorageManager !== 'undefined') {
+            if (typeof StorageManager.forceReset === 'function') {
+                console.log("Using forceReset during favorites initialization");
+                // Utiliser forceReset pour garantir des données propres
+                const cleanFavorites = StorageManager.forceReset();
+                this.cachedFavorites = cleanFavorites;
+            } else if (typeof StorageManager.clearCache === 'function') {
+                StorageManager.clearCache();
+                this.cachedFavorites = getFavorites();
+            } else {
+                this.cachedFavorites = getFavorites();
+            }
+        } else {
+            // Fallback si StorageManager n'est pas disponible
+            this.cachedFavorites = getFavorites();
+        }
+        
         this.favoritesPlaceholder = this.favoritesList.querySelector('p');
         this.setupSortButtons();
         
@@ -38,7 +59,7 @@ export const FavoritesInit = {
         FavoritesPopups.createDetailsPopup();
         
         // Charger les favoris mais attendre pour les afficher
-        this.cachedFavorites = getFavorites();
+        // Note: cachedFavorites est déjà défini, pas besoin de le redéfinir ici
         
         // Attendre que tout soit prêt pour afficher la liste de favoris
         requestAnimationFrame(() => {

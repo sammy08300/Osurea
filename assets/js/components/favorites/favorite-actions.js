@@ -341,8 +341,13 @@ export const FavoritesActions = {
                                 favoriteElement.parentNode.removeChild(favoriteElement);
                             }
                             
-                            // Mettre à jour le cache des favoris
-                            FavoritesInit.cachedFavorites = getFavorites();
+                            // Mettre à jour le cache des favoris et forcer une mise à jour complète
+                            FavoritesInit.updateFavoriteCache(true);
+                            
+                            // S'assurer que le favori est également supprimé des préférences
+                            if (typeof window.PreferencesManager !== 'undefined' && typeof window.PreferencesManager.saveCurrentState === 'function') {
+                                setTimeout(() => window.PreferencesManager.saveCurrentState(), 100);
+                            }
                             
                             if (typeof Notifications !== 'undefined' && Notifications.success) {
                                 Notifications.success(localeManager.translate('notifications.favoriteDeleted') || 'Favori supprimé');
@@ -356,14 +361,18 @@ export const FavoritesActions = {
                             }
                         }
                     }, 300); // Durée de l'animation fadeOut
-                    
                 } else {
                     // Si l'élément n'est pas trouvé dans le DOM, suppression classique
                     const success = removeFavorite(id);
                     
                     if (success) {
                         // Mettre à jour le cache et l'interface
-                        FavoritesInit.updateFavoriteCache(false);
+                        FavoritesInit.updateFavoriteCache(true);
+                        
+                        // S'assurer que le favori est également supprimé des préférences
+                        if (typeof window.PreferencesManager !== 'undefined' && typeof window.PreferencesManager.saveCurrentState === 'function') {
+                            setTimeout(() => window.PreferencesManager.saveCurrentState(), 100);
+                        }
                         
                         if (typeof Notifications !== 'undefined' && Notifications.success) {
                             Notifications.success(localeManager.translate('notifications.favoriteDeleted') || 'Favori supprimé');
@@ -413,6 +422,9 @@ export const FavoritesActions = {
                 presetInfo = tabletSelectorText.textContent;
             }
         }
+        
+        // Log pour déboguer
+        console.log('Saving favorite, edit mode:', !!this.editingFavoriteId);
         
         // Vérifier si on est en mode édition
         if (this.editingFavoriteId) {
@@ -498,13 +510,37 @@ export const FavoritesActions = {
                     tabletW: tabletWidth,
                     tabletH: tabletHeight,
                     presetInfo: presetInfo,
-                    radius: areaRadius
+                    radius: areaRadius,
+                    createdAt: Date.now()
                 };
+                
+                console.log('Creating new favorite:', newFavorite);
+                
+                // Forcer le nettoyage du cache avant d'ajouter
+                if (typeof StorageManager !== 'undefined' && typeof StorageManager.clearCache === 'function') {
+                    StorageManager.clearCache();
+                }
                 
                 const savedFavorite = addFavorite(newFavorite);
                 if (savedFavorite) {
+                    // Récupérer la liste complète des favoris après l'ajout pour débogage
+                    console.log('All favorites after adding:', getFavorites());
+                    
                     // Mettre à jour le cache et forcer un rafraîchissement complet
                     FavoritesInit.updateFavoriteCache(true);
+                    
+                    // Sauvegarder les préférences après un court délai pour s'assurer que l'ajout est terminé
+                    if (typeof window.PreferencesManager !== 'undefined' && typeof window.PreferencesManager.saveCurrentState === 'function') {
+                        // Délai plus long pour garantir que le stockage est terminé
+                        setTimeout(() => {
+                            // Debug: vérifier si le favori existe avant de sauvegarder les préférences
+                            const allFavs = getFavorites();
+                            const favExists = allFavs.some(f => f.id === savedFavorite.id);
+                            console.log(`Favorite ${savedFavorite.id} exists before saving prefs: ${favExists}`);
+                            
+                            window.PreferencesManager.saveCurrentState();
+                        }, 300);
+                    }
                     
                     // Attendre un court instant pour permettre au DOM de se mettre à jour
                     setTimeout(() => {
@@ -525,11 +561,6 @@ export const FavoritesActions = {
                     if (typeof Notifications !== 'undefined' && Notifications.error) {
                         Notifications.error(localeManager.translate('notifications.errorSavingConfig') || 'Erreur lors de la sauvegarde de la configuration');
                     }
-                }
-                
-                // Sauvegarder l'état actuel dans les préférences si disponible
-                if (typeof window.PreferencesManager !== 'undefined' && typeof window.PreferencesManager.saveCurrentState === 'function') {
-                    setTimeout(() => window.PreferencesManager.saveCurrentState(), 100);
                 }
             });
         }
