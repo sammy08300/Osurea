@@ -7,46 +7,64 @@
 
 import localeManager from '../locales/index.js';
 
+// Supported language codes
+const SUPPORTED_LANGUAGES = {
+  fr: 'fr',
+  es: 'es',
+  en: 'en' // default
+};
+
+/**
+ * Extracts the main language code from the browser's language setting
+ * @returns {string} Two-letter language code
+ */
+function getBrowserLanguageCode() {
+  const browserLang = navigator.language || 'en';
+  return browserLang.slice(0, 2).toLowerCase();
+}
+
+/**
+ * Determines which supported language to use based on browser language
+ * @param {string} langCode - Two-letter language code
+ * @returns {string} Supported language code (fr, es, or en)
+ */
+function getSupportedLanguage(langCode) {
+  return SUPPORTED_LANGUAGES[langCode] || SUPPORTED_LANGUAGES.en;
+}
+
 /**
  * Detects the browser's interface language and applies the corresponding language.
- * - fr for any French variant
- * - es for any Spanish variant
- * - en otherwise (default)
+ * Supports French, Spanish, or English (default)
  */
 function detectAndApplyBrowserLanguage() {
   try {
-    // Vérifier si l'utilisateur a déjà choisi une langue
+    // Check if user has already chosen a language
     const savedLocale = localeManager.getSafeLocalStorage('osureaLocale');
     if (savedLocale && localeManager.translations[savedLocale]) {
       console.log(`[LangDetect] User has already chosen language: ${savedLocale}, skipping auto-detection`);
       return;
     }
-    // Uses only the browser's interface language
-    let lang = 'en'; // fallback
-    if (navigator.language) {
-      lang = navigator.language;
-    }
-    // Extracts the main language code (2 letters)
-    const langCode = lang.slice(0, 2).toLowerCase();
-    let appliedLang = 'en';
-    if (langCode === 'fr') {
-      appliedLang = 'fr';
-    } else if (langCode === 'es') {
-      appliedLang = 'es';
-    }
+    
+    const langCode = getBrowserLanguageCode();
+    const appliedLang = getSupportedLanguage(langCode);
+    
     localeManager.setLocale(appliedLang);
-    console.log(`[LangDetect] Browser interface language: ${lang} → Application: ${appliedLang}`);
+    console.log(`[LangDetect] Browser interface language: ${navigator.language} → Application: ${appliedLang}`);
   } catch (e) {
-    localeManager.setLocale('en');
+    localeManager.setLocale(SUPPORTED_LANGUAGES.en);
     console.error('[LangDetect] Error, fallback to English', e);
   }
 }
 
-// Calls detection automatically when the site opens
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', detectAndApplyBrowserLanguage);
-} else {
-  detectAndApplyBrowserLanguage();
+// Initialize language detection
+function init() {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', detectAndApplyBrowserLanguage);
+  } else {
+    detectAndApplyBrowserLanguage();
+  }
 }
+
+init();
 
 export { detectAndApplyBrowserLanguage }; 
