@@ -149,7 +149,11 @@ const fr = {
         areaPositionBottomLeft: "Zone active positionnée en bas à gauche",
         areaPositionBottomRight: "Zone active positionnée en bas à droite",
         copiedInfo: "Informations copiées !",
-        copyError: "Erreur lors de la copie"
+        copyError: "Erreur lors de la copie",
+        invalidDimensions: "Dimensions invalides pour l'alignement",
+        tabletDataError: "Erreur de chargement des données tablettes",
+        errorSavingPreferences: "Impossible de sauvegarder vos préférences",
+        preferencesReset: "Préférences réinitialisées"
     }
 };
 

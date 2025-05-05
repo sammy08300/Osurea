@@ -109,7 +109,7 @@ export const FavoritesRendering = {
         const item = document.createElement('div');
         item.className = 'favorite-item bg-gray-800 rounded-xl p-3 border border-gray-700 hover:border-blue-500/30 shadow-lg';
         item.dataset.id = favorite.id;
-        let title = favorite.title || favorite.comment || 'i18n:default_favorite_name';
+        let title = favorite.title || favorite.comment || 'i18n:favorites.defaultName';
         let translatedTitle = title;
         if (title.startsWith('i18n:')) {
             const key = title.substring(5);
@@ -243,7 +243,7 @@ export const FavoritesRendering = {
      */
     updateFavoriteElementContent(element, favorite) {
         // Extraire les informations nécessaires pour la mise à jour
-        let title = favorite.title || favorite.comment || 'i18n:default_favorite_name';
+        let title = favorite.title || favorite.comment || 'i18n:favorites.defaultName';
         let translatedTitle = title;
         if (title.startsWith('i18n:')) {
             const key = title.substring(5);

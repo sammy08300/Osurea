@@ -323,7 +323,7 @@ const ContextMenu = {
         
         // Check validity of dimensions
         if ([tabletWidth, tabletHeight, areaWidth, areaHeight].some(v => !isValidNumber(v, 0))) {
-            this.showError('Invalid dimensions for alignment');
+            this.showError('notifications.invalidDimensions');
             return null;
         }
         
@@ -332,11 +332,17 @@ const ContextMenu = {
     
     /**
      * Show error notification with fallback
-     * @param {string} message - Error message
+     * @param {string} message - Error message or translation key
      */
     showError(message) {
         if (typeof Notifications !== 'undefined' && Notifications?.error) {
-            Notifications.error(message);
+            // Try to get the translation if it looks like a key
+            if (message.includes('.') && typeof window.translateWithFallback === 'function') {
+                const translated = window.translateWithFallback(message);
+                Notifications.error(translated || "Dimensions invalides pour l'alignement");
+            } else {
+                Notifications.error(message);
+            }
         } else {
             console.error(message);
         }
@@ -441,31 +447,44 @@ const ContextMenu = {
      * @param {string} position - The position name
      */
     showSuccessNotification(position) {
-        const translationKey = `area_position_${position}`;
+        // Position mapping to translation keys
+        const positionToKey = {
+            'left': 'notifications.areaPositionLeft',
+            'right': 'notifications.areaPositionRight',
+            'top': 'notifications.areaPositionTop',
+            'bottom': 'notifications.areaPositionBottom',
+            'center': 'notifications.areaPositionCenter',
+            'top-left': 'notifications.areaPositionTopLeft',
+            'top-right': 'notifications.areaPositionTopRight', 
+            'bottom-left': 'notifications.areaPositionBottomLeft',
+            'bottom-right': 'notifications.areaPositionBottomRight'
+        };
+        
+        const translationKey = positionToKey[position];
         
         // Try to use the translation system
-        if (typeof window.__ === 'function') {
-            const translatedMessage = window.__(translationKey);
-            if (translatedMessage !== translationKey) {
+        if (typeof window.translateWithFallback === 'function' && translationKey) {
+            const translatedMessage = window.translateWithFallback(translationKey);
+            if (translatedMessage) {
                 this.showSuccess(translatedMessage);
                 return;
             }
         }
         
-        // Fallback if translation is not available
-        const positionNames = {
-            'left': 'left',
-            'right': 'right',
-            'top': 'top',
-            'bottom': 'bottom',
-            'center': 'center',
-            'top-left': 'top-left',
-            'top-right': 'top-right', 
-            'bottom-left': 'bottom-left',
-            'bottom-right': 'bottom-right'
+        // Fallback in case of missing translation
+        const fallbackMessages = {
+            'left': 'Zone active positionnée à gauche',
+            'right': 'Zone active positionnée à droite',
+            'top': 'Zone active positionnée en haut',
+            'bottom': 'Zone active positionnée en bas',
+            'center': 'Zone active positionnée au centre',
+            'top-left': 'Zone active positionnée en haut à gauche',
+            'top-right': 'Zone active positionnée en haut à droite', 
+            'bottom-left': 'Zone active positionnée en bas à gauche',
+            'bottom-right': 'Zone active positionnée en bas à droite'
         };
         
-        this.showSuccess(`Active area positioned at ${positionNames[position]}`);
+        this.showSuccess(fallbackMessages[position] || `Zone active positionnée (${position})`);
     },
     
     /**

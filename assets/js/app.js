@@ -40,7 +40,7 @@ class AppState {
             TabletSelector.init(this.tabletData);
         } catch (error) {
             console.error('Error loading tablet data:', error);
-            Notifications.error('Erreur de chargement des données tablettes');
+            Notifications.error(window.translateWithFallback('notifications.tabletDataError') || 'Erreur de chargement des données tablettes');
         }
     }
     
@@ -65,7 +65,7 @@ class AppState {
             this.originalValues = null;
             
             UIManager.updateEditModeUI(false);
-            Notifications.info('Modifications annulées');
+            Notifications.info(window.translateWithFallback('notifications.editModeCanceled') || 'Modifications annulées');
         }
     }
     

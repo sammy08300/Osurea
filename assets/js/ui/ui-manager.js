@@ -33,13 +33,29 @@ export const UIManager = {
         
         if (isEditing) {
             // Update button styling for edit mode
-            saveBtn.textContent = "Mettre à Jour";
+            const updateText = translateWithFallback('favorites.confirmModification') || "Mettre à Jour";
+            const saveSpan = saveBtn.querySelector('span[data-i18n]');
+            if (saveSpan) {
+                saveSpan.textContent = updateText;
+                saveSpan.setAttribute('data-i18n', 'favorites.confirmModification');
+            } else {
+                saveBtn.textContent = updateText;
+            }
+            
             saveBtn.classList.remove('bg-green-600', 'hover:bg-green-700', 'focus:ring-green-500');
             saveBtn.classList.add('bg-yellow-600', 'hover:bg-yellow-700', 'focus:ring-yellow-500');
             cancelEditBtn.classList.remove('hidden');
         } else {
             // Reset to default styling
-            saveBtn.textContent = "Sauvegarder";
+            const saveText = translateWithFallback('favorites.saveButton') || "Sauvegarder";
+            const saveSpan = saveBtn.querySelector('span[data-i18n]');
+            if (saveSpan) {
+                saveSpan.textContent = saveText;
+                saveSpan.setAttribute('data-i18n', 'favorites.saveButton');
+            } else {
+                saveBtn.textContent = saveText;
+            }
+            
             saveBtn.classList.add('bg-green-600', 'hover:bg-green-700', 'focus:ring-green-500');
             saveBtn.classList.remove('bg-yellow-600', 'hover:bg-yellow-700', 'focus:ring-yellow-500');
             
@@ -105,10 +121,12 @@ export const UIManager = {
                 }
                 this.appState.cancelEditMode();
                 
-                // Notification
+                // Notification with proper translation key
                 if (typeof Notifications !== 'undefined') {
-                    Notifications.success('Configuration mise à jour');
+                    Notifications.success(translateWithFallback('notifications.configurationUpdated') || 'Configuration mise à jour');
                 }
+            } else if (typeof Notifications !== 'undefined') {
+                Notifications.error(translateWithFallback('notifications.errorUpdatingConfig') || 'Erreur lors de la mise à jour de la configuration');
             }
         }
     },
@@ -217,6 +235,11 @@ Centre X: ${NumberUtils.formatNumber(offsetX, 3)} mm
 Centre Y: ${NumberUtils.formatNumber(offsetY, 3)} mm`;
         
         DOMUtils.copyToClipboard(info);
+        
+        // Show notification with proper translation key
+        if (typeof Notifications !== 'undefined') {
+            Notifications.success(translateWithFallback('notifications.copiedInfo') || 'Information copiée !');
+        }
     },
     
     /**

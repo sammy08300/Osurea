@@ -33,9 +33,28 @@ export function translateWithFallback(key) {
         // Try to get the translation from localeManager with the detected language
         if (localeManager && localeManager.translations && localeManager.translations[lang]) {
             try {
-                const langSpecificTranslation = localeManager.translations[lang][key];
-                if (langSpecificTranslation) {
-                    return langSpecificTranslation;
+                // Handle hierarchical keys with dots
+                if (key.includes('.')) {
+                    const segments = key.split('.');
+                    let current = localeManager.translations[lang];
+                    
+                    // Navigate the hierarchical structure
+                    for (const segment of segments) {
+                        if (current[segment] === undefined) {
+                            return null; // Key path not found
+                        }
+                        current = current[segment];
+                    }
+                    
+                    if (typeof current === 'string') {
+                        return current; // Return the found translation
+                    }
+                } else {
+                    // For flat keys
+                    const langSpecificTranslation = localeManager.translations[lang][key];
+                    if (langSpecificTranslation) {
+                        return langSpecificTranslation;
+                    }
                 }
             } catch (e) {
                 console.warn('Failed to get language-specific translation:', e);

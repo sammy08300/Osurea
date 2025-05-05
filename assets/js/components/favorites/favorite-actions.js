@@ -34,7 +34,7 @@ export const FavoritesActions = {
         const favorite = getFavoriteById(id);
         if (!favorite) {
             if (typeof Notifications !== 'undefined' && Notifications.error) {
-                Notifications.error(localeManager.translate('favorite_not_found') || `Favori ID ${id} introuvable`);
+                Notifications.error(localeManager.translate('notifications.favoriteNotFound') || `Favori ID ${id} introuvable`);
             }
             return;
         }
@@ -102,12 +102,12 @@ export const FavoritesActions = {
             
             // Notification
             if (typeof Notifications !== 'undefined' && Notifications.success) {
-                Notifications.success(localeManager.translate('configuration_loaded') || 'Configuration chargée');
+                Notifications.success(localeManager.translate('notifications.configurationLoaded') || 'Configuration chargée');
             }
         } catch (error) {
             console.error('Error loading the favorite:', error);
             if (typeof Notifications !== 'undefined' && Notifications.error) {
-                Notifications.error(localeManager.translate('error_loading_config') || 'Erreur lors du chargement de la configuration');
+                Notifications.error(localeManager.translate('notifications.errorLoadingConfig') || 'Erreur lors du chargement de la configuration');
             }
         }
     },
@@ -120,7 +120,7 @@ export const FavoritesActions = {
         const favorite = getFavoriteById(id);
         if (!favorite) {
             if (typeof Notifications !== 'undefined' && Notifications.error) {
-                Notifications.error(localeManager.translate('favorite_not_found') || 'Favori introuvable');
+                Notifications.error(localeManager.translate('notifications.favoriteNotFound') || 'Favori introuvable');
             }
             return;
         }
@@ -167,7 +167,7 @@ export const FavoritesActions = {
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>
-                <span data-i18n="confirm_modification">Confirmer la modification</span>`;
+                <span data-i18n="favorites.confirmModification">Confirmer la modification</span>`;
             
             // S'assurer que la traduction est appliquée
             if (typeof localeManager !== 'undefined') {
@@ -217,7 +217,7 @@ export const FavoritesActions = {
         
         // Afficher une notification
         if (typeof Notifications !== 'undefined' && Notifications.info) {
-            Notifications.info(localeManager.translate('edit_mode_activated') || 'Mode édition activé - Modifiez les paramètres puis cliquez sur "Confirmer la modification"');
+            Notifications.info(localeManager.translate('notifications.editModeActivated') || 'Mode édition activé - Modifiez les paramètres puis cliquez sur "Confirmer la modification"');
         }
     },
 
@@ -313,7 +313,7 @@ export const FavoritesActions = {
         
         // Afficher une notification sauf si demandé de ne pas le faire
         if (!skipNotification && typeof Notifications !== 'undefined' && Notifications.info) {
-            Notifications.info(localeManager.translate('edit_mode_canceled') || 'Mode édition annulé');
+            Notifications.info(localeManager.translate('notifications.editModeCanceled') || 'Mode édition annulé');
         }
     },
 
@@ -345,14 +345,14 @@ export const FavoritesActions = {
                             FavoritesInit.cachedFavorites = getFavorites();
                             
                             if (typeof Notifications !== 'undefined' && Notifications.success) {
-                                Notifications.success(localeManager.translate('favorite_deleted') || 'Favori supprimé');
+                                Notifications.success(localeManager.translate('notifications.favoriteDeleted') || 'Favori supprimé');
                             }
                         } else {
                             // Si erreur, retirer l'animation et restaurer l'élément
                             favoriteElement.classList.remove('animate-fadeOut');
                             
                             if (typeof Notifications !== 'undefined' && Notifications.error) {
-                                Notifications.error(localeManager.translate('error_deleting_favorite') || 'Erreur lors de la suppression du favori');
+                                Notifications.error(localeManager.translate('notifications.errorDeletingFavorite') || 'Erreur lors de la suppression du favori');
                             }
                         }
                     }, 300); // Durée de l'animation fadeOut
@@ -366,11 +366,11 @@ export const FavoritesActions = {
                         FavoritesInit.updateFavoriteCache(false);
                         
                         if (typeof Notifications !== 'undefined' && Notifications.success) {
-                            Notifications.success(localeManager.translate('favorite_deleted') || 'Favori supprimé');
+                            Notifications.success(localeManager.translate('notifications.favoriteDeleted') || 'Favori supprimé');
                         }
                     } else {
                         if (typeof Notifications !== 'undefined' && Notifications.error) {
-                            Notifications.error(localeManager.translate('error_deleting_favorite') || 'Erreur lors de la suppression du favori');
+                            Notifications.error(localeManager.translate('notifications.errorDeletingFavorite') || 'Erreur lors de la suppression du favori');
                         }
                     }
                 }
@@ -457,11 +457,11 @@ export const FavoritesActions = {
                 }
                 
                 if (typeof Notifications !== 'undefined' && Notifications.success) {
-                    Notifications.success(localeManager.translate('configuration_updated') || 'Configuration mise à jour');
+                    Notifications.success(localeManager.translate('notifications.configurationUpdated') || 'Configuration mise à jour');
                 }
             } else {
                 if (typeof Notifications !== 'undefined' && Notifications.error) {
-                    Notifications.error(localeManager.translate('error_updating_config') || 'Erreur lors de la mise à jour de la configuration');
+                    Notifications.error(localeManager.translate('notifications.errorUpdatingConfig') || 'Erreur lors de la mise à jour de la configuration');
                 }
             }
         } else {
@@ -469,20 +469,20 @@ export const FavoritesActions = {
             FavoritesPopups.showCommentDialog((commentData) => {
                 // Si le titre est vide, utiliser la clé de traduction complète
                 if (!commentData.title || commentData.title.trim() === '') {
-                    commentData.title = "i18n:default_favorite_name";
+                    commentData.title = "i18n:favorites.defaultName";
                 }
                 
                 // Si c'est une clé de traduction, ne pas tronquer
                 if (!commentData.title.startsWith('i18n:') && commentData.title.length > 32) {
                     if (typeof Notifications !== 'undefined' && Notifications.warning) {
-                        Notifications.warning(localeManager.translate('title_truncated') || "Le titre a été tronqué à 32 caractères.");
+                        Notifications.warning(localeManager.translate('notifications.titleTruncated') || "Le titre a été tronqué à 32 caractères.");
                     }
                     commentData.title = commentData.title.substring(0, 32);
                 }
                 
                 if (commentData.description && commentData.description.length > 144) {
                     if (typeof Notifications !== 'undefined' && Notifications.warning) {
-                        Notifications.warning(localeManager.translate('description_truncated') || "La description a été tronquée à 144 caractères.");
+                        Notifications.warning(localeManager.translate('notifications.descriptionTruncated') || "La description a été tronquée à 144 caractères.");
                     }
                     commentData.description = commentData.description.substring(0, 144);
                 }
@@ -519,11 +519,11 @@ export const FavoritesActions = {
                     }, 100);
                     
                     if (typeof Notifications !== 'undefined' && Notifications.success) {
-                        Notifications.success(localeManager.translate('configuration_saved') || 'Configuration sauvegardée');
+                        Notifications.success(localeManager.translate('notifications.configurationSaved') || 'Configuration sauvegardée');
                     }
                 } else {
                     if (typeof Notifications !== 'undefined' && Notifications.error) {
-                        Notifications.error(localeManager.translate('error_saving_config') || 'Erreur lors de la sauvegarde de la configuration');
+                        Notifications.error(localeManager.translate('notifications.errorSavingConfig') || 'Erreur lors de la sauvegarde de la configuration');
                     }
                 }
                 
@@ -604,8 +604,8 @@ export const FavoritesActions = {
             } else if (newTitleValue === key) {
                 // L'utilisateur a entré la clé brute, garder le format i18n
                 newTitle = originalTitle;
-            } else if (key === 'default_favorite_name') {
-                // Pour default_favorite_name, vérifier s'ils ont tapé l'une des traductions standard
+            } else if (key === 'favorites.defaultName') {
+                // Pour favorites.defaultName, vérifier s'ils ont tapé l'une des traductions standard
                 let isDefaultTranslation = false;
                 
                 if (newTitleValue === 'Configuration sauvegardée' ||
@@ -615,7 +615,7 @@ export const FavoritesActions = {
                 }
                 
                 if (isDefaultTranslation) {
-                    newTitle = 'i18n:default_favorite_name';
+                    newTitle = 'i18n:favorites.defaultName';
                 }
             }
         }

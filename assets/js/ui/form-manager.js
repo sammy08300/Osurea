@@ -88,8 +88,8 @@ export const FormManager = {
         const handleTabletDimensionInput = () => {
             // Update the text of the selector
             if (elements.tabletSelectorText) {
-                elements.tabletSelectorText.textContent = translateWithFallback('custom_dimensions');
-                elements.tabletSelectorText.title = translateWithFallback('custom_dimensions');
+                elements.tabletSelectorText.textContent = translateWithFallback('tablet.customDimensions');
+                elements.tabletSelectorText.title = translateWithFallback('tablet.customDimensions');
             }
             
             // Ensure the dimensions container is visible

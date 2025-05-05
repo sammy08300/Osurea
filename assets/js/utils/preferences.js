@@ -222,7 +222,7 @@ const PreferencesManager = {
         } catch (error) {
             console.error('Erreur lors de la sauvegarde des préférences:', error);
             if (typeof Notifications !== 'undefined') {
-                Notifications.error('Impossible de sauvegarder vos préférences');
+                Notifications.error(window.translateWithFallback('notifications.errorSavingPreferences') || 'Impossible de sauvegarder vos préférences');
             }
         }
     },
@@ -449,7 +449,7 @@ const PreferencesManager = {
             this._preferences = {};
             
             if (typeof Notifications !== 'undefined') {
-                Notifications.success('Préférences réinitialisées');
+                Notifications.success(window.translateWithFallback('notifications.preferencesReset') || 'Préférences réinitialisées');
             }
             
             window.location.reload();
