@@ -1,11 +1,11 @@
 <div align="center">
   <img src="assets/img/favicon.svg" alt="Logo Osu!rea" width="60" height="60" style="vertical-align: middle; margin-bottom: 10px;">
-  <h1>Osu!rea - Visualiseur de Zone Active v2.0</h1>
+  <h1>🇫🇷 Osu!rea - Visualiseur de Zone Active v2.0</h1>
   <a href="https://github.com/sammy08300/Areasu/tree/v2git">
     <img src="https://img.shields.io/badge/version-2.0-blue.svg" alt="Version">
   </a>
     <br />
-  <a href="https://github.com/sammy08300/Osurea/blob/refacto/README.md#osurea---area-visualizer-v20">Read in English</a>
+  <a href="README.md">🇬🇧 Read in English</a> | <a href="README-ES.md">🇪🇸 Leer en español</a>
 </div>
 </div>
 

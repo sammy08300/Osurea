@@ -2,24 +2,27 @@
   "name": "areasu",
   "version": "1.0.0",
   "description": "Un outil interactif pour les joueurs d'osu! permettant de visualiser et configurer la zone active de leur tablette graphique.",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build:css": "postcss assets/css/main.css -o assets/css/styles.css",
-    "watch:css": "postcss assets/css/main.css -o assets/css/styles.css --watch",
-    "build": "npm run build:css && node build.js",
-    "build:prod": "cross-env NODE_ENV=production npm run build:css && node build.js"
-  },
+  "author": "",
+  "license": "ISC",
+  "keywords": ["osu", "tablet", "configuration", "gaming"],
+  "homepage": "https://github.com/sammy08300/Areasu#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sammy08300/Areasu.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "bugs": {
     "url": "https://github.com/sammy08300/Areasu/issues"
   },
-  "homepage": "https://github.com/sammy08300/Areasu#readme",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "npm run watch:css",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npm run build:css && node build.js",
+    "build:prod": "cross-env NODE_ENV=production npm run build:css && node build.js",
+    "build:css": "postcss assets/css/main.css -o assets/css/styles.css",
+    "watch:css": "postcss assets/css/main.css -o assets/css/styles.css --watch"
+  },
   "devDependencies": {
     "autoprefixer": "^10.4.14",
     "cross-env": "^7.0.3",
