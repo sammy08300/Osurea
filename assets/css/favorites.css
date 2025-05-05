@@ -46,7 +46,7 @@
         box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
     }
     70% {
-        box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+        box-shadow: 0 0 0 7px rgba(16, 185, 129, 0);
     }
     100% {
         box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
@@ -59,9 +59,22 @@
     50% { opacity: 0.6; }
 }
 
+/* Animation de clic rapide pour les cartes */
+@keyframes cardClickPulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    100% {
+        transform: scale(0.98);
+        box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
+        border-color: rgba(59, 130, 246, 0.7);
+    }
+}
+
 /* Classes d'animation - SIMPLIFIÉES */
 .animate-fadeIn-smooth {
-    animation: fadeInSmooth 0.4s ease-out forwards;
+    animation: fadeInSmooth 0.3s ease-out forwards;
     opacity: 0;
 }
 
@@ -73,32 +86,32 @@
 }
 
 .animate-fadeOut {
-    animation: fadeOut 0.2s ease-out forwards;
+    animation: fadeOut 0.15s ease-out forwards;
     pointer-events: none;
 }
 
 .animate-fadeIn {
-    animation: fadeIn 0.3s ease-out forwards;
+    animation: fadeIn 0.2s ease-out forwards;
 }
 
 .animate-scaleIn {
-    animation: scaleIn 0.3s ease-out forwards;
+    animation: scaleIn 0.2s ease-out forwards;
 }
 
 /* Effet de highlight pour favoris */
 .highlight-effect {
-    animation: highlightPulse 1.5s 1;
+    animation: highlightPulse 1s 1;
     transition: border-color 0.3s;
 }
 
 /* Transitions simplifiées */
 .favorites-transition-in {
-    transition: opacity 0.3s ease;
+    transition: opacity 0.2s ease;
     opacity: 1;
 }
 
 .favorites-transition-out {
-    transition: opacity 0.2s ease;
+    transition: opacity 0.15s ease;
     opacity: 0;
 }
 
@@ -108,7 +121,7 @@
 
 /* Style de base des cartes de favoris */
 .favorite-item {
-    transition: border-color 0.3s, box-shadow 0.3s;
+    transition: border-color 0.2s, box-shadow 0.2s;
     opacity: 1;
 }
 
@@ -119,7 +132,7 @@
 
 /* Popup styles */
 #favorite-details-popup {
-    transition: opacity 0.3s ease;
+    transition: opacity 0.2s ease;
 }
 
 #favorite-details-popup.show {
@@ -127,7 +140,7 @@
 }
 
 #favorite-details-popup > div {
-    transition: transform 0.3s ease;
+    transition: transform 0.2s ease;
 }
 
 #favorite-details-popup.show > div {
@@ -150,7 +163,7 @@
 
 /* Boutons à l'intérieur des favoris */
 .favorite-item .favorite-btn {
-    transition: transform 0.2s, background-color 0.2s;
+    transition: transform 0.15s, background-color 0.15s;
 }
 
 .favorite-item .favorite-btn:hover {
@@ -170,4 +183,10 @@
     .favorite-item {
         margin-bottom: 8px;
     }
+}
+
+/* Effet de clic sur les cartes de favoris */
+.card-click-effect {
+    animation: cardClickPulse 0.08s ease-out forwards !important;
+    border-color: rgba(59, 130, 246, 0.7) !important;
 }

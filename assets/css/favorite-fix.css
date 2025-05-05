@@ -10,6 +10,12 @@
     will-change: none !important; /* Désactiver les optimisations qui peuvent causer des problèmes */
 }
 
+/* Exception pour permettre l'effet de clic sur les cartes */
+.favorite-item.card-click-effect {
+    will-change: transform !important;
+    transition: transform 0.08s ease, box-shadow 0.08s ease !important;
+}
+
 /* Ajout de z-index et position pour éviter que les boutons soient affectés par l'animation de la carte */
 .load-favorite-btn:active, .edit-favorite-btn:active, .delete-favorite-btn:active {
     transform: translateY(0) !important;
@@ -79,11 +85,11 @@
 
 /* Animation simple pour la popup */
 #favorite-details-popup {
-    transition: opacity 0.25s ease !important;
+    transition: opacity 0.18s ease !important;
 }
 
 #favorite-details-popup > div {
-    transition: transform 0.25s ease !important;
+    transition: transform 0.18s ease !important;
 }
 
 #favorite-details-popup.show {
