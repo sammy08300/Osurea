@@ -42,7 +42,7 @@ const fr = {
     // Favorites
     "favorites": "Favoris",
     "no_favorites": "Aucun favori enregistré. Sauvegardez une configuration pour la retrouver ici.",
-    "save_favorite": "Enregistrer la configuratio actuelle",
+    "save_favorite": "Enregistrer la configuration actuelle",
     "favorite_name": "Nom du favori",
     "favorite_name_placeholder": "Nom du favori (optionnel)",
     "favorite_description": "Description",
@@ -56,6 +56,7 @@ const fr = {
     "sort_date": "Date",
     "sort_name": "Nom",
     "sort_size": "Taille",
+    "sort_modified": "Modifié",
     
     // Summary
     "summary": "Récapitulatif",

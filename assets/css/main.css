@@ -1,3 +1,6 @@
+@import './favorites.css';
+@import './favorite-fix.css';
+
 /*
 ====================================================
   Tailwind Base Imports
@@ -250,20 +253,15 @@ body:not(.page-loaded) #rectangle {
   Favorite Items (Cards)
 ====================================================*/
 .favorite-item {
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), z-index 0.3s ease;
-    will-change: transform, box-shadow;
+    transition: box-shadow 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), z-index 0.3s ease;
+    will-change: box-shadow;
     position: relative;
     top: 4px;
     z-index: 1;
 }
 .favorite-item:hover {
-    transform: translateY(-12px) !important;
     box-shadow: 0 14px 20px var(--shadow-color) !important;
     z-index: 10 !important;
-}
-.favorite-item:active {
-    transform: translateY(-4px);
-    transition-duration: 0.1s;
 }
 
 /* Favorite action buttons */
@@ -586,10 +584,20 @@ body.loading-favorites #favorites-list .favorite-item {
 ====================================================*/
 .load-favorite-btn:active, .edit-favorite-btn:active, .delete-favorite-btn:active {
     transform: translateY(0) !important;
+    position: relative;
+    z-index: 5;
 }
 
-.favorite-item:has(.load-favorite-btn:active),
-.favorite-item:has(.edit-favorite-btn:active) {
+/* Suppression de l'effet de rebond sur la carte quand on clique sur les boutons */
+.favorite-item .load-favorite-btn:active,
+.favorite-item .edit-favorite-btn:active,
+.favorite-item .delete-favorite-btn:active {
+    animation: none !important;
+}
+
+/* On conserve uniquement la désactivation d'animation pour les cartes elles-mêmes, 
+   mais pas quand on clique sur les boutons à l'intérieur */
+.favorite-item:active {
     animation: none !important;
     opacity: 1 !important;
     transform: translateY(0) !important;

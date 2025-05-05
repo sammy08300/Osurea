@@ -2,7 +2,7 @@
  * Storage utility functions for favorites management
  */
 
-const StorageManager = {
+export const StorageManager = {
     // Storage key for favorites
     FAVORITES_KEY: 'Osu!reaFavorites_v2',
     
@@ -110,7 +110,9 @@ const StorageManager = {
             const favorites = this.getFavorites();
             const index = favorites.findIndex(f => f.id.toString() === id.toString());
             
-            if (index === -1) return false;
+            if (index === -1) {
+                return false;
+            }
             
             favorites[index] = {
                 ...favorites[index],

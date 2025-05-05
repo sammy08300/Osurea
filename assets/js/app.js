@@ -2,6 +2,9 @@
  * Main application module
  */
 
+// Import the FavoritesUI module
+import { FavoritesUI } from './components/favorites/favoritesindex.js';
+
 /**
  * Utility function to translate an i18n key with robust fallback
  * @param {string} key - The translation key without the i18n: prefix
@@ -604,9 +607,7 @@ Centre Y: ${formatNumber(offsetY, 3)} mm`;
                 });
         });
         
-        saveButton.addEventListener('click', () => {
-            Favorites.saveFavorite();
-        });
+        // Le bouton de sauvegarde est déjà géré par le module FavoritesEvents
         
         cancelEditBtn.addEventListener('click', () => {
             this.cancelEditMode();
@@ -714,9 +715,9 @@ Centre Y: ${formatNumber(offsetY, 3)} mm`;
         Notifications.init();
         
         // Preload favorites during the loading of other data
-        if (typeof Favorites !== 'undefined') {
+        if (typeof FavoritesUI !== 'undefined') {
             // Initialize Favorites as soon as possible to avoid the flash
-            Favorites.init();
+            FavoritesUI.init();
         }
         
         // Initialize the preferences manager if it exists
@@ -765,6 +766,95 @@ Centre Y: ${formatNumber(offsetY, 3)} mm`;
 // Initialize app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     appState.init();
+    
+    // Ajout d'un event listener direct sur le bouton de sauvegarde
+    const saveButton = document.getElementById('save-btn');
+    if (saveButton) {
+        saveButton.addEventListener('click', function() {
+            // Vérifier si nous sommes en mode édition
+            if (appState.editingFavoriteId) {
+                // En mode édition, on récupère les valeurs du formulaire
+                const areaWidth = parseFloat(document.getElementById('areaWidth').value);
+                const areaHeight = parseFloat(document.getElementById('areaHeight').value);
+                const areaOffsetX = parseFloat(document.getElementById('areaOffsetX').value);
+                const areaOffsetY = parseFloat(document.getElementById('areaOffsetY').value);
+                const customRatio = parseFloat(document.getElementById('customRatio').value);
+                const areaRadius = parseInt(document.getElementById('areaRadius')?.value) || 0;
+                
+                // Récupérer les informations de la tablette
+                let tabletWidth = 0;
+                let tabletHeight = 0;
+                let presetInfo = null;
+                
+                const tabletWidthElement = document.getElementById('tabletWidth');
+                const tabletHeightElement = document.getElementById('tabletHeight');
+                const tabletSelectorText = document.getElementById('tabletSelectorText');
+                
+                if (tabletWidthElement) {
+                    tabletWidth = parseFloat(tabletWidthElement.value) || 0;
+                }
+                if (tabletHeightElement) {
+                    tabletHeight = parseFloat(tabletHeightElement.value) || 0;
+                }
+                if (tabletSelectorText) {
+                    if (tabletSelectorText.hasAttribute('data-i18n')) {
+                        presetInfo = 'i18n:' + tabletSelectorText.getAttribute('data-i18n');
+                    } else {
+                        presetInfo = tabletSelectorText.textContent;
+                    }
+                }
+                
+                // Créer l'objet de mise à jour
+                const updatedData = {
+                    width: !isNaN(areaWidth) ? areaWidth : appState.originalValues.width,
+                    height: !isNaN(areaHeight) ? areaHeight : appState.originalValues.height,
+                    x: !isNaN(areaOffsetX) ? areaOffsetX : appState.originalValues.x,
+                    y: !isNaN(areaOffsetY) ? areaOffsetY : appState.originalValues.y,
+                    ratio: !isNaN(customRatio) ? customRatio : appState.originalValues.ratio,
+                    tabletW: !isNaN(tabletWidth) ? tabletWidth : appState.originalValues.tabletW,
+                    tabletH: !isNaN(tabletHeight) ? tabletHeight : appState.originalValues.tabletH,
+                    presetInfo: presetInfo || appState.originalValues.presetInfo,
+                    title: appState.originalValues.title,
+                    description: appState.originalValues.description,
+                    radius: !isNaN(areaRadius) ? areaRadius : (appState.originalValues.radius || 0),
+                    lastModified: new Date().getTime()
+                };
+                
+                // Mettre à jour le favori
+                if (typeof FavoritesUI !== 'undefined' && typeof FavoritesUI.updateFavorite === 'function') {
+                    const success = FavoritesUI.updateFavorite(appState.editingFavoriteId, updatedData);
+                    
+                    if (success) {
+                        // Rafraîchir la liste des favoris
+                        FavoritesUI.cachedFavorites = null;
+                        FavoritesUI.loadFavoritesWithAnimation();
+                        
+                        // Annuler le mode édition
+                        FavoritesUI.cancelEditMode();
+                        appState.cancelEditMode();
+                        
+                        // Rétablir l'apparence du bouton
+                        saveButton.textContent = "Sauvegarder";
+                        saveButton.classList.add('bg-green-600', 'hover:bg-green-700', 'focus:ring-green-500');
+                        saveButton.classList.remove('bg-yellow-600', 'hover:bg-yellow-700', 'focus:ring-yellow-500');
+                        
+                        // Notification
+                        if (typeof Notifications !== 'undefined' && Notifications.success) {
+                            Notifications.success('Configuration mise à jour');
+                        }
+                    }
+                }
+            } else {
+                // En mode création, on appelle normalement saveFavorite
+                if (typeof FavoritesUI !== 'undefined' && typeof FavoritesUI.saveFavorite === 'function') {
+                    console.log('Bouton de sauvegarde cliqué - appelant FavoritesUI.saveFavorite()');
+                    FavoritesUI.saveFavorite();
+                } else {
+                    console.error('FavoritesUI ou sa méthode saveFavorite n\'est pas disponible');
+                }
+            }
+        });
+    }
     
     // Prevent the browser context menu on the entire page
     document.addEventListener('contextmenu', (e) => {

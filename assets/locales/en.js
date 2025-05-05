@@ -56,6 +56,7 @@ const en = {
     "sort_date": "Date",
     "sort_name": "Name",
     "sort_size": "Size",
+    "sort_modified": "Modified",
     
     // Summary
     "summary": "Summary",

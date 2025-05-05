@@ -1,0 +1,173 @@
+/* favorites.css - Styles pour le module de favoris */
+
+/* Animation d'entrée fade-in progressive - SIMPLIFIÉE */
+@keyframes fadeInSmooth {
+    from {
+        opacity: 0;
+        transform: scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Animation de sortie fade-out - SIMPLIFIÉE */
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+/* Animation de fade basique */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Animation d'échelle entrante simple */
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Animation de highlight pulsante */
+@keyframes highlightPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+}
+
+/* Animation de pulsation pour compteurs */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* Classes d'animation - SIMPLIFIÉES */
+.animate-fadeIn-smooth {
+    animation: fadeInSmooth 0.4s ease-out forwards;
+    opacity: 0;
+}
+
+/* Les éléments avec animation terminée sont forcément visibles */
+.animation-complete {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+    animation: none !important;
+}
+
+.animate-fadeOut {
+    animation: fadeOut 0.2s ease-out forwards;
+    pointer-events: none;
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+.animate-scaleIn {
+    animation: scaleIn 0.3s ease-out forwards;
+}
+
+/* Effet de highlight pour favoris */
+.highlight-effect {
+    animation: highlightPulse 1.5s 1;
+    transition: border-color 0.3s;
+}
+
+/* Transitions simplifiées */
+.favorites-transition-in {
+    transition: opacity 0.3s ease;
+    opacity: 1;
+}
+
+.favorites-transition-out {
+    transition: opacity 0.2s ease;
+    opacity: 0;
+}
+
+.favorites-loading {
+    opacity: 0;
+}
+
+/* Style de base des cartes de favoris */
+.favorite-item {
+    transition: border-color 0.3s, box-shadow 0.3s;
+    opacity: 1;
+}
+
+/* Garantir que tous les favoris restent visibles */
+#favorites-list .favorite-item:not(.animate-fadeOut) {
+    opacity: 1 !important;
+}
+
+/* Popup styles */
+#favorite-details-popup {
+    transition: opacity 0.3s ease;
+}
+
+#favorite-details-popup.show {
+    opacity: 1 !important;
+}
+
+#favorite-details-popup > div {
+    transition: transform 0.3s ease;
+}
+
+#favorite-details-popup.show > div {
+    transform: scale(1) !important;
+}
+
+/* Alertes compteurs */
+#details-title-counter.text-red-500, 
+#details-description-counter.text-red-500,
+#favorite-title-counter.text-red-500, 
+#favorite-desc-counter.text-red-500 {
+    animation: pulse 1s infinite;
+}
+
+/* Hover effects pour les cartes de favoris */
+.favorite-item:hover {
+    border-color: rgba(59, 130, 246, 0.5);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Boutons à l'intérieur des favoris */
+.favorite-item .favorite-btn {
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.favorite-item .favorite-btn:hover {
+    transform: translateY(-1px);
+}
+
+.favorite-item .favorite-btn:active {
+    transform: translateY(0);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .favorites-list {
+        grid-template-columns: 1fr;
+    }
+    
+    .favorite-item {
+        margin-bottom: 8px;
+    }
+}
