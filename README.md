@@ -4,6 +4,8 @@
   <a href="https://github.com/sammy08300/Areasu/tree/v2git">
     <img src="https://img.shields.io/badge/version-2.0-blue.svg" alt="Version">
   </a>
+  <br />
+  <a href="README.fr.md">🇫🇷 Lire en français</a>
 </div>
 
 ---
