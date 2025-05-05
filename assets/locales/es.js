@@ -10,6 +10,7 @@ const es = {
     "search_tablet": "Buscar una tableta...",
     "search": "Buscar...",
     "custom_tablet": "Tableta personalizada",
+    "custom_dimensions": "Dimensiones personalizadas",
     "tablet_width": "Ancho de la tableta",
     "tablet_height": "Alto de la tableta",
     "tablet_units": "mm",

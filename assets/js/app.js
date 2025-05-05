@@ -2,73 +2,14 @@
  * Main application module
  */
 
-// Import the FavoritesUI module
+// Import modules
 import { FavoritesUI } from './components/favorites/favoritesindex.js';
+import TabletSelector from './components/tabletSelector.js';
+import { translateWithFallback } from './i18n-init.js';
 
 /**
- * Utility function to translate an i18n key with robust fallback
- * @param {string} key - The translation key without the i18n: prefix
- * @returns {string} - The translation or a formatted default value
+ * Global application state
  */
-function translateWithFallback(key) {
-    // First try to use the standard translation system
-    let translated = null;
-    
-    if (typeof localeManager !== 'undefined' && typeof localeManager.translate === 'function') {
-        try {
-            translated = localeManager.translate(key);
-            if (translated === key) translated = null; // If translation returns the key, consider it a failure
-        } catch (e) {
-            console.error("[ERROR] Translation failed for key:", key, e);
-        }
-    }
-    
-    // If standard translation failed, use fallbacks
-    if (!translated || translated.startsWith('i18n:')) {
-        const htmlLang = document.documentElement.lang || 'fr';
-        
-        // Manually defined translations for common keys
-        const fallbackTranslations = {
-            'select_model': {
-                'en': 'Select a model',
-                'es': 'Seleccionar modelo',
-                'fr': 'Sélectionner un modèle'
-            },
-            'default_favorite_name': {
-                'en': 'Saved configuration',
-                'es': 'Configuración guardada',
-                'fr': 'Configuration sauvegardée'
-            },
-            'custom_dimensions': {
-                'en': 'Custom dimensions',
-                'es': 'Dimensiones personalizadas',
-                'fr': 'Dimensions personnalisées'
-            }
-        };
-        
-        // Determine the language to use (prefix only)
-        let lang = 'fr'; // Default
-        if (htmlLang.startsWith('en')) {
-            lang = 'en';
-        } else if (htmlLang.startsWith('es')) {
-            lang = 'es';
-        }
-        
-        // Use fallback translation if available
-        if (fallbackTranslations[key] && fallbackTranslations[key][lang]) {
-            translated = fallbackTranslations[key][lang];
-        } else {
-            // Default formatting for unknown keys
-            translated = key.replace(/_/g, ' ');
-            // First letter uppercase
-            translated = translated.charAt(0).toUpperCase() + translated.slice(1);
-        }
-    }
-    
-    return translated;
-}
-
-// Global application state
 const appState = {
     tabletData: [],
     editingFavoriteId: null,
@@ -88,13 +29,8 @@ const appState = {
             }
             this.tabletData = await response.json();
             
-            // Initialize the new tablet selector
-            if (typeof TabletSelector !== 'undefined') {
-                TabletSelector.init(this.tabletData);
-            } else {
-                // Fallback to the old method if necessary
-                this.populateTabletPresets();
-            }
+            // Initialize the tablet selector
+            TabletSelector.init(this.tabletData);
         } catch (error) {
             console.error('Error loading tablet data:', error);
             Notifications.error('Erreur de chargement des données tablettes');
@@ -102,129 +38,20 @@ const appState = {
     },
     
     /**
-     * Populate tablet preset dropdown
-     */
-    populateTabletPresets() {
-        const tabletPresetSelect = document.getElementById('tabletPresetSelect');
-        
-        if (!tabletPresetSelect || !this.tabletData.length) {
-            return;
-        }
-        
-        console.warn('Using the obsolete populateTabletPresets method. Please use TabletSelector if possible.');
-        
-        // Group tablets by brand
-        const tabletsByBrand = this.tabletData.reduce((groups, tablet) => {
-            if (!groups[tablet.brand]) {
-                groups[tablet.brand] = [];
-            }
-            groups[tablet.brand].push(tablet);
-            return groups;
-        }, {});
-        
-        // Clear existing options except the first two
-        while (tabletPresetSelect.options.length > 2) {
-            tabletPresetSelect.remove(2);
-        }
-        
-        // Add option groups by brand
-        Object.keys(tabletsByBrand).sort().forEach(brand => {
-            const optgroup = document.createElement('optgroup');
-            optgroup.label = brand;
-            
-            // Add options for each tablet model
-            tabletsByBrand[brand].forEach(tablet => {
-                const option = document.createElement('option');
-                option.value = `${brand}_${tablet.model}`.replace(/\s+/g, '_');
-                option.textContent = tablet.model;
-                option.dataset.width = tablet.width;
-                option.dataset.height = tablet.height;
-                option.dataset.brand = tablet.brand;
-                optgroup.appendChild(option);
-            });
-            
-            tabletPresetSelect.appendChild(optgroup);
-        });
-    },
-    
-    /**
      * Setup all input listeners
      */
     setupInputListeners() {
-        // Tablet presets - old method - kept for compatibility
-        const tabletPresetSelect = document.getElementById('tabletPresetSelect');
-        if (tabletPresetSelect) {
-            tabletPresetSelect.addEventListener('change', (e) => {
-                const selectedValue = e.target.value;
-                const selectedOption = e.target.selectedOptions[0];
-                
-                if (selectedValue === 'custom') {
-                    const tabletWidthGroup = document.getElementById('tablet-width-group');
-                    const tabletHeightGroup = document.getElementById('tablet-height-group');
-                    const tabletManualHr = document.getElementById('tablet-manual-hr');
-                    
-                    if (tabletWidthGroup && tabletHeightGroup && tabletManualHr) {
-                        tabletWidthGroup.classList.remove('hidden');
-                        tabletHeightGroup.classList.remove('hidden');
-                        tabletManualHr.classList.remove('hidden');
-                    }
-                    
-                    this.cancelEditMode();
-                    return;
-                }
-                
-                if (selectedValue && selectedOption.dataset.width) {
-                    const width = parseFloat(selectedOption.dataset.width);
-                    const height = parseFloat(selectedOption.dataset.height);
-                    const tabletWidthInput = document.getElementById('tabletWidth');
-                    const tabletHeightInput = document.getElementById('tabletHeight');
-                    const tabletWidthGroup = document.getElementById('tablet-width-group');
-                    const tabletHeightGroup = document.getElementById('tablet-height-group');
-                    const tabletManualHr = document.getElementById('tablet-manual-hr');
-                    
-                    if (!isNaN(width) && !isNaN(height) && tabletWidthInput && tabletHeightInput) {
-                        tabletWidthInput.value = formatNumber(width);
-                        tabletHeightInput.value = formatNumber(height);
-                        
-                        if (tabletWidthGroup && tabletHeightGroup && tabletManualHr) {
-                            tabletWidthGroup.classList.add('hidden');
-                            tabletHeightGroup.classList.add('hidden');
-                            tabletManualHr.classList.add('hidden');
-                        }
-                        
-                        this.cancelEditMode();
-                        updateDisplay();
-                    }
-                } else {
-                    const tabletWidthGroup = document.getElementById('tablet-width-group');
-                    const tabletHeightGroup = document.getElementById('tablet-height-group');
-                    const tabletManualHr = document.getElementById('tablet-manual-hr');
-                    
-                    if (tabletWidthGroup && tabletHeightGroup && tabletManualHr) {
-                        tabletWidthGroup.classList.add('hidden');
-                        tabletHeightGroup.classList.add('hidden');
-                        tabletManualHr.classList.add('hidden');
-                    }
-                }
-            });
-        }
-        
         // Tablet dimensions
         const tabletWidthInput = document.getElementById('tabletWidth');
         const tabletHeightInput = document.getElementById('tabletHeight');
         
         if (tabletWidthInput) {
             tabletWidthInput.addEventListener('input', () => {
-                // If the old selector exists, update its value
-                if (tabletPresetSelect) {
-                    tabletPresetSelect.value = 'custom';
-                }
-                
                 // Update the text of the new selector
                 const selectorText = document.getElementById('tabletSelectorText');
                 if (selectorText) {
-                    selectorText.textContent = 'Custom dimensions';
-                    selectorText.title = 'Custom dimensions';
+                    selectorText.textContent = translateWithFallback('custom_dimensions');
+                    selectorText.title = translateWithFallback('custom_dimensions');
                 }
                 
                 // Ensure the dimensions container is visible
@@ -240,16 +67,11 @@ const appState = {
         
         if (tabletHeightInput) {
             tabletHeightInput.addEventListener('input', () => {
-                // If the old selector exists, update its value
-                if (tabletPresetSelect) {
-                    tabletPresetSelect.value = 'custom';
-                }
-                
                 // Update the text of the new selector
                 const selectorText = document.getElementById('tabletSelectorText');
                 if (selectorText) {
-                    selectorText.textContent = 'Custom dimensions';
-                    selectorText.title = 'Custom dimensions';
+                    selectorText.textContent = translateWithFallback('custom_dimensions');
+                    selectorText.title = translateWithFallback('custom_dimensions');
                 }
                 
                 // Ensure the dimensions container is visible
