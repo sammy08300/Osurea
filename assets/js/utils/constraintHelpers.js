@@ -32,9 +32,6 @@ function constrainAreaOffset(offsetX, offsetY, areaWidth, areaHeight, tabletWidt
         return { x: 0, y: 0 };
     }
     
-    let constrainedX = offsetX;
-    let constrainedY = offsetY;
-    
     // Calculate the movement limits to keep the active area entirely 
     // within the tablet boundaries
     const halfAreaWidth = areaWidth / 2;
@@ -48,25 +45,11 @@ function constrainAreaOffset(offsetX, offsetY, areaWidth, areaHeight, tabletWidt
     const minY = halfAreaHeight;
     const maxY = tabletHeight - halfAreaHeight;
     
-    // Apply the constraints (clamping)
-    constrainedX = clamp(offsetX, minX, maxX);
+    // If tablet dimensions are too small for the area, center it
+    const constrainedX = minX > maxX ? tabletWidth / 2 : clamp(offsetX, minX, maxX);
+    const constrainedY = minY > maxY ? tabletHeight / 2 : clamp(offsetY, minY, maxY);
     
-    // If the tablet is smaller than the area in width, center horizontally
-    if (minX > maxX) {
-        constrainedX = tabletWidth / 2;
-    }
-    
-    constrainedY = clamp(offsetY, minY, maxY);
-    
-    // If the tablet is smaller than the area in height, center vertically
-    if (minY > maxY) {
-        constrainedY = tabletHeight / 2;
-    }
-    
-    return {
-        x: constrainedX,
-        y: constrainedY
-    };
+    return { x: constrainedX, y: constrainedY };
 }
 
 /**
@@ -81,16 +64,15 @@ function adaptAreaToNewTablet(currentState, oldTablet, newTablet) {
     // Get the current dimensions and position
     const { areaWidth, areaHeight, offsetX, offsetY } = currentState;
     
-    console.log("adaptAreaToNewTablet - Comparaison dimensions:", {
+    const logData = {
         "Zone active": { largeur: areaWidth, hauteur: areaHeight },
         "Nouvelle tablette": { largeur: newTablet.width, hauteur: newTablet.height },
         "Dimensions conservées": areaWidth <= newTablet.width && areaHeight <= newTablet.height
-    });
+    };
+    console.log("adaptAreaToNewTablet - Comparaison dimensions:", logData);
     
-    // If the active area is already smaller than the new tablet, 
-    // do not change its dimensions
+    // If the active area is already smaller than the new tablet, only adjust position
     if (areaWidth <= newTablet.width && areaHeight <= newTablet.height) {
-        // Only recalculate the position to remain within the limits
         const constrainedOffsets = constrainAreaOffset(
             offsetX, offsetY, 
             areaWidth, areaHeight, 
@@ -103,15 +85,14 @@ function adaptAreaToNewTablet(currentState, oldTablet, newTablet) {
         });
         
         return {
-            areaWidth: areaWidth,
-            areaHeight: areaHeight,
+            areaWidth,
+            areaHeight,
             offsetX: constrainedOffsets.x,
             offsetY: constrainedOffsets.y
         };
     }
     
-    // For other cases, adapt the dimensions as before
-    // Calculate the scaling ratios
+    // Calculate the scaling ratios for dimension adaptation
     const widthRatio = newTablet.width / oldTablet.width;
     const heightRatio = newTablet.height / oldTablet.height;
     
@@ -124,8 +105,8 @@ function adaptAreaToNewTablet(currentState, oldTablet, newTablet) {
     const relativeX = offsetX / oldTablet.width;
     const relativeY = offsetY / oldTablet.height;
     
-    let newOffsetX = relativeX * newTablet.width;
-    let newOffsetY = relativeY * newTablet.height;
+    const newOffsetX = relativeX * newTablet.width;
+    const newOffsetY = relativeY * newTablet.height;
     
     // Constrain the new position to ensure that the area remains within the limits
     const constrainedOffsets = constrainAreaOffset(
@@ -149,6 +130,12 @@ function adaptAreaToNewTablet(currentState, oldTablet, newTablet) {
     };
 }
 
-// Export the functions for use in other modules
-window.constrainAreaOffset = constrainAreaOffset;
-window.adaptAreaToNewTablet = adaptAreaToNewTablet; 
+// Create a namespace for constraint utilities
+const ConstraintUtils = {
+    MIN_AREA_DIMENSION,
+    constrainAreaOffset,
+    adaptAreaToNewTablet
+};
+
+// Export the namespace to window for use in other modules
+window.ConstraintUtils = ConstraintUtils; 
