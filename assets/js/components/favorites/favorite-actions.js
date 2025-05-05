@@ -550,7 +550,7 @@ export const FavoritesActions = {
             // Si les données ont été modifiées, forcer un rafraîchissement 
             // des favoris dans l'interface pour refléter les changements
             if (needsUpdate) {
-                FavoritesInit.updateFavoriteCache(false);
+                FavoritesInit.updateFavoriteCache(true);
             }
         }, 600);
     },
@@ -653,6 +653,8 @@ export const FavoritesActions = {
                 
                 // Mettre à jour le cache pour refléter les changements
                 FavoritesInit.cachedFavorites = getFavorites();
+                // Forcer une mise à jour complète des favoris pour assurer la persistance
+                FavoritesInit.updateFavoriteCache(true);
                 
                 return true; // Des modifications ont été effectuées
             }

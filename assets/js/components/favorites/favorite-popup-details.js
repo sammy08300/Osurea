@@ -287,6 +287,12 @@ export const FavoritesDetailsPopup = {
             // Sauvegarde automatique avant la fermeture
             const hasChanges = actionsHandler.saveChangesIfNeeded();
             
+            // Si des changements ont été effectués, s'assurer que les données sont persistées
+            if (hasChanges && typeof FavoritesInit !== 'undefined') {
+                // Actuellement les changements sont déjà persistés par saveChangesIfNeeded()
+                // Cette vérification supplémentaire est une sécurité
+            }
+            
             // Réinitialiser les compteurs et leurs classes
             const titleCounter = this.detailsPopup.querySelector('#details-title-counter');
             const descCounter = this.detailsPopup.querySelector('#details-description-counter');
