@@ -101,7 +101,29 @@ const es = {
     
     // Pie de página
     "footer_credit": "Diseñado para la comunidad de osu! por Yuzuctus",
-    "footer_description": "Usa esta herramienta para visualizar y guardar el área activa de tu tableta gráfica."
+    "footer_description": "Usa esta herramienta para visualizar y guardar el área activa de tu tableta gráfica.",
+    
+    // Additional favoritesI18n keys
+    "delete_confirm": "Confirmar eliminación",
+    "warning": "Advertencia",
+    "confirm_modification": "Aplicar modificación",
+    "delete_warning": "¿Está seguro de que desea eliminar esta configuración? Esta acción no se puede deshacer.",
+    "title": "Título",
+    
+    // Notification messages
+    "favorite_not_found": "Favorito no encontrado",
+    "configuration_loaded": "Configuración cargada",
+    "error_loading_config": "Error al cargar la configuración",
+    "edit_mode_activated": "Modo de edición activado - Modifique los parámetros y luego haga clic en \"Confirmar modificación\"",
+    "edit_mode_canceled": "Modo de edición cancelado",
+    "favorite_deleted": "Favorito eliminado",
+    "error_deleting_favorite": "Error al eliminar el favorito",
+    "configuration_updated": "Configuración actualizada",
+    "error_updating_config": "Error al actualizar la configuración",
+    "title_truncated": "El título ha sido truncado a 32 caracteres",
+    "description_truncated": "La descripción ha sido truncada a 144 caracteres",
+    "configuration_saved": "Configuración guardada",
+    "error_saving_config": "Error al guardar la configuración"
 };
 
 export default es; 

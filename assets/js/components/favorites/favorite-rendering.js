@@ -1,5 +1,5 @@
 // favorite-rendering.js - Module de création et rendu des éléments de favoris
-import { translateWithFallback } from './favoritesI18n.js';
+import { translateWithFallback } from '../../../js/i18n-init.js';
 import { getFavorites } from './favorite-storage.js';
 import { favoriteSortFavorites } from './favorite-sort.js';
 import { FavoritesActions } from './favorite-actions.js';

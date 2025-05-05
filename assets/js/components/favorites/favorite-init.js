@@ -1,6 +1,6 @@
 // favorite-init.js - Module d'initialisation pour les favoris
 import { FavoritesEvents } from './favorite-events.js';
-import { translateWithFallback } from './favoritesI18n.js';
+import { translateWithFallback } from '../../../js/i18n-init.js';
 import { getFavorites } from './favorite-storage.js';
 import { favoriteSortFavorites } from './favorite-sort.js';
 import { FavoritesRendering } from './favorite-rendering.js';

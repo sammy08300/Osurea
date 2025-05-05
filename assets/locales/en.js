@@ -100,7 +100,29 @@ const en = {
     
     // Footer
     "footer_credit": "Designed for the osu! community by Yuzuctus",
-    "footer_description": "Use this tool to visualize and save your graphics tablet's active area."
+    "footer_description": "Use this tool to visualize and save your graphics tablet's active area.",
+    
+    // Additional favoritesI18n keys
+    "delete_confirm": "Confirm deletion",
+    "warning": "Warning",
+    "confirm_modification": "Confirm modification",
+    "delete_warning": "Are you sure you want to delete this configuration? This action cannot be undone.",
+    "title": "Title",
+    
+    // Notification messages
+    "favorite_not_found": "Favorite not found",
+    "configuration_loaded": "Configuration loaded",
+    "error_loading_config": "Error loading the configuration",
+    "edit_mode_activated": "Edit mode activated - Modify the parameters then click \"Confirm modification\"",
+    "edit_mode_canceled": "Edit mode canceled",
+    "favorite_deleted": "Favorite deleted",
+    "error_deleting_favorite": "Error deleting favorite",
+    "configuration_updated": "Configuration updated",
+    "error_updating_config": "Error updating configuration",
+    "title_truncated": "Title has been truncated to 32 characters",
+    "description_truncated": "Description has been truncated to 144 characters",
+    "configuration_saved": "Configuration saved",
+    "error_saving_config": "Error saving configuration"
 };
 
 export default en; 

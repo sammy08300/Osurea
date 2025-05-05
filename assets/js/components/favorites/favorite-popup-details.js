@@ -1,5 +1,5 @@
 // favorite-popup-details.js - Module de gestion des popups détaillées
-import { translateWithFallback } from './favoritesI18n.js';
+import { translateWithFallback } from '../../../js/i18n-init.js';
 import { getFavoriteById } from './favorite-storage.js';
 
 /**

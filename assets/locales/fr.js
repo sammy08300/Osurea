@@ -100,7 +100,30 @@ const fr = {
     
     // Footer
     "footer_credit": "Conçu pour la communauté osu! par Yuzuctus",
-    "footer_description": "Utilisez cet outil pour visualiser et sauvegarder votre zone active de tablette graphique."
+    "footer_description": "Utilisez cet outil pour visualiser et sauvegarder votre zone active de tablette graphique.",
+    
+    // Additional favoritesI18n keys
+    "select_model": "Sélectionner un modèle",
+    "delete_confirm": "Confirmer la suppression",
+    "warning": "Attention",
+    "confirm_modification": "Valider la modification",
+    "delete_warning": "Êtes-vous sûr de vouloir supprimer cette configuration ? Cette action est irréversible et ne peut pas être annulée.",
+    "title": "Titre",
+    
+    // Notification messages
+    "favorite_not_found": "Favori introuvable",
+    "configuration_loaded": "Configuration chargée",
+    "error_loading_config": "Erreur lors du chargement de la configuration",
+    "edit_mode_activated": "Mode édition activé - Modifiez les paramètres puis cliquez sur \"Confirmer la modification\"",
+    "edit_mode_canceled": "Mode édition annulé",
+    "favorite_deleted": "Favori supprimé",
+    "error_deleting_favorite": "Erreur lors de la suppression du favori",
+    "configuration_updated": "Configuration mise à jour",
+    "error_updating_config": "Erreur lors de la mise à jour de la configuration",
+    "title_truncated": "Le titre a été tronqué à 32 caractères",
+    "description_truncated": "La description a été tronquée à 144 caractères",
+    "configuration_saved": "Configuration sauvegardée",
+    "error_saving_config": "Erreur lors de la sauvegarde de la configuration"
 };
 
 export default fr; 

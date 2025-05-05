@@ -1,5 +1,5 @@
 // favorite-popup-dialogs.js - Module pour les dialogues de création et suppression
-import { translateWithFallback } from './favoritesI18n.js';
+import { translateWithFallback } from '../../../js/i18n-init.js';
 
 /**
  * Module de gestion des dialogues de création et suppression

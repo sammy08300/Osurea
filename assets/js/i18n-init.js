@@ -6,7 +6,7 @@ import { detectAndApplyBrowserLanguage } from './browser-language-detector.js';
  * @param {string} key - The translation key without the i18n: prefix
  * @returns {string} - The translated text or a formatted default
  */
-function translateWithFallback(key) {
+export function translateWithFallback(key) {
     // First try to use the standard translation system
     let translated = null;
     
@@ -49,6 +49,131 @@ function translateWithFallback(key) {
                 'en': 'Search',
                 'es': 'Buscar',
                 'fr': 'Rechercher'
+            },
+            'load': {
+                'en': 'Load',
+                'es': 'Cargar',
+                'fr': 'Charger'
+            },
+            'edit': {
+                'en': 'Edit',
+                'es': 'Editar',
+                'fr': 'Modifier'
+            },
+            'delete': {
+                'en': 'Delete',
+                'es': 'Eliminar',
+                'fr': 'Supprimer'
+            },
+            'tablet_model': {
+                'en': 'Model',
+                'es': 'Modelo',
+                'fr': 'Modèle'
+            },
+            'dimensions': {
+                'en': 'Dimensions',
+                'es': 'Dimensiones',
+                'fr': 'Dimensions'
+            },
+            'ratio': {
+                'en': 'Ratio',
+                'es': 'Relación',
+                'fr': 'Ratio'
+            },
+            'tablet_settings': {
+                'en': 'TABLET',
+                'es': 'TABLETA',
+                'fr': 'TABLETTE'
+            },
+            'area_settings': {
+                'en': 'ACTIVE AREA',
+                'es': 'ZONA ACTIVA',
+                'fr': 'ZONE ACTIVE'
+            },
+            'area_position': {
+                'en': 'Position',
+                'es': 'Posición',
+                'fr': 'Position'
+            },
+            'surface_area': {
+                'en': 'Surface',
+                'es': 'Superficie',
+                'fr': 'Surface'
+            },
+            'last_modified': {
+                'en': 'Last modified:',
+                'es': 'Última modificación:',
+                'fr': 'Dernière modification:'
+            },
+            'creation_date': {
+                'en': 'Created:',
+                'es': 'Creado:',
+                'fr': 'Création:'
+            },
+            'title': {
+                'en': 'Title',
+                'es': 'Título',
+                'fr': 'Titre'
+            },
+            'favorite_name': {
+                'en': 'Title',
+                'es': 'Título',
+                'fr': 'Titre'
+            },
+            'description': {
+                'en': 'Description',
+                'es': 'Descripción',
+                'fr': 'Description'
+            },
+            'favorite_description': {
+                'en': 'Description',
+                'es': 'Descripción',
+                'fr': 'Description'
+            },
+            'current_config': {
+                'en': 'Configuration',
+                'es': 'Configuración',
+                'fr': 'Configuration'
+            },
+            'radius': {
+                'en': 'Radius:',
+                'es': 'Radio:',
+                'fr': 'Rayon:'
+            },
+            'save': {
+                'en': 'Save',
+                'es': 'Guardar',
+                'fr': 'Sauvegarder'
+            },
+            'cancel': {
+                'en': 'Cancel',
+                'es': 'Cancelar',
+                'fr': 'Annuler'
+            },
+            'save_favorite': {
+                'en': 'Save current configuration',
+                'es': 'Guardar configuración actual',
+                'fr': 'Enregistrer la configuration actuelle'
+            },
+            'delete_confirm': {
+                'en': 'Confirm deletion',
+                'es': 'Confirmar eliminación',
+                'fr': 'Confirmer la suppression'
+            },
+            'warning': {
+                'en': 'Warning',
+                'es': 'Advertencia',
+                'fr': 'Attention'
+            },
+            'confirm_modification': {
+                'en': 'Confirm modification',
+                'es': 'Confirmar modificación',
+                'fr': 'Confirmer la modification'
+            },
+            'delete_warning': {
+                'en': 'Are you sure you want to delete this configuration? This action cannot be undone.',
+                'es': '¿Está seguro de que desea eliminar esta configuración? Esta acción no se puede deshacer.',
+                'fr': 'Êtes-vous sûr de vouloir supprimer cette configuration ? Cette action est irréversible et ne peut pas être annulée.'
             }
         };
         

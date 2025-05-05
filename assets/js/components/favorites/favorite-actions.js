@@ -1,9 +1,10 @@
 // favorite-actions.js - Module de gestion des actions sur les favoris
-import { translateWithFallback } from './favoritesI18n.js';
+import { translateWithFallback } from '../../../js/i18n-init.js';
 import { getFavorites, getFavoriteById, addFavorite, updateFavorite, removeFavorite } from './favorite-storage.js';
 import { FavoritesPopups } from './favorite-popup.js';
 import { FavoritesRendering } from './favorite-rendering.js';
 import { FavoritesInit } from './favorite-init.js';
+import localeManager from '../../../locales/index.js';
 
 /**
  * Formate un nombre avec un certain nombre de décimales
@@ -33,7 +34,7 @@ export const FavoritesActions = {
         const favorite = getFavoriteById(id);
         if (!favorite) {
             if (typeof Notifications !== 'undefined' && Notifications.error) {
-                Notifications.error(`Favori ID ${id} introuvable`);
+                Notifications.error(localeManager.translate('favorite_not_found') || `Favori ID ${id} introuvable`);
             }
             return;
         }
@@ -101,12 +102,12 @@ export const FavoritesActions = {
             
             // Notification
             if (typeof Notifications !== 'undefined' && Notifications.success) {
-                Notifications.success('Configuration chargée');
+                Notifications.success(localeManager.translate('configuration_loaded') || 'Configuration chargée');
             }
         } catch (error) {
             console.error('Error loading the favorite:', error);
             if (typeof Notifications !== 'undefined' && Notifications.error) {
-                Notifications.error('Erreur lors du chargement de la configuration');
+                Notifications.error(localeManager.translate('error_loading_config') || 'Erreur lors du chargement de la configuration');
             }
         }
     },
@@ -119,7 +120,7 @@ export const FavoritesActions = {
         const favorite = getFavoriteById(id);
         if (!favorite) {
             if (typeof Notifications !== 'undefined' && Notifications.error) {
-                Notifications.error('Favori introuvable');
+                Notifications.error(localeManager.translate('favorite_not_found') || 'Favori introuvable');
             }
             return;
         }
@@ -176,7 +177,7 @@ export const FavoritesActions = {
                     const span = saveBtn.querySelector('span[data-i18n]');
                     if (span) {
                         const key = span.getAttribute('data-i18n');
-                        span.textContent = localeManager.translate(key) || 'Confirmer la modification';
+                        span.textContent = localeManager.translate(key);
                     }
                 }
             }
@@ -216,7 +217,7 @@ export const FavoritesActions = {
         
         // Afficher une notification
         if (typeof Notifications !== 'undefined' && Notifications.info) {
-            Notifications.info('Mode édition activé - Modifiez les paramètres puis cliquez sur "Confirmer la modification"');
+            Notifications.info(localeManager.translate('edit_mode_activated') || 'Mode édition activé - Modifiez les paramètres puis cliquez sur "Confirmer la modification"');
         }
     },
 
@@ -287,7 +288,7 @@ export const FavoritesActions = {
                     const span = saveBtn.querySelector('span[data-i18n]');
                     if (span) {
                         const key = span.getAttribute('data-i18n');
-                        span.textContent = localeManager.translate(key) || 'Sauvegarder';
+                        span.textContent = localeManager.translate(key);
                     }
                 }
             }
@@ -312,7 +313,7 @@ export const FavoritesActions = {
         
         // Afficher une notification sauf si demandé de ne pas le faire
         if (!skipNotification && typeof Notifications !== 'undefined' && Notifications.info) {
-            Notifications.info('Mode édition annulé');
+            Notifications.info(localeManager.translate('edit_mode_canceled') || 'Mode édition annulé');
         }
     },
 
@@ -344,14 +345,14 @@ export const FavoritesActions = {
                             FavoritesInit.cachedFavorites = getFavorites();
                             
                             if (typeof Notifications !== 'undefined' && Notifications.success) {
-                                Notifications.success('Favori supprimé');
+                                Notifications.success(localeManager.translate('favorite_deleted') || 'Favori supprimé');
                             }
                         } else {
                             // Si erreur, retirer l'animation et restaurer l'élément
                             favoriteElement.classList.remove('animate-fadeOut');
                             
                             if (typeof Notifications !== 'undefined' && Notifications.error) {
-                                Notifications.error('Erreur lors de la suppression du favori');
+                                Notifications.error(localeManager.translate('error_deleting_favorite') || 'Erreur lors de la suppression du favori');
                             }
                         }
                     }, 300); // Durée de l'animation fadeOut
@@ -365,11 +366,11 @@ export const FavoritesActions = {
                         FavoritesInit.updateFavoriteCache(false);
                         
                         if (typeof Notifications !== 'undefined' && Notifications.success) {
-                            Notifications.success('Favori supprimé');
+                            Notifications.success(localeManager.translate('favorite_deleted') || 'Favori supprimé');
                         }
                     } else {
                         if (typeof Notifications !== 'undefined' && Notifications.error) {
-                            Notifications.error('Erreur lors de la suppression du favori');
+                            Notifications.error(localeManager.translate('error_deleting_favorite') || 'Erreur lors de la suppression du favori');
                         }
                     }
                 }
@@ -456,11 +457,11 @@ export const FavoritesActions = {
                 }
                 
                 if (typeof Notifications !== 'undefined' && Notifications.success) {
-                    Notifications.success('Configuration mise à jour');
+                    Notifications.success(localeManager.translate('configuration_updated') || 'Configuration mise à jour');
                 }
             } else {
                 if (typeof Notifications !== 'undefined' && Notifications.error) {
-                    Notifications.error('Erreur lors de la mise à jour de la configuration');
+                    Notifications.error(localeManager.translate('error_updating_config') || 'Erreur lors de la mise à jour de la configuration');
                 }
             }
         } else {
@@ -474,14 +475,14 @@ export const FavoritesActions = {
                 // Si c'est une clé de traduction, ne pas tronquer
                 if (!commentData.title.startsWith('i18n:') && commentData.title.length > 32) {
                     if (typeof Notifications !== 'undefined' && Notifications.warning) {
-                        Notifications.warning("Le titre a été tronqué à 32 caractères.");
+                        Notifications.warning(localeManager.translate('title_truncated') || "Le titre a été tronqué à 32 caractères.");
                     }
                     commentData.title = commentData.title.substring(0, 32);
                 }
                 
                 if (commentData.description && commentData.description.length > 144) {
                     if (typeof Notifications !== 'undefined' && Notifications.warning) {
-                        Notifications.warning("La description a été tronquée à 144 caractères.");
+                        Notifications.warning(localeManager.translate('description_truncated') || "La description a été tronquée à 144 caractères.");
                     }
                     commentData.description = commentData.description.substring(0, 144);
                 }
@@ -518,11 +519,11 @@ export const FavoritesActions = {
                     }, 100);
                     
                     if (typeof Notifications !== 'undefined' && Notifications.success) {
-                        Notifications.success('Configuration sauvegardée');
+                        Notifications.success(localeManager.translate('configuration_saved') || 'Configuration sauvegardée');
                     }
                 } else {
                     if (typeof Notifications !== 'undefined' && Notifications.error) {
-                        Notifications.error('Erreur lors de la sauvegarde de la configuration');
+                        Notifications.error(localeManager.translate('error_saving_config') || 'Erreur lors de la sauvegarde de la configuration');
                     }
                 }
                 
