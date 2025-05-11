@@ -121,7 +121,10 @@ const en = {
     // Pied de page
     footer: {
         credit: "Designed for the osu! community by Yuzuctus",
-        description: "Use this tool to visualize and save your graphics tablet's active area."
+        description: "Use this tool to visualize and save your graphics tablet's active area.",
+        tabletSettings: "Tablet Settings",
+        spreadsheets: "Spreadsheets",
+        otherProjects: "Other projects"
     },
     
     // Messages de notification

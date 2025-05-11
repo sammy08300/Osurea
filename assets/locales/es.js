@@ -121,7 +121,10 @@ const es = {
     // Pied de page
     footer: {
         credit: "Diseñado para la comunidad de osu! por Yuzuctus",
-        description: "Usa esta herramienta para visualizar y guardar el área activa de tu tableta gráfica."
+        description: "Usa esta herramienta para visualizar y guardar el área activa de tu tableta gráfica.",
+        tabletSettings: "Configuración de Tableta",
+        spreadsheets: "Hojas de cálculo",
+        otherProjects: "Otros proyectos"
     },
     
     // Messages de notification

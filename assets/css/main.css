@@ -611,3 +611,110 @@ body.loading-favorites #favorites-list .favorite-item {
 .highlight-effect {
     animation: highlight-pulse 1.5s ease-in-out;
 }
+
+/*
+====================================================
+  Footer Styles
+====================================================*/
+.site-footer {
+    background-color: #111827;
+    padding: 1rem 0;
+    margin-top: 1.5rem;
+    border-top: 1px solid #1f2937;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.footer-info h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #fff;
+}
+
+.footer-info .osu {
+    color: #3b82f6;
+}
+
+.footer-info .yuzu {
+    color: #f59e0b;
+}
+
+.footer-info p {
+    color: #9ca3af;
+    margin-bottom: 1rem;
+}
+
+.footer-resources h4,
+.footer-social h4,
+.footer-projects h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.7rem;
+    color: #d1d5db;
+}
+
+.footer-resources ul,
+.footer-social ul,
+.footer-projects ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-resources li,
+.footer-social li,
+.footer-projects li {
+    margin-bottom: 0.5rem;
+}
+
+.footer-resources a,
+.footer-social a,
+.footer-projects a {
+    color: #9ca3af;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    display: flex;
+    align-items: center;
+}
+
+.footer-resources a:hover,
+.footer-social a:hover,
+.footer-projects a:hover {
+    color: #3b82f6;
+}
+
+.footer-resources i,
+.footer-social i,
+.footer-projects i {
+    margin-right: 0.4rem;
+    width: 1rem;
+    text-align: center;
+}
+
+.copyright {
+    grid-column: 1 / -1;
+    margin-top: 1rem;
+    text-align: center;
+    color: #6b7280;
+    font-size: 0.75rem;
+}
+
+@media (max-width: 768px) {
+    .footer-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    
+    .footer-resources a,
+    .footer-social a,
+    .footer-projects a {
+        justify-content: center;
+    }
+}

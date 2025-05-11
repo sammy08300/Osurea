@@ -121,7 +121,10 @@ const fr = {
     // Pied de page
     footer: {
         credit: "Conçu pour la communauté osu! par Yuzuctus",
-        description: "Utilisez cet outil pour visualiser et sauvegarder votre zone active de tablette graphique."
+        description: "Utilisez cet outil pour visualiser et sauvegarder votre zone active de tablette graphique.",
+        tabletSettings: "Paramètres Tablette",
+        spreadsheets: "Feuilles de calcul",
+        otherProjects: "Autres projets"
     },
     
     // Messages de notification

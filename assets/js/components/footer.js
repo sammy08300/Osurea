@@ -2,11 +2,38 @@
 (function dynamicFooter() {
     document.addEventListener('DOMContentLoaded', function() {
         const footer = document.createElement('footer');
-        footer.className = "bg-gray-900 py-4 mt-8 border-t border-gray-800";
+        footer.id = "footer";
+        footer.className = "site-footer py-4";
         footer.innerHTML = `
-            <div class="container mx-auto text-center text-gray-400 text-sm">
-                <p>Osu!rea - Area Visualizer v2.0 - <span data-i18n="footer.credit">Conçu pour la communauté osu! par Yuzuctus</span></p>
-                <p class="mt-1" data-i18n="footer.description">Utilisez cet outil pour visualiser et sauvegarder votre zone active de tablette graphique.</p>
+            <div class="container footer-content">
+                <div class="footer-info">
+                    <h3 class="text-base"><span class="text-[#FF66AA]">Osu!</span>rea</h3>
+                    <p class="text-xs">Area visualizer</p>
+                </div>
+                <div class="footer-resources">
+                    <h4 class="text-sm" data-i18n="footer.tabletSettings">Tablet Settings</h4>
+                    <ul class="text-xs">
+                        <li><a href="https://github.com/OpenTabletDriver/OpenTabletDriver" target="_blank"><i class="fab fa-github"></i> Open Tablet Driver</a></li>
+                        <li><a href="https://github.com/KaikeGold/OsuAreaCalculator" target="_blank"><i class="fab fa-github"></i> Osu Area Calculator</a></li>
+                        <li><a href="https://mixmg.github.io/smoothing/smoothing-calculator.html" target="_blank"><i class="fas fa-calculator"></i> Smoothing Calculator</a></li>
+                    </ul>
+                </div>
+                <div class="footer-social">
+                    <h4 class="text-sm" data-i18n="footer.spreadsheets">Spreadsheets</h4>
+                    <ul class="text-xs">
+                        <li><a href="https://docs.google.com/spreadsheets/d/125LNzGmidy1gagwYUt12tRhrNdrWFHhWon7kxWY7iWU/edit?gid=854129046#gid=854129046" target="_blank"><i class="fas fa-table"></i> Tablet Compatibility Spreadsheet</a></li>
+                        <li><a href="https://docs.google.com/spreadsheets/d/1DYVfiSpQqdpa4sWWYUALPmliOIuGyKog7B7LJJdmlhE/edit?gid=2077726645#gid=2077726645" target="_blank"><i class="fas fa-table"></i> Area Calculator Spreadsheet</a></li>
+                    </ul>
+                </div>
+                <div class="footer-projects">
+                    <h4 class="text-sm" data-i18n="footer.otherProjects">Other projects</h4>
+                    <ul class="text-xs">
+                        <li><a href="https://osu-yuzu-skins.vercel.app/" target="_blank"><i class="fas fa-palette"></i> Osu!Yuzu skins</a></li>
+                    </ul>
+                </div>
+                <div class="copyright">
+                    <p class="text-xs">© 2025 Osu!rea Area Visualizer. All rights reserved.</p>
+                </div>
             </div>
         `;
         const footerContainer = document.getElementById('footer-container');
