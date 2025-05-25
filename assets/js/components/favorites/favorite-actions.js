@@ -6,16 +6,8 @@ import { FavoritesRendering } from './favorite-rendering.js';
 import { FavoritesInit } from './favorite-init.js';
 import localeManager from '../../../locales/index.js';
 
-/**
- * Format a number with a certain number of decimals
- * @param {number} val
- * @param {number} decimals
- * @returns {string}
- */
-function formatNumber(val, decimals = 1) {
-    if (typeof val !== 'number' || isNaN(val)) return '';
-    return val.toFixed(decimals);
-}
+import { formatNumber, getElement, showNotification, logError } from './favorites-utils.js';
+import { FAVORITES_CONFIG } from './favorites-config.js';
 
 /**
  * Module of actions on favorites

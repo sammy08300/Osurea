@@ -11,7 +11,13 @@ const CONFIG = {
     'service-worker.js',
     'manifest.webmanifest'
   ],
-  dirsToCopy: ['assets', 'data']
+  dirsToCopy: ['assets', 'data'],
+  // Performance optimization settings
+  optimization: {
+    minifyHTML: process.env.NODE_ENV === 'production',
+    compressAssets: process.env.NODE_ENV === 'production',
+    generateSourceMaps: process.env.NODE_ENV !== 'production'
+  }
 };
 
 // Create directory if it doesn't exist
@@ -74,14 +80,57 @@ async function copyDir(src, dest) {
   }
 }
 
+// Optimize HTML files (basic minification)
+async function optimizeHTML(filePath) {
+  if (!CONFIG.optimization.minifyHTML) return;
+  
+  try {
+    let content = await fs.readFile(filePath, 'utf8');
+    
+    // Basic HTML minification
+    content = content
+      .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+      .replace(/>\s+</g, '><') // Remove spaces between tags
+      .replace(/\s+>/g, '>') // Remove spaces before closing tags
+      .replace(/<!--[\s\S]*?-->/g, '') // Remove comments
+      .trim();
+    
+    await fs.writeFile(filePath, content);
+    console.log(`- Optimized HTML: ${filePath}`);
+  } catch (error) {
+    console.warn(`Failed to optimize HTML ${filePath}:`, error);
+  }
+}
+
+// Generate performance report
+function generatePerformanceReport() {
+  const report = {
+    buildTime: Date.now(),
+    environment: process.env.NODE_ENV || 'development',
+    optimizations: CONFIG.optimization,
+    files: {
+      copied: 0,
+      optimized: 0
+    }
+  };
+  
+  return report;
+}
+
 // Main build function
 async function build() {
+  const startTime = Date.now();
+  const performanceReport = generatePerformanceReport();
+  
   try {
+    console.log(`Starting build in ${performanceReport.environment} mode...`);
+    
     // Ensure public directory exists
     await ensureDir(CONFIG.publicDir);
     
     // Copy root files
     await copyRootFiles();
+    performanceReport.files.copied += CONFIG.rootFiles.length;
     
     // Copy directories
     for (const dir of CONFIG.dirsToCopy) {
@@ -91,7 +140,20 @@ async function build() {
       }
     }
     
-    console.log('\nBuild completed successfully!');
+    // Optimize HTML files if in production
+    if (CONFIG.optimization.minifyHTML) {
+      console.log('Optimizing HTML files...');
+      for (const file of CONFIG.rootFiles.filter(f => f.endsWith('.html'))) {
+        await optimizeHTML(path.join(CONFIG.publicDir, file));
+        performanceReport.files.optimized++;
+      }
+    }
+    
+    const buildTime = Date.now() - startTime;
+    console.log(`\nBuild completed successfully in ${buildTime}ms!`);
+    console.log(`Files copied: ${performanceReport.files.copied}`);
+    console.log(`Files optimized: ${performanceReport.files.optimized}`);
+    
   } catch (err) {
     console.error('\nBuild failed:', err);
     process.exit(1);

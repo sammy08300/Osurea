@@ -1,19 +1,55 @@
-// favoritesModule.js - Point d'entrée navigateur pour le module favoris (initialisation automatique)
-import { FavoritesUI } from './favoritesindex.js';
+/**
+ * Favorites Module - Browser Entry Point
+ * Automatic initialization for browser environments
+ */
 
-if (typeof window !== 'undefined') {
-    // Exposer l'interface unifiée au niveau global
-    window.FavoritesUI = FavoritesUI;
-    
-    // Initialiser automatiquement au chargement du DOM
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => FavoritesUI.init());
-    } else {
-        FavoritesUI.init();
+import { FavoritesUI } from './favoritesindex.js';
+import { logError } from './favorites-utils.js';
+
+/**
+ * Initialize favorites when DOM is ready
+ */
+async function initializeFavorites() {
+    try {
+        console.log('Starting favorites initialization...');
+        const success = await FavoritesUI.init();
+        
+        if (success) {
+            console.log('Favorites module initialized successfully');
+        } else {
+            console.error('Failed to initialize favorites module');
+        }
+    } catch (error) {
+        logError('initializeFavorites', error);
     }
 }
 
-// Support pour l'exportation CommonJS si nécessaire
+// Browser environment setup
+if (typeof window !== 'undefined') {
+    // Expose the unified interface globally
+    window.FavoritesUI = FavoritesUI;
+    
+    // Auto-initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeFavorites);
+    } else {
+        // DOM is already ready
+        initializeFavorites();
+    }
+    
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+        try {
+            FavoritesUI.destroy();
+        } catch (error) {
+            console.warn('Error during favorites cleanup:', error);
+        }
+    });
+}
+
+// CommonJS support if needed
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = FavoritesUI;
-} 
+}
+
+export default FavoritesUI; 

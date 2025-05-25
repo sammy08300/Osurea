@@ -9,6 +9,11 @@ import { notificationManager, registerLegacyGlobals as registerNotificationGloba
 import { initLegacyCompatibility } from './core/legacy-compatibility.js';
 import { Utils } from './utils/index.js';
 
+// Import performance optimization modules
+import { LazyComponent } from './utils/lazy-component-loader.js';
+import { bundleOptimizer } from './core/bundle-optimizer.js';
+import { setupEnhancedLazyLoading } from './utils/lazyLoadImages.js';
+
 // Import existing modules
 import { FavoritesUI } from './components/favorites/favoritesindex.js';
 import TabletSelector from './components/tablet/tabletSelector.js';
@@ -173,7 +178,7 @@ class AppState {
                 PreferencesManager: typeof PreferencesManager !== 'undefined' ? PreferencesManager : null
             });
             
-            // Create debounced ratio update function
+            // Create debounced ratio update function with memoized calculation
             this.debouncedUpdateRatio = Utils.DOM.debounce(() => {
                 const formManager = dependencyManager.get('FormManager');
                 const elements = formManager.getFormElements();
@@ -181,7 +186,8 @@ class AppState {
                 const height = Utils.parseFloatSafe(elements.areaHeight.value);
                 
                 if (height > 0 && width > 0) {
-                    const calculatedRatio = width / height;
+                    // Use memoized calculation for better performance
+                    const calculatedRatio = Utils.calculateRatioMemoized(width, height);
                     // Always update the ratio, unless the user is directly editing the field
                     if (!elements.customRatio.dataset.editing && !elements.customRatio.matches(':focus')) {
                         elements.customRatio.value = Utils.formatNumber(calculatedRatio, 3);
@@ -192,12 +198,38 @@ class AppState {
             
             this.isInitialized = true;
             
+            // Initialize performance optimizations
+            this._initializePerformanceOptimizations();
+            
             // Start with default values using the new display manager
             displayManager.update();
             
         } catch (error) {
             console.error('Error initializing application:', error);
             notificationManager.error('Error initializing application');
+        }
+    }
+
+    /**
+     * Initialize performance optimizations
+     * @private
+     */
+    _initializePerformanceOptimizations() {
+        try {
+            // Setup enhanced lazy loading for images
+            setupEnhancedLazyLoading();
+            
+            // Preload critical chunks during idle time
+            bundleOptimizer.preloadCriticalChunks();
+            
+            // Register performance optimization dependencies
+            dependencyManager.register('LazyComponent', LazyComponent, true);
+            dependencyManager.register('BundleOptimizer', bundleOptimizer, true);
+            
+            console.log('Performance optimizations initialized');
+            
+        } catch (error) {
+            console.warn('Failed to initialize some performance optimizations:', error);
         }
     }
 

@@ -227,6 +227,11 @@ const Numbers = {
         
         return width / height;
     },
+
+    /**
+     * Memoized version of calculateRatio for performance optimization
+     */
+    calculateRatioMemoized: null, // Will be initialized below
     
     /**
      * Convert millimeters to pixels based on the scaling factor 
@@ -300,22 +305,46 @@ const Performance = {
      * Memoize function results to improve performance
      * @param {Function} fn - Function to memoize
      * @param {Function} keyGenerator - Optional key generator function
+     * @param {number} maxCacheSize - Maximum cache size (default: 1000)
      * @returns {Function} Memoized function
      */
-    memoize(fn, keyGenerator = (...args) => JSON.stringify(args)) {
+    memoize(fn, keyGenerator = (...args) => JSON.stringify(args), maxCacheSize = 1000) {
         const cache = new Map();
         
         return function(...args) {
             const key = keyGenerator(...args);
             
             if (cache.has(key)) {
-                return cache.get(key);
+                // Move to end (LRU behavior)
+                const value = cache.get(key);
+                cache.delete(key);
+                cache.set(key, value);
+                return value;
             }
             
             const result = fn.apply(this, args);
+            
+            // Implement LRU cache eviction
+            if (cache.size >= maxCacheSize) {
+                const firstKey = cache.keys().next().value;
+                cache.delete(firstKey);
+            }
+            
             cache.set(key, result);
             return result;
         };
+    },
+
+    /**
+     * Create a memoized version of calculateRatio with optimized key generation
+     * @returns {Function} Memoized calculateRatio function
+     */
+    createMemoizedCalculateRatio() {
+        return this.memoize(
+            Numbers.calculateRatio,
+            (width, height) => `${width}:${height}`, // Simple string key for better performance
+            500 // Smaller cache for ratio calculations
+        );
     },
     
     /**
@@ -344,6 +373,9 @@ const Performance = {
     }
 };
 
+// Initialize memoized functions
+Numbers.calculateRatioMemoized = Performance.createMemoizedCalculateRatio();
+
 // -----------------------------------------------------------------------------
 // Main Utils Export
 // -----------------------------------------------------------------------------
@@ -366,6 +398,7 @@ export const Utils = {
     mmToPx: Numbers.mmToPx,
     pxToMm: Numbers.pxToMm,
     calculateRatio: Numbers.calculateRatio,
+    calculateRatioMemoized: Numbers.calculateRatioMemoized,
     constrainAreaOffset: Numbers.constrainAreaOffset,
     memoize: Performance.memoize
 };
@@ -383,6 +416,7 @@ if (typeof window !== 'undefined') {
     window.mmToPx = Numbers.mmToPx;
     window.pxToMm = Numbers.pxToMm;
     window.calculateRatio = Numbers.calculateRatio;
+    window.calculateRatioMemoized = Numbers.calculateRatioMemoized;
     window.isValidNumber = Numbers.isValidNumber;
     window.parseFloatSafe = Numbers.parseFloatSafe;
     window.constrainAreaOffset = Numbers.constrainAreaOffset;

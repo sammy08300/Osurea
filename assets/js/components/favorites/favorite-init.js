@@ -2,7 +2,7 @@
 import { FavoritesEvents } from './favorite-events.js';
 import { translateWithFallback } from '../../../js/i18n-init.js';
 import { getFavorites } from './favorite-storage.js';
-import { favoriteSortFavorites } from './favorite-sort.js';
+import { sortFavorites } from './favorite-sort.js';
 import { FavoritesRendering } from './favorite-rendering.js';
 import { FavoritesPopups } from './favorite-popup.js';
 
