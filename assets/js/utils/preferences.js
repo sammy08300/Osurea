@@ -18,10 +18,10 @@ const PreferencesManager = {
      * Initialize the preferences manager
      */
     init() {
-        console.log('DEBUG: Initializing preferences manager');
+        // Initializing preferences manager
         
         this._preferences = this.loadPreferences();
-        console.log('DEBUG: Preferences loaded from localStorage:', this._preferences);
+        // Preferences loaded from localStorage
         
         // Check and clean references to deleted favorites
         this._cleanupFavoriteReferences();

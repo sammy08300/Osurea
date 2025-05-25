@@ -13,6 +13,7 @@ export async function runAllTests() {
         utils: null,
         translations: null,
         storage: null,
+        visualization: null,
         total: { passed: 0, failed: 0, tests: 0 }
     };
     
@@ -32,6 +33,11 @@ export async function runAllTests() {
         const storageModule = await import('./storage.test.js');
         results.storage = storageModule.runStorageTests();
         
+        // Visualization tests
+        console.log('\n🎨 Visualization tests...');
+        const visualizationModule = await import('./visualization-test.js');
+        results.visualization = visualizationModule.runVisualizationTest();
+        
         // Calculate totals
         if (results.utils) {
             results.total.passed += results.utils.passed || 0;
@@ -49,6 +55,12 @@ export async function runAllTests() {
             results.total.passed += results.storage.passed || 0;
             results.total.failed += results.storage.failed || 0;
             results.total.tests += results.storage.total || 0;
+        }
+        
+        if (results.visualization) {
+            results.total.passed += results.visualization.passed || 0;
+            results.total.failed += results.visualization.failed || 0;
+            results.total.tests += results.visualization.total || 0;
         }
         
         // Display summary
@@ -137,8 +149,5 @@ if (typeof window !== 'undefined' && window.location) {
         diagnose: quickDiagnosis
     };
     
-    console.log('🧪 Osurea tests loaded! Use:');
-    console.log('• osureaTests.runAll() - All tests');
-    console.log('• osureaTests.runCritical() - Critical tests only');
-    console.log('• osureaTests.diagnose() - Quick diagnosis');
+    // Tests loaded silently
 } 

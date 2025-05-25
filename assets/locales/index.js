@@ -431,7 +431,7 @@ class LocaleManager {
    * @private
    */
   async updateTranslations() {
-    console.log('updateTranslations called but not implemented');
+            // updateTranslations not implemented
     return true;
   }
   

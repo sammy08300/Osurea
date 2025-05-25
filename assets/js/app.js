@@ -36,13 +36,13 @@ class AppState {
      */
     async loadTabletData() {
         try {
-            console.log('Loading tablet data from data/tablets.json...');
+            // Loading tablet data
             const response = await fetch('data/tablets.json');
             if (!response.ok) {
                 throw new Error('Failed to load tablet data');
             }
             this.tabletData = await response.json();
-            console.log('Tablet data loaded successfully:', this.tabletData.length, 'tablets');
+            // Tablet data loaded successfully
             
             // Initialize the tablet selector
             TabletSelector.init(this.tabletData);
@@ -100,11 +100,11 @@ class AppState {
     _initializeStorageDiagnostics() {
         // Run initial storage diagnostic
         if (typeof StorageManager !== 'undefined') {
-            console.log("Running initial storage diagnostic...");
+            // Running storage diagnostic
             
             // Reset storage to resolve potential issues
             if (typeof StorageManager.forceReset === 'function') {
-                console.log("Performing full storage reset during initialization");
+                // Performing storage reset
                 StorageManager.forceReset();
             } else if (typeof StorageManager.diagnoseFavorites === 'function') {
                 StorageManager.diagnoseFavorites();
@@ -114,13 +114,13 @@ class AppState {
         // Clean up favorite references in preferences
         if (typeof PreferencesManager !== 'undefined' && 
             typeof PreferencesManager._cleanupFavoriteReferences === 'function') {
-            console.log("Performing preferences cleanup during initialization");
+            // Performing preferences cleanup
             PreferencesManager._cleanupFavoriteReferences();
         }
 
         // Run post-init diagnostic
         if (typeof StorageManager !== 'undefined' && typeof StorageManager.diagnoseFavorites === 'function') {
-            console.log("Running post-init storage diagnostic...");
+            // Running post-init diagnostic
             setTimeout(() => StorageManager.diagnoseFavorites(), 500);
         }
     }
@@ -209,11 +209,11 @@ class AppState {
         // Handler for F5 and Ctrl+R to ensure favorites are properly saved
         window.addEventListener('keydown', (e) => {
             if (e.key === 'F5' || (e.ctrlKey && e.key === 'r')) {
-                console.log("Page refresh detected (F5/Ctrl+R)");
+                // Page refresh detected
                 
                 // Force cache cleanup before refresh
                 if (typeof StorageManager !== 'undefined') {
-                    console.log("Cleaning StorageManager cache before refresh");
+                    // Cleaning cache
                     if (typeof StorageManager.clearCache === 'function') {
                         StorageManager.clearCache();
                     }
@@ -221,13 +221,13 @@ class AppState {
                     // Verify and recover the latest available favorites list
                     if (typeof StorageManager.getFavorites === 'function') {
                         const currentFavorites = StorageManager.getFavorites();
-                        console.log(`Current favorites before refresh: ${currentFavorites.length} items`);
+                        // Favorites verified
                     }
                 }
                 
                 // Clean favorites cache in initialization
                 if (typeof FavoritesInit !== 'undefined') {
-                    console.log("Cleaning FavoritesInit cache before refresh");
+                    // Cleaning favorites cache
                     FavoritesInit.cachedFavorites = null;
                     
                     // Force complete refresh as last resort
@@ -238,7 +238,7 @@ class AppState {
                 
                 // Ensure preferences are updated
                 if (typeof PreferencesManager !== 'undefined') {
-                    console.log("Saving and cleaning preferences before refresh");
+                    // Saving preferences
                     
                     // Clean references to deleted favorites
                     if (typeof PreferencesManager._cleanupFavoriteReferences === 'function') {

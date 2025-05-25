@@ -77,26 +77,41 @@ html.loading, body.loading {
 ====================================================
   Tablet Boundary & Rectangle (osu! zone viewer)
 ====================================================*/
+#visual-container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
 #tablet-boundary {
     transition: width var(--transition-normal), height var(--transition-normal);
+    position: relative;
+    margin: auto;
 }
+
 .rectangle, #rectangle {
     cursor: grab;
     user-select: none;
     box-shadow: 0 0 15px var(--shadow-color);
     transition: none;
     visibility: visible;
+    position: absolute;
+    transform-origin: center center;
 }
+
 .page-loaded #rectangle {
     transition: width var(--transition-fast), height var(--transition-fast), transform var(--transition-fast);
 }
+
 #rectangle:active {
     cursor: grabbing;
 }
+
 [data-loading="true"] #rectangle,
 body:not(.page-loaded) #rectangle {
     pointer-events: none !important;
 }
+
 #rectangle.invisible {
     visibility: hidden;
 }

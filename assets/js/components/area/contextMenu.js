@@ -14,7 +14,7 @@ const ContextMenu = {
      * Initialize the context menu
      */
     init() {
-        console.log('Initializing the context menu...');
+        // Initializing context menu
         
         // Get existing elements
         this.rectangle = document.getElementById('rectangle');
@@ -26,7 +26,7 @@ const ContextMenu = {
         }
         
         this.setupEventListeners();
-        console.log('Context menu initialized successfully');
+        // Context menu ready
     },
     
     /**

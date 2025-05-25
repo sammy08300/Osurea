@@ -60,7 +60,7 @@ export function registerLegacyGlobals() {
     // Constraint helpers (from constraintHelpers.js)
     window.constrainAreaOffset = Utils.Numbers.constrainAreaOffset;
 
-    console.log('Legacy global functions registered for backward compatibility');
+    // Legacy functions registered
 }
 
 /**
@@ -88,7 +88,7 @@ export function migrateLegacyDependencies() {
         dependencyManager.register('ContextMenu', ContextMenu, true);
     }
 
-    console.log('Legacy dependencies migrated to dependency manager');
+    // Dependencies migrated
 }
 
 /**
@@ -118,10 +118,7 @@ export function checkLegacyConflicts() {
         window.hasOwnProperty(name) && typeof window[name] !== 'undefined'
     );
 
-    if (conflicts.length > 0) {
-        console.info('Legacy global functions detected:', conflicts);
-        console.info('Consider migrating to the new modular system for better maintainability');
-    }
+    // Legacy functions detected silently
 }
 
 /**
@@ -138,7 +135,7 @@ export function initLegacyCompatibility() {
         // Migrate existing dependencies
         migrateLegacyDependencies();
         
-        console.log('Legacy compatibility layer initialized successfully');
+        // Legacy compatibility initialized
         return true;
     } catch (error) {
         console.error('Error initializing legacy compatibility layer:', error);

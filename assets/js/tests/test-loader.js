@@ -5,11 +5,10 @@
 
 (async function() {
     try {
-        console.log('🧪 Loading Osurea tests...');
+        // Loading tests silently
         
         // Ensure Utils is available globally before running tests
         if (!window.Utils) {
-            console.log('📦 Loading Utils module...');
             const utilsModule = await import('../utils/index.js');
             window.Utils = utilsModule.Utils;
             
@@ -25,14 +24,10 @@
             window.formatNumber = utilsModule.Utils.formatNumber;
             window.parseFloatSafe = utilsModule.Utils.parseFloatSafe;
             window.constrainAreaOffset = utilsModule.Utils.constrainAreaOffset;
-            
-            console.log('✅ Utils module loaded and made available globally');
         }
         
         // Ensure Utils has the correct structure (fix missing namespaces)
         if (window.Utils && (!window.Utils.DOM || !window.Utils.Numbers || !window.Utils.Performance)) {
-            console.log('🔧 Fixing Utils object structure...');
-            
             // Import the module again to get fresh references
             const utilsModule = await import('../utils/index.js');
             
@@ -40,22 +35,12 @@
             if (!window.Utils.DOM) window.Utils.DOM = utilsModule.DOM;
             if (!window.Utils.Numbers) window.Utils.Numbers = utilsModule.Numbers;
             if (!window.Utils.Performance) window.Utils.Performance = utilsModule.Performance;
-            
-            console.log('✅ Utils object structure fixed');
         }
         
-        // Debug: Check what's actually in the Utils object
-        console.log('🔍 Utils object structure:', {
-            Utils: typeof window.Utils,
-            'Utils.DOM': typeof window.Utils?.DOM,
-            'Utils.Numbers': typeof window.Utils?.Numbers,
-            'Utils.Performance': typeof window.Utils?.Performance,
-            'Utils keys': window.Utils ? Object.keys(window.Utils) : 'N/A'
-        });
+        // Utils object structure verified
         
         // Ensure localeManager is available globally for translation tests
         if (!window.localeManager) {
-            console.log('🌍 Loading LocaleManager...');
             const localeModule = await import('../../locales/index.js');
             window.localeManager = localeModule.default;
             
@@ -66,42 +51,60 @@
                     window.translateWithFallback = i18nModule.translateWithFallback;
                 }
             } catch (error) {
-                console.log('Note: translateWithFallback not available');
+                // translateWithFallback not available
             }
-            
-            console.log('✅ LocaleManager loaded and made available globally');
         }
         
         // Ensure StorageManager is available globally for storage tests
-        // Note: We need to override the native browser StorageManager
-        console.log('💾 Loading StorageManager...');
         const storageModule = await import('../utils/storage.js');
-        
-        // Force override the native StorageManager with our custom one
         window.StorageManager = storageModule.StorageManager;
-        
-        console.log('✅ StorageManager loaded and made available globally');
-        console.log('🔍 StorageManager methods:', Object.keys(window.StorageManager));
         
         // Import the main test runner
         const testModule = await import('./run-all-tests.js');
+        
+        // Import drag debug script
+        const dragDebugModule = await import('./drag-debug.js');
         
         // Create global test object
         window.OsureaTest = {
             runAll: testModule.runAllTests,
             runCritical: testModule.runCriticalTests,
-            diagnose: testModule.quickDiagnosis
+            diagnose: testModule.quickDiagnosis,
+            debugDrag: dragDebugModule.debugDragFunctionality,
+            init: () => {
+                console.log('🧪 Osurea Test Suite Initialized');
+                console.log('📋 Available Test Commands:');
+                console.log('');
+                console.log('🔬 MAIN TEST SUITES:');
+                console.log('  • OsureaTest.runAll()        - Run complete test suite');
+                console.log('  • OsureaTest.runCritical()   - Run critical tests only');
+                console.log('  • OsureaTest.diagnose()      - Quick system diagnosis');
+                console.log('');
+                console.log('🎯 DRAG & VISUALIZATION:');
+                console.log('  • OsureaTest.debugDrag()     - Debug drag functionality');
+                console.log('  • testCompleteDrag()         - Initialize and test drag system');
+                console.log('  • quickDragDiagnosis()       - Quick drag system check');
+                console.log('  • forceTestMove()            - Test rectangle movement');
+                console.log('  • forceReattachEvents()      - Reattach drag event listeners');
+                console.log('');
+                console.log('🔧 UTILITY FUNCTIONS:');
+                console.log('  • initThrottledFunctions()   - Initialize throttled display updates');
+                console.log('  • testDragEvents()           - Test drag event attachment');
+                console.log('  • testDragFunctionality()    - Verify drag setup');
+                console.log('');
+                console.log('💡 ALTERNATIVE SYNTAX:');
+                console.log('  • osureaTests.runAll()       - Same as OsureaTest.runAll()');
+                console.log('  • osureaTests.diagnose()     - Same as OsureaTest.diagnose()');
+                console.log('');
+                console.log('📖 Usage: Simply type any command above in the console');
+                return true;
+            }
         };
         
         // Also create the osureaTests object for compatibility
         window.osureaTests = window.OsureaTest;
         
-        console.log('✅ Osurea tests loaded successfully!');
-        console.log('📋 Available commands:');
-        console.log('  • OsureaTest.runAll() - Run all tests');
-        console.log('  • OsureaTest.runCritical() - Run critical tests only');
-        console.log('  • OsureaTest.diagnose() - Quick diagnosis');
-        console.log('  • osureaTests.runAll() - Alternative syntax');
+        // Silent initialization - tests ready but not announced
         
     } catch (error) {
         console.error('❌ Failed to load Osurea tests:', error);

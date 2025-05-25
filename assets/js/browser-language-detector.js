@@ -41,7 +41,7 @@ function detectAndApplyBrowserLanguage() {
     // Check if user has already chosen a language
     const savedLocale = localeManager.getSafeLocalStorage('osureaLocale');
     if (savedLocale && localeManager.translations[savedLocale]) {
-      console.log(`[LangDetect] User has already chosen language: ${savedLocale}, skipping auto-detection`);
+              // User language already set, skipping detection
       return;
     }
     

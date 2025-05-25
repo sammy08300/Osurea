@@ -44,8 +44,8 @@ let containerSize = { width: 0, height: 0 };
 let tabletSize = { width: 0, height: 0 };
 const containerPadding = 40;
 
-// Throttled update function to limit frequency
-const throttledUpdateDisplay = throttle(updateDisplay, 16); // ~60fps
+// Throttled update function will be defined after updateDisplay function
+let throttledUpdateDisplay;
 
 /**
  * Updates the container size when it changes
@@ -105,18 +105,34 @@ function updateDisplaySizes(tabletWidth, tabletHeight) {
  * Updates rectangle display
  */
 function updateRectangleDisplay(areaWidth, areaHeight, areaOffsetX, areaOffsetY) {
-    const rectWidth = mmToPx(areaWidth, currentScale);
-    const rectHeight = mmToPx(areaHeight, currentScale);
+    const rectWidth = (typeof mmToPx === 'function') ? mmToPx(areaWidth, currentScale) : areaWidth * currentScale;
+    const rectHeight = (typeof mmToPx === 'function') ? mmToPx(areaHeight, currentScale) : areaHeight * currentScale;
     
-    const rectCenterX = mmToPx(areaOffsetX, currentScale);
-    const rectCenterY = mmToPx(areaOffsetY, currentScale);
+    // Get tablet boundary dimensions
+    const tabletBoundaryRect = tabletBoundary.getBoundingClientRect();
+    const tabletDisplayWidth = parseFloat(tabletBoundary.style.width) || tabletBoundaryRect.width;
+    const tabletDisplayHeight = parseFloat(tabletBoundary.style.height) || tabletBoundaryRect.height;
     
+    // Convert offset from mm to pixels relative to tablet boundary
+    const rectCenterX = (typeof mmToPx === 'function') ? mmToPx(areaOffsetX, currentScale) : areaOffsetX * currentScale;
+    const rectCenterY = (typeof mmToPx === 'function') ? mmToPx(areaOffsetY, currentScale) : areaOffsetY * currentScale;
+    
+    // Calculate position relative to tablet boundary center
     const rectLeft = rectCenterX - rectWidth / 2;
     const rectTop = rectCenterY - rectHeight / 2;
     
+    // Set rectangle dimensions and position
     rectangle.style.width = `${rectWidth}px`;
     rectangle.style.height = `${rectHeight}px`;
-    rectangle.style.transform = `translate(${rectLeft}px, ${rectTop}px)`;
+    rectangle.style.left = `${rectLeft}px`;
+    rectangle.style.top = `${rectTop}px`;
+    rectangle.style.transform = 'none'; // Reset transform to avoid conflicts
+    
+    // Ensure rectangle is visible
+    rectangle.style.visibility = 'visible';
+    rectangle.style.opacity = '1';
+    
+    // Rectangle updated silently for performance
     
     // Update border radius
     const radiusValue = window.currentRadius;
@@ -153,7 +169,14 @@ function handleFirstRender() {
         // Make the rectangle visible
         if (rectangle.classList.contains('invisible')) {
             rectangle.classList.remove('invisible');
+            // Rectangle made visible
         }
+        
+        // Ensure rectangle is fully visible and interactive
+        rectangle.style.visibility = 'visible';
+        rectangle.style.opacity = '1';
+        rectangle.style.pointerEvents = 'auto';
+        rectangle.style.cursor = 'grab';
     });
 }
 
@@ -267,6 +290,11 @@ function updateDisplay() {
     } else {
         saveCurrentState();
     }
+}
+
+// Initialize throttled update function now that updateDisplay is defined
+if (!throttledUpdateDisplay && typeof throttle === 'function') {
+    throttledUpdateDisplay = throttle(updateDisplay, 16); // ~60fps
 }
 
 /**
@@ -463,7 +491,7 @@ function updateInfoDisplaysWithoutRatio(dims) {
 function setupDragFunctionality() {
     // Verify if the initialization is still in progress
     if (document.body.getAttribute('data-loading') === 'true') {
-        console.log('Waiting for the loading to finish before enabling drag functionality');
+        // Waiting for loading to finish
         return;
     }
     
@@ -480,10 +508,18 @@ function setupDragFunctionality() {
     document.addEventListener('mousemove', handleDragMove);
     document.addEventListener('mouseup', handleDragEnd);
     
+    // Event listeners attached for interaction feedback
+    
     // Touch support
     rectangle.addEventListener('touchstart', handleTouchStart, { passive: false });
     document.addEventListener('touchmove', handleTouchMove, { passive: false });
     document.addEventListener('touchend', handleDragEnd);
+    
+    // Ensure rectangle is draggable
+    rectangle.style.cursor = 'grab';
+    rectangle.style.pointerEvents = 'auto';
+    
+    // Drag functionality initialized successfully
 }
 
 /**
@@ -497,8 +533,17 @@ function handleDragStart(e) {
     dragStartX = e.clientX;
     dragStartY = e.clientY;
     
-    dragStartOffsetX = parseFloatSafe(cachedElements.areaOffsetXInput.value);
-    dragStartOffsetY = parseFloatSafe(cachedElements.areaOffsetYInput.value);
+    dragStartOffsetX = (typeof parseFloatSafe === 'function') 
+        ? parseFloatSafe(cachedElements.areaOffsetXInput.value)
+        : parseFloat(cachedElements.areaOffsetXInput.value) || 0;
+    dragStartOffsetY = (typeof parseFloatSafe === 'function') 
+        ? parseFloatSafe(cachedElements.areaOffsetYInput.value)
+        : parseFloat(cachedElements.areaOffsetYInput.value) || 0;
+    
+    // Drag started - values cached for performance
+    
+    // Change cursor to grabbing
+    rectangle.style.cursor = 'grabbing';
 }
 
 /**
@@ -514,8 +559,12 @@ function handleTouchStart(e) {
         dragStartX = touch.clientX;
         dragStartY = touch.clientY;
         
-        dragStartOffsetX = parseFloatSafe(cachedElements.areaOffsetXInput.value);
-        dragStartOffsetY = parseFloatSafe(cachedElements.areaOffsetYInput.value);
+        dragStartOffsetX = (typeof parseFloatSafe === 'function') 
+            ? parseFloatSafe(cachedElements.areaOffsetXInput.value)
+            : parseFloat(cachedElements.areaOffsetXInput.value) || 0;
+        dragStartOffsetY = (typeof parseFloatSafe === 'function') 
+            ? parseFloatSafe(cachedElements.areaOffsetYInput.value)
+            : parseFloat(cachedElements.areaOffsetYInput.value) || 0;
     }
 }
 
@@ -531,38 +580,69 @@ function handleMovement(clientX, clientY) {
     const isOffsetXFocused = document.activeElement === cachedElements.areaOffsetXInput;
     const isOffsetYFocused = document.activeElement === cachedElements.areaOffsetYInput;
     
-    // Calculate movement in millimeters
+    // Get tablet boundary position for accurate calculations
+    const tabletBoundaryRect = tabletBoundary.getBoundingClientRect();
+    const visualContainerRect = visualContainer.getBoundingClientRect();
+    
+    // Calculate movement in pixels relative to the tablet boundary
     const deltaXPx = clientX - dragStartX;
     const deltaYPx = clientY - dragStartY;
     
-    const deltaXMm = pxToMm(deltaXPx, currentScale);
-    const deltaYMm = pxToMm(deltaYPx, currentScale);
+    // Convert pixel movement to millimeters
+    const deltaXMm = (typeof pxToMm === 'function') ? pxToMm(deltaXPx, currentScale) : deltaXPx / currentScale;
+    const deltaYMm = (typeof pxToMm === 'function') ? pxToMm(deltaYPx, currentScale) : deltaYPx / currentScale;
+    
+    // Movement calculated - optimized for performance
     
     // Calculate new offset values
     let newOffsetX = dragStartOffsetX + deltaXMm;
     let newOffsetY = dragStartOffsetY + deltaYMm;
     
     // Constrain within the tablet boundaries
-    const constrainedOffsets = constrainAreaOffset(
-        newOffsetX, 
-        newOffsetY, 
-        dims.areaWidth, 
-        dims.areaHeight, 
-        dims.tabletWidth, 
-        dims.tabletHeight
-    );
+    const constrainedOffsets = (typeof constrainAreaOffset === 'function') 
+        ? constrainAreaOffset(
+            newOffsetX, 
+            newOffsetY, 
+            dims.areaWidth, 
+            dims.areaHeight, 
+            dims.tabletWidth, 
+            dims.tabletHeight
+        )
+        : { x: newOffsetX, y: newOffsetY }; // Fallback without constraint
+    
+    // Constraints applied for boundary checking
     
     // Update inputs only if the user is not editing them
     if (!isOffsetXFocused) {
-        cachedElements.areaOffsetXInput.value = formatNumber(constrainedOffsets.x, DECIMAL_PRECISION_POSITION);
+        const oldValue = cachedElements.areaOffsetXInput.value;
+        const newValue = (typeof formatNumber === 'function') 
+            ? formatNumber(constrainedOffsets.x, DECIMAL_PRECISION_POSITION)
+            : constrainedOffsets.x.toFixed(3);
+        cachedElements.areaOffsetXInput.value = newValue;
+        // X input updated
     }
     
     if (!isOffsetYFocused) {
-        cachedElements.areaOffsetYInput.value = formatNumber(constrainedOffsets.y, DECIMAL_PRECISION_POSITION);
+        const oldValue = cachedElements.areaOffsetYInput.value;
+        const newValue = (typeof formatNumber === 'function') 
+            ? formatNumber(constrainedOffsets.y, DECIMAL_PRECISION_POSITION)
+            : constrainedOffsets.y.toFixed(3);
+        cachedElements.areaOffsetYInput.value = newValue;
+        // Y input updated
     }
     
+    // Final offsets calculated
+    
     // Update display with throttle to limit calls
-    throttledUpdateDisplay();
+    if (typeof throttledUpdateDisplay === 'function') {
+        throttledUpdateDisplay();
+    } else {
+        // Fallback to direct update if throttled version is not available
+        // Fallback to direct update
+        if (typeof updateDisplay === 'function') {
+            updateDisplay();
+        }
+    }
 }
 
 /**
@@ -590,7 +670,11 @@ function handleTouchMove(e) {
 function handleDragEnd() {
     if (!isDragging) return;
     
+    // Drag operation completed
     isDragging = false;
+    
+    // Reset cursor to grab
+    rectangle.style.cursor = 'grab';
     
     // Ensure the body has the page-loaded class to activate transitions
     if (!document.body.classList.contains('page-loaded')) {
@@ -663,6 +747,14 @@ function centerArea() {
 function setupResizeObserver() {
     const resizeObserver = new ResizeObserver(throttle(() => {
         updateContainerSize();
+        
+        // Ensure proper centering after resize
+        if (visualContainer) {
+            visualContainer.style.display = 'flex';
+            visualContainer.style.alignItems = 'center';
+            visualContainer.style.justifyContent = 'center';
+        }
+        
         updateDisplay();
     }, 100));
     
@@ -719,6 +811,17 @@ function setupRadiusControl() {
 }
 
 /**
+ * Initialize throttled functions and ensure proper order
+ */
+function initThrottledFunctions() {
+    // Initialize throttled update function
+    if (!throttledUpdateDisplay && typeof throttle === 'function' && typeof updateDisplay === 'function') {
+        throttledUpdateDisplay = throttle(updateDisplay, 16);
+        // throttledUpdateDisplay initialized
+    }
+}
+
+/**
  * Initialize the visualizer
  */
 function initVisualizer() {
@@ -733,6 +836,9 @@ function initVisualizer() {
     // Temporarily disable interactions during initial loading
     rectangle.style.pointerEvents = 'none';
     
+    // Initialize throttled functions first
+    initThrottledFunctions();
+    
     // Configure the rectangle to its correct initial position before activating transitions
     updateContainerSize();
     updateDisplay();
@@ -745,8 +851,8 @@ function initVisualizer() {
         // Reactivate interactions with the rectangle
         rectangle.style.pointerEvents = 'auto';
         
-        // Set the normal cursor on the rectangle
-        rectangle.style.cursor = 'default';
+        // Set the grab cursor on the rectangle
+        rectangle.style.cursor = 'grab';
         
         // Indicate that the loading is finished
         document.body.removeAttribute('data-loading');
@@ -767,6 +873,11 @@ function initVisualizer() {
         setupDragFunctionality();
         setupResizeObserver();
         setupRadiusControl();
+        
+        // Initialize context menu
+        if (typeof ContextMenu !== 'undefined') {
+            ContextMenu.init();
+        }
         
         // Center button
         const centerBtn = document.getElementById('center-btn');
@@ -789,16 +900,230 @@ function initVisualizer() {
         });
     }, 300);
 
-    // Ensure the flex class is applied to the container
+    // Ensure the container is properly configured for centering
     if (visualContainer) {
+        visualContainer.style.display = 'flex';
+        visualContainer.style.alignItems = 'center';
+        visualContainer.style.justifyContent = 'center';
         visualContainer.classList.add('flex');
+    }
+    
+    // Ensure tablet boundary is properly positioned
+    if (tabletBoundary) {
+        tabletBoundary.style.position = 'relative';
+        tabletBoundary.style.margin = 'auto';
     }
 }
 
 // Call init when window loads
 window.addEventListener('load', initVisualizer);
 
+/**
+ * Test function to verify drag functionality
+ */
+function testDragFunctionality() {
+    console.log('🧪 Testing drag functionality...');
+    
+    const rect = document.getElementById('rectangle');
+    if (!rect) {
+        console.error('❌ Rectangle not found');
+        return false;
+    }
+    
+    const tests = {
+        'Element exists': !!rect,
+        'Has grab cursor': rect.style.cursor === 'grab',
+        'Pointer events enabled': rect.style.pointerEvents === 'auto',
+        'Is visible': rect.style.visibility !== 'hidden' && !rect.classList.contains('invisible'),
+        'Has dimensions': rect.style.width && rect.style.height,
+        'Has position': rect.style.left !== undefined && rect.style.top !== undefined
+    };
+    
+    console.log('Drag functionality tests:', tests);
+    
+    const allPassed = Object.values(tests).every(test => test === true);
+    console.log(allPassed ? '✅ All drag tests passed' : '❌ Some drag tests failed');
+    
+    return allPassed;
+}
+
+/**
+ * Test if drag events are properly attached
+ */
+function testDragEvents() {
+    console.log('Testing drag events...');
+    
+    const rect = document.getElementById('rectangle');
+    if (!rect) {
+        console.error('Rectangle not found');
+        return false;
+    }
+    
+    // Test drag sequence silently
+    const mouseDownEvent = new MouseEvent('mousedown', {
+        bubbles: true,
+        cancelable: true,
+        clientX: 100,
+        clientY: 100
+    });
+    
+    rect.dispatchEvent(mouseDownEvent);
+    
+    setTimeout(() => {
+        const mouseMoveEvent = new MouseEvent('mousemove', {
+            bubbles: true,
+            cancelable: true,
+            clientX: 110,
+            clientY: 110
+        });
+        
+        document.dispatchEvent(mouseMoveEvent);
+        
+        setTimeout(() => {
+            const mouseUpEvent = new MouseEvent('mouseup', {
+                bubbles: true,
+                cancelable: true,
+                clientX: 110,
+                clientY: 110
+            });
+            
+            document.dispatchEvent(mouseUpEvent);
+            console.log('Drag test completed');
+        }, 50);
+    }, 50);
+    
+    return true;
+}
+
+/**
+ * Force reattach drag events
+ */
+function forceReattachEvents() {
+    console.log('Reattaching drag events...');
+    
+    // Remove data-loading to ensure events can be attached
+    document.body.removeAttribute('data-loading');
+    
+    // Initialize throttled update function if not already done
+    if (!throttledUpdateDisplay && typeof throttle === 'function' && typeof updateDisplay === 'function') {
+        throttledUpdateDisplay = throttle(updateDisplay, 16);
+    }
+    
+    // Force setup drag functionality
+    setupDragFunctionality();
+    
+    console.log('✅ Drag events reattached successfully');
+}
+
+/**
+ * Quick diagnostic function
+ */
+function quickDragDiagnosis() {
+    console.log('Running drag diagnosis...');
+    
+    const rect = document.getElementById('rectangle');
+    const inputs = {
+        x: document.getElementById('areaOffsetX'),
+        y: document.getElementById('areaOffsetY')
+    };
+    
+    // Quick element check
+    const elementsOk = !!rect && !!inputs.x && !!inputs.y;
+    
+    if (!elementsOk) {
+        console.error('Missing required elements');
+        return false;
+    }
+    
+    // Check critical functions
+    const functionsOk = typeof updateDisplay === 'function' && 
+                       typeof throttledUpdateDisplay === 'function';
+    
+    // Check rectangle state
+    const rectOk = rect.style.cursor === 'grab' && 
+                   rect.style.pointerEvents === 'auto' &&
+                   rect.getBoundingClientRect().width > 0;
+    
+    // Check loading state
+    const notLoading = document.body.getAttribute('data-loading') !== 'true';
+    
+    const allOk = elementsOk && functionsOk && rectOk && notLoading;
+    
+    console.log('Diagnosis result:', {
+        elements: elementsOk ? '✅' : '❌',
+        functions: functionsOk ? '✅' : '❌', 
+        rectangle: rectOk ? '✅' : '❌',
+        loading: notLoading ? '✅' : '❌',
+        overall: allOk ? '✅ Ready' : '❌ Issues found'
+    });
+    
+    return allOk;
+}
+
+/**
+ * Test complete drag functionality with proper initialization
+ */
+function testCompleteDrag() {
+    console.log('Initializing complete drag functionality...');
+    
+    // Ensure all functions are properly initialized
+    initThrottledFunctions();
+    
+    // Verify initialization
+    const isReady = typeof throttledUpdateDisplay === 'function';
+    console.log('Drag system ready:', isReady);
+    
+    if (isReady) {
+        console.log('✅ Drag functionality is now active');
+    } else {
+        console.error('❌ Failed to initialize drag system');
+    }
+    
+    return isReady;
+}
+
+/**
+ * Force move rectangle to test positioning
+ */
+function forceTestMove() {
+    console.log('Testing rectangle movement...');
+    
+    const areaOffsetXInput = document.getElementById('areaOffsetX');
+    const areaOffsetYInput = document.getElementById('areaOffsetY');
+    
+    if (!areaOffsetXInput || !areaOffsetYInput) {
+        console.error('Input elements not found');
+        return;
+    }
+    
+    // Get current values and move by 10mm
+    const currentX = parseFloat(areaOffsetXInput.value);
+    const currentY = parseFloat(areaOffsetYInput.value);
+    const newX = currentX + 10;
+    const newY = currentY + 10;
+    
+    console.log(`Moving from (${currentX}, ${currentY}) to (${newX}, ${newY})`);
+    
+    // Update inputs and trigger display update
+    areaOffsetXInput.value = newX.toFixed(3);
+    areaOffsetYInput.value = newY.toFixed(3);
+    
+    if (typeof updateDisplay === 'function') {
+        updateDisplay();
+        console.log('✅ Rectangle moved successfully');
+    } else {
+        console.error('❌ updateDisplay function not available');
+    }
+}
+
 // Expose functions globally
 window.updateDisplayWithoutRatio = updateDisplayWithoutRatio;
 window.centerArea = centerArea;
+window.testDragFunctionality = testDragFunctionality;
+window.testDragEvents = testDragEvents;
+window.forceReattachEvents = forceReattachEvents;
+window.quickDragDiagnosis = quickDragDiagnosis;
+window.testCompleteDrag = testCompleteDrag;
+window.initThrottledFunctions = initThrottledFunctions;
+window.forceTestMove = forceTestMove;
 

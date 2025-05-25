@@ -48,8 +48,7 @@ const TabletSelector = {
      * @param {Array} tabletData - Data of the tablets from the tablets.json file
      */
     init(tabletData) {
-        console.log('Initializing tablet selector...');
-        console.log('Tablet data received:', tabletData ? tabletData.length : 'null', 'items');
+        // Initializing tablet selector
         
         // DOM elements recovery
         this.initElements();
@@ -75,7 +74,7 @@ const TabletSelector = {
             }
         });
         
-        console.log('Tablet selector successfully initialized');
+        // Tablet selector ready
         
         // Check once more if no tablet has been loaded
         setTimeout(() => this.ensureTabletIsLoaded(), 300);
@@ -513,7 +512,7 @@ const TabletSelector = {
         const { brandsList } = this.elements;
         const { tabletData, selectedBrand } = this.state;
         
-        console.log('Populating brands list with data:', tabletData ? tabletData.length : 'null', 'items');
+        // Populating brands list
         
         // Clear current list
         brandsList.innerHTML = '';
