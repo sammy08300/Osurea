@@ -6,47 +6,53 @@
 const PreferencesManager = {
     // Constants
     PREFERENCES_KEY: 'Osu!reaPreferences_v2',
+    DEBUG_LOGS: false, // Set to true to enable detailed logs
     
     // State
     _preferences: null,
     _resetConfirmCallback: null,
+    _lastSavedState: null,
+    _hasChanges: false,
     
     /**
      * Initialize the preferences manager
      */
     init() {
-        console.log('DEBUG: Initialisation du gestionnaire de préférences');
+        console.log('DEBUG: Initializing preferences manager');
         
         this._preferences = this.loadPreferences();
-        console.log('DEBUG: Préférences chargées depuis localStorage:', this._preferences);
+        console.log('DEBUG: Preferences loaded from localStorage:', this._preferences);
         
-        // Vérifier et nettoyer les références aux favoris qui n'existent plus
+        // Check and clean references to deleted favorites
         this._cleanupFavoriteReferences();
         
         this.createResetDialog();
         this.applyPreferences();
         this.setupEventListeners();
         
-        console.log('Gestionnaire de préférences initialisé');
+        // Initialize saved state to avoid unnecessary saves
+        this._initializeLastSavedState();
+        
+        console.log('Preferences manager initialized (optimized saving enabled)');
     },
     
     /**
-     * Nettoie les références aux favoris supprimés dans les préférences
+     * Clean references to deleted favorites in preferences
      */
     _cleanupFavoriteReferences() {
         if (!this._preferences) return;
         
-        // Si pas de StorageManager ou pas de favoris référencés, rien à faire
+        // If no StorageManager or no referenced favorites, nothing to do
         if (typeof window.StorageManager === 'undefined' || !this._preferences.lastLoadedFavoriteId) {
             return;
         }
         
-        console.log(`Vérification des références aux favoris: ${this._preferences.lastLoadedFavoriteId}`);
+        console.log(`Checking favorite references: ${this._preferences.lastLoadedFavoriteId}`);
         
-        // Vérifier si le favori existe
+        // Check if the favorite exists
         if (window.StorageManager.getFavoriteById && 
             !window.StorageManager.getFavoriteById(this._preferences.lastLoadedFavoriteId)) {
-            console.log(`Suppression de la référence au favori ${this._preferences.lastLoadedFavoriteId} (supprimé)`);
+            console.log(`Removing reference to favorite ${this._preferences.lastLoadedFavoriteId} (deleted)`);
             delete this._preferences.lastLoadedFavoriteId;
             this.savePreferences(this._preferences);
         }
@@ -76,11 +82,11 @@ const PreferencesManager = {
     _getResetDialogHTML() {
         return `
             <div class="bg-gray-900 rounded-lg p-6 shadow-xl max-w-md w-full border border-gray-700">
-                <h3 class="text-lg font-medium text-white mb-4">Confirmation de réinitialisation</h3>
-                <p class="text-gray-300 text-sm mb-4">Êtes-vous sûr de vouloir réinitialiser toutes vos préférences ? Cette action est irréversible et la page sera rechargée.</p>
+                <h3 class="text-lg font-medium text-white mb-4">Reset Confirmation</h3>
+                <p class="text-gray-300 text-sm mb-4">Are you sure you want to reset all your preferences? This action is irreversible and the page will be reloaded.</p>
                 <div class="flex justify-end space-x-3">
-                    <button id="cancel-reset-btn" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md text-sm">Annuler</button>
-                    <button id="confirm-reset-btn" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm">Réinitialiser</button>
+                    <button id="cancel-reset-btn" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md text-sm">Cancel</button>
+                    <button id="confirm-reset-btn" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm">Reset</button>
                 </div>
             </div>
         `;
@@ -120,7 +126,7 @@ const PreferencesManager = {
         
         if (!resetDialog) {
             console.error("Reset dialog element not found");
-            if (confirm('Êtes-vous sûr de vouloir réinitialiser toutes vos préférences ? Cette action est irréversible.')) {
+            if (confirm('Are you sure you want to reset all your preferences? This action is irreversible.')) {
                 callback(true);
             }
             return;
@@ -159,8 +165,14 @@ const PreferencesManager = {
         // Lock ratio checkbox
         const lockRatioCheckbox = document.getElementById('lockRatio');
         if (lockRatioCheckbox) {
-            lockRatioCheckbox.addEventListener('change', () => this.saveCurrentState());
-            lockRatioCheckbox.addEventListener('click', () => this.saveCurrentState());
+            lockRatioCheckbox.addEventListener('change', () => {
+                this.markChanges();
+                setTimeout(() => this.saveCurrentState(), 100);
+            });
+            lockRatioCheckbox.addEventListener('click', () => {
+                this.markChanges();
+                setTimeout(() => this.saveCurrentState(), 100);
+            });
         }
     },
     
@@ -171,8 +183,12 @@ const PreferencesManager = {
     _addChangeAndInputListeners(elementId) {
         const element = document.getElementById(elementId);
         if (element) {
-            element.addEventListener('change', () => this.saveCurrentState());
-            element.addEventListener('input', () => this.saveCurrentState());
+            element.addEventListener('change', () => {
+                this.markChanges();
+                // Save immediately for important changes
+                setTimeout(() => this.saveCurrentState(), 100);
+            });
+            element.addEventListener('input', () => this.markChanges());
         }
     },
     
@@ -183,11 +199,13 @@ const PreferencesManager = {
         // Tablet selection
         document.addEventListener('tablet:selected', (e) => {
             if (e.detail && e.detail.tablet) {
+                this.markChanges();
                 setTimeout(() => this.saveCurrentState(), 100);
             }
         });
         
         document.addEventListener('tablet:custom', () => {
+            this.markChanges();
             setTimeout(() => this.saveCurrentState(), 100);
         });
         
@@ -195,6 +213,7 @@ const PreferencesManager = {
         const areaEvents = ['activearea:positioned', 'activearea:moved', 'activearea:centered'];
         areaEvents.forEach(event => {
             document.addEventListener(event, () => {
+                this.markChanges();
                 setTimeout(() => this.saveCurrentState(), 100);
             });
         });
@@ -204,8 +223,8 @@ const PreferencesManager = {
      * Setup periodic save and page unload handlers
      */
     _setupPeriodicSave() {
-        // Save periodically
-        setInterval(() => this.saveCurrentState(), 10000);
+        // Save periodically only if there are changes
+        setInterval(() => this.saveCurrentStateIfChanged(), 10000);
         
         // Save before page unload
         window.addEventListener('beforeunload', () => this.saveCurrentState());
@@ -230,7 +249,7 @@ const PreferencesManager = {
                 return JSON.parse(storedPrefs);
             }
         } catch (error) {
-            console.error('Erreur lors du chargement des préférences:', error);
+            console.error('Error loading preferences:', error);
         }
         
         return {};
@@ -245,9 +264,9 @@ const PreferencesManager = {
             localStorage.setItem(this.PREFERENCES_KEY, JSON.stringify(preferences));
             this._preferences = preferences;
         } catch (error) {
-            console.error('Erreur lors de la sauvegarde des préférences:', error);
+            console.error('Error saving preferences:', error);
             if (typeof Notifications !== 'undefined') {
-                Notifications.error(window.translateWithFallback('notifications.errorSavingPreferences') || 'Impossible de sauvegarder vos préférences');
+                Notifications.error(window.translateWithFallback('notifications.errorSavingPreferences') || 'Unable to save your preferences');
             }
         }
     },
@@ -262,20 +281,91 @@ const PreferencesManager = {
             timestamp: Date.now()
         };
         
-        // Si une préférence fait référence à un favori, vérifier qu'il existe toujours
+        // If a preference references a favorite, check that it still exists
         if (preferences.lastLoadedFavoriteId) {
-            // Vérifier que le favori existe encore
+            // Check that the favorite still exists
             if (typeof StorageManager !== 'undefined' && 
                 (!StorageManager.getFavoriteById || !StorageManager.getFavoriteById(preferences.lastLoadedFavoriteId))) {
-                // Le favori n'existe plus, supprimer la référence
+                // The favorite no longer exists, remove the reference
                 delete preferences.lastLoadedFavoriteId;
             }
         }
         
         this._validatePreferences(preferences);
         this.savePreferences(preferences);
+        this._lastSavedState = JSON.stringify(preferences);
+        this._hasChanges = false;
         
-        console.log('Préférences sauvegardées:', preferences);
+        if (this.DEBUG_LOGS) {
+            console.log('Preferences saved:', preferences);
+        }
+    },
+
+    /**
+     * Save the current state only if there are changes
+     */
+    saveCurrentStateIfChanged() {
+        const currentState = {
+            tablet: this._collectTabletSettings(),
+            area: this._collectAreaSettings(),
+            timestamp: Date.now()
+        };
+        
+        // If a preference references a favorite, check that it still exists
+        if (currentState.lastLoadedFavoriteId) {
+            if (typeof StorageManager !== 'undefined' && 
+                (!StorageManager.getFavoriteById || !StorageManager.getFavoriteById(currentState.lastLoadedFavoriteId))) {
+                delete currentState.lastLoadedFavoriteId;
+            }
+        }
+        
+        this._validatePreferences(currentState);
+        
+        // Compare with the last saved state (without timestamp)
+        const currentStateForComparison = { ...currentState };
+        delete currentStateForComparison.timestamp;
+        
+        const lastStateForComparison = this._lastSavedState ? 
+            (() => {
+                const parsed = JSON.parse(this._lastSavedState);
+                delete parsed.timestamp;
+                return parsed;
+            })() : null;
+        
+        const currentStateString = JSON.stringify(currentStateForComparison);
+        const lastStateString = lastStateForComparison ? JSON.stringify(lastStateForComparison) : null;
+        
+        // Save only if there are changes
+        if (currentStateString !== lastStateString) {
+            this.savePreferences(currentState);
+            this._lastSavedState = JSON.stringify(currentState);
+            this._hasChanges = false;
+            if (this.DEBUG_LOGS) {
+                console.log('Preferences saved (changes detected):', currentState);
+            }
+        }
+    },
+
+    /**
+     * Mark that changes have been made (called by event listeners)
+     */
+    markChanges() {
+        this._hasChanges = true;
+    },
+
+    /**
+     * Initialize the last saved state to current state
+     */
+    _initializeLastSavedState() {
+        const currentState = {
+            tablet: this._collectTabletSettings(),
+            area: this._collectAreaSettings(),
+            timestamp: Date.now()
+        };
+        
+        this._validatePreferences(currentState);
+        this._lastSavedState = JSON.stringify(currentState);
+        this._hasChanges = false;
     },
     
     /**
@@ -286,7 +376,7 @@ const PreferencesManager = {
         return {
             width: parseFloatSafe(document.getElementById('tabletWidth')?.value),
             height: parseFloatSafe(document.getElementById('tabletHeight')?.value),
-            model: document.getElementById('tabletSelectorText')?.textContent || 'Sélectionner un modèle',
+            model: document.getElementById('tabletSelectorText')?.textContent || 'Select a model',
             isCustom: document.getElementById('tablet-dimensions-container')?.classList.contains('hidden') === false,
             brand: document.getElementById('tabletSelectorButton')?.dataset.tabletBrand || ''
         };
@@ -340,7 +430,7 @@ const PreferencesManager = {
             this._updateUIAfterApplyingPreferences();
             
         } catch (error) {
-            console.error('Erreur lors de l\'application des préférences:', error);
+            console.error('Error applying preferences:', error);
         }
     },
     
@@ -466,13 +556,13 @@ const PreferencesManager = {
     _getRestorationMessage() {
         const timestamp = this._preferences.timestamp;
         if (!timestamp) {
-            return 'Configuration restaurée';
+            return 'Configuration restored';
         }
         
         const date = new Date(timestamp);
         const formattedDate = date.toLocaleDateString();
         const formattedTime = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        return `Configuration du ${formattedDate} à ${formattedTime} restaurée`;
+        return `Configuration from ${formattedDate} at ${formattedTime} restored`;
     },
     
     /**
@@ -484,12 +574,12 @@ const PreferencesManager = {
             this._preferences = {};
             
             if (typeof Notifications !== 'undefined') {
-                Notifications.success(window.translateWithFallback('notifications.preferencesReset') || 'Préférences réinitialisées');
+                Notifications.success(window.translateWithFallback('notifications.preferencesReset') || 'Preferences reset');
             }
             
             window.location.reload();
         } catch (error) {
-            console.error('Erreur lors de la réinitialisation des préférences:', error);
+            console.error('Error resetting preferences:', error);
         }
     }
 }; 

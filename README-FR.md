@@ -68,7 +68,6 @@ Osu!rea est un visualiseur de zone active pour les joueurs d’osu! utilisant un
 
 - **Vie privée** : Toutes les données sont stockées uniquement sur ton appareil
 - **Performance optimale** : Application légère et réactive
-- **Mises à jour automatiques** : Améliorations régulières sans intervention de l’utilisateur
 - **Accessible hors-ligne** : Une fois le site chargé, il reste accessible à tout moment avec la même URL, même sans connexion internet
 
 ---

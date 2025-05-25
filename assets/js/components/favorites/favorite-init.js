@@ -1,4 +1,4 @@
-// favorite-init.js - Module d'initialisation pour les favoris
+// favorite-init.js - Favorites initialization module
 import { FavoritesEvents } from './favorite-events.js';
 import { translateWithFallback } from '../../../js/i18n-init.js';
 import { getFavorites } from './favorite-storage.js';
@@ -7,7 +7,7 @@ import { FavoritesRendering } from './favorite-rendering.js';
 import { FavoritesPopups } from './favorite-popup.js';
 
 /**
- * Module de gestion d'initialisation et configuration des favoris
+ * Favorites initialization and configuration management module
  */
 export const FavoritesInit = {
     favoritesList: null,
@@ -17,7 +17,7 @@ export const FavoritesInit = {
     cachedFavorites: null,
     
     /**
-     * Initialise le composant favoris (DOM, listeners, tri, etc.)
+     * Initialize the favorites component (DOM, listeners, sorting, etc.)
      */
     init() {
         this.favoritesList = document.getElementById('favorites-list');
@@ -30,14 +30,14 @@ export const FavoritesInit = {
         this.favoritesList.style.visibility = 'hidden';
         this.favoritesList.style.opacity = '0';
         
-        // Force le nettoyage du cache local des favoris et du StorageManager
+        // Force cleanup of local favorites cache and StorageManager
         this.cachedFavorites = null;
         
-        // S'assurer que le StorageManager est réinitialisé pour obtenir des données propres
+        // Ensure StorageManager is reset to get clean data
         if (typeof StorageManager !== 'undefined') {
             if (typeof StorageManager.forceReset === 'function') {
                 console.log("Using forceReset during favorites initialization");
-                // Utiliser forceReset pour garantir des données propres
+                // Use forceReset to ensure clean data
                 const cleanFavorites = StorageManager.forceReset();
                 this.cachedFavorites = cleanFavorites;
             } else if (typeof StorageManager.clearCache === 'function') {
@@ -47,92 +47,92 @@ export const FavoritesInit = {
                 this.cachedFavorites = getFavorites();
             }
         } else {
-            // Fallback si StorageManager n'est pas disponible
+            // Fallback if StorageManager is not available
             this.cachedFavorites = getFavorites();
         }
         
         this.favoritesPlaceholder = this.favoritesList.querySelector('p');
         this.setupSortButtons();
         
-        // Créer les dialogues à l'avance pour éviter la création lors de l'utilisation
+        // Create dialogs in advance to avoid creation during use
         FavoritesPopups.createDialogs();
         FavoritesPopups.createDetailsPopup();
         
-        // Charger les favoris mais attendre pour les afficher
-        // Note: cachedFavorites est déjà défini, pas besoin de le redéfinir ici
+        // Load favorites but wait to display them
+        // Note: cachedFavorites is already defined, no need to redefine it here
         
-        // Attendre que tout soit prêt pour afficher la liste de favoris
+        // Wait for everything to be ready to display the favorites list
         requestAnimationFrame(() => {
             setTimeout(() => {
-                // Précharger la liste en arrière-plan
+                // Preload the list in the background
                 FavoritesRendering.loadFavoritesWithAnimation(true);
                 
-                // Mettre à jour la visibilité
+                // Update visibility
                 this.isInitialized = true;
                 this.favoritesList.style.visibility = 'visible';
                 this.favoritesList.style.opacity = '1';
                 document.body.classList.remove('loading-favorites');
                 
-                // Initialiser les écouteurs d'événements après le chargement
+                // Initialize event listeners after loading
                 FavoritesEvents.init();
                 
-                // Écouteurs pour les changements de langue
+                // Listeners for language changes
                 document.removeEventListener('localeChanged', this.handleLocaleChange);
                 this.boundHandleLocaleChange = this.handleLocaleChange.bind(this);
                 document.addEventListener('localeChanged', this.boundHandleLocaleChange);
                 
-                // Écouter les événements globaux de changement de langue
+                // Listen to global language change events
                 window.addEventListener('languageChanged', (event) => {
                     this.manualLanguageUpdate(event.detail?.language);
                 });
-            }, 50); // Délai légèrement plus long pour assurer la stabilité
+            }, 50); // Slightly longer delay to ensure stability
         });
     },
     
     /**
-     * Gère les changements de langue
-     * @param {Event} event - L'événement de changement de langue
+     * Handles language changes
+     * @param {Event} event - The language change event
      */
     handleLocaleChange(event) {
-        // Forcer le nettoyage du cache
+        // Force cache cleanup
         this.cachedFavorites = null;
         
-        // Préparer la transition
+        // Prepare transition
         if (this.favoritesList) {
-            // Ajouter la classe de transition de sortie
+            // Add exit transition class
             this.favoritesList.classList.add('favorites-transition-out');
             
-            // Attendre que l'animation de sortie soit terminée
+            // Wait for exit animation to complete
             setTimeout(() => {
-                // Vider la liste de favoris
+                // Empty the favorites list
                 while (this.favoritesList.firstChild) {
                     this.favoritesList.removeChild(this.favoritesList.firstChild);
                 }
                 
-                // Supprimer la classe de transition de sortie
+                // Remove exit transition class
                 this.favoritesList.classList.remove('favorites-transition-out');
                 
-                // Recharger les favoris avec animation
+                // Reload favorites with animation
                 FavoritesRendering.loadFavoritesWithAnimation(false);
             }, 120);
         }
     },
 
     /**
-     * Force la mise à jour des favoris lors d'un changement manuel de langue
-     * @param {string} language - La nouvelle langue
+     * Force favorites update during manual language change
+     * @param {string} language - The new language
      */
     manualLanguageUpdate(language) {
-        // Vider notre cache local
+        // Empty our local cache
         this.cachedFavorites = null;
         
-        // Ajouter l'animation de sortie avant de rafraîchir les favoris
+        // Add exit animation before refreshing favorites
         if (this.favoritesList) {
             this.favoritesList.classList.add('favorites-loading');
             this.favoritesList.classList.add('favorites-transition-out');
         }
         
-        // Reconstruire complètement les favoris
+        // Rebuild favorites completely
         setTimeout(() => {
             this.forceRefreshFavorites();
         }, 120);
@@ -178,7 +178,7 @@ export const FavoritesInit = {
         // Vider complètement le cache
         this.cachedFavorites = null;
         
-        // Supprimer tous les éléments existants
+        // Remove tous les éléments existants
         if (this.favoritesList) {
             while (this.favoritesList.firstChild) {
                 this.favoritesList.removeChild(this.favoritesList.firstChild);
@@ -201,7 +201,7 @@ export const FavoritesInit = {
         if (forceFullRefresh) {
             // Utiliser requestAnimationFrame pour optimiser les performances d'animation
             requestAnimationFrame(() => {
-                // Supprimer tous les éléments existants
+                // Remove tous les éléments existants
                 if (this.favoritesList) {
                     while (this.favoritesList.firstChild) {
                         this.favoritesList.removeChild(this.favoritesList.firstChild);
@@ -291,9 +291,9 @@ export const FavoritesInit = {
             });
             
         } catch (error) {
-            console.error("Erreur lors du tri des favoris:", error);
+            console.error("Error sorting favorites:", error);
             
-            // En cas d'erreur, recourir à la méthode précédente
+                            // In case of error, fall back to the previous method
             this.cachedFavorites = null;
             FavoritesRendering.loadFavoritesWithAnimation(false);
         }

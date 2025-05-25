@@ -164,7 +164,7 @@ export const FavoritesDialogs = {
         titleCounter.textContent = '0/32';
         descCounter.textContent = '0/144';
         
-        // Supprimer les écouteurs d'événements existants pour éviter les doublons
+        // Remove les écouteurs d'événements existants pour éviter les doublons
         const oldTitleListener = titleInput._inputListener;
         const oldDescListener = descInput._inputListener;
         
@@ -205,7 +205,7 @@ export const FavoritesDialogs = {
             }
         };
         
-        // Stocker les références aux écouteurs pour pouvoir les supprimer plus tard
+        // Store les références aux écouteurs pour pouvoir les supprimer plus tard
         titleInput._inputListener = titleInputListener;
         descInput._inputListener = descInputListener;
         

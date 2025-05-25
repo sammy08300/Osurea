@@ -3,7 +3,7 @@
  * @param {string} key - The translation key without the i18n: prefix
  * @returns {string} - The translation or a formatted default value
  */
-import { translateWithFallback } from '../i18n-init.js';
+import { translateWithFallback } from '../../i18n-init.js';
 
 /**
  * Tablet selector component with popup
@@ -49,6 +49,7 @@ const TabletSelector = {
      */
     init(tabletData) {
         console.log('Initializing tablet selector...');
+        console.log('Tablet data received:', tabletData ? tabletData.length : 'null', 'items');
         
         // DOM elements recovery
         this.initElements();
@@ -311,7 +312,7 @@ const TabletSelector = {
             this.selectBrand(tabletData[0].brand);
             this.selectModel(tabletData[0]);
         } else {
-            console.error('Aucun modèle de tablette disponible!');
+            console.error('No tablet models available!');
         }
     },
     
@@ -512,14 +513,17 @@ const TabletSelector = {
         const { brandsList } = this.elements;
         const { tabletData, selectedBrand } = this.state;
         
+        console.log('Populating brands list with data:', tabletData ? tabletData.length : 'null', 'items');
+        
         // Clear current list
         brandsList.innerHTML = '';
         
         // If no data, display message
         if (!tabletData || tabletData.length === 0) {
+            console.error('No tablet data available for brands list');
             const noData = document.createElement('div');
             noData.className = 'p-4 text-gray-400 text-center italic';
-            noData.textContent = 'Aucune donnée de tablette disponible';
+            noData.textContent = 'No tablet data available';
             brandsList.appendChild(noData);
             return;
         }
@@ -772,7 +776,7 @@ const TabletSelector = {
         };
         
         // Adapt active area to new model
-        const adaptedState = adaptAreaToNewTablet(currentState, oldTablet, newTablet);
+        const adaptedState = ConstraintUtils.adaptAreaToNewTablet(currentState, oldTablet, newTablet);
         
         // Update fields with new values
         document.getElementById('areaWidth').value = formatNumber(adaptedState.areaWidth);

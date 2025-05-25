@@ -25,7 +25,6 @@ yarn-error.log*
 .idea/
 .vscode/
 
-
 # Logs
 logs
 *.log
@@ -35,9 +34,6 @@ logs
 .npm
 .eslintcache
 
-# Optional npm cache directory
-.npm
-
 # Optional eslint cache
 .eslintcache
 
@@ -45,18 +41,14 @@ logs
 assets/css/styles.css
 OLD FAVORITES
 
-# Autres fichiers générés
+# Generated files
 dist/
 build/
 
-# Test files (temporary)
+# Test files (temporary - only ignore temporary test files)
 test-integration.html
 *.test.html
 test-*.html
-
-# Documentation temporaire
-RESOLUTION_*.md
-REFACTORING_GUIDE.md
 
 # Backup files
 *.backup
@@ -67,4 +59,3 @@ REFACTORING_GUIDE.md
 Thumbs.db
 ehthumbs.db
 Desktop.ini
-

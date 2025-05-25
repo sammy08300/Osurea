@@ -13,6 +13,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Osu!rea">
     <meta name="theme-color" content="#4287f5">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta property="og:title" content="Osu!rea - Area Visualizer">
     <meta property="og:description" content="Visualiseur de zone active pour les joueurs d'osu!. Configurez et partagez vos zones actives facilement.">
     <meta property="og:type" content="website">
@@ -89,7 +90,7 @@
                         </h2>
                         <div class="space-y-4">
                             <div class="input-group">
-                                <label for="tabletPresetSelect" class="block text-sm font-medium text-gray-400 mb-1.5" data-i18n="tablet.model">
+                                <label for="tabletSelectorButton" class="block text-sm font-medium text-gray-400 mb-1.5" data-i18n="tablet.model">
                                     Modèle de Tablette
                                 </label>
                                 <div class="tablet-selector-container relative">
@@ -194,9 +195,9 @@
                                             </div>
                                         </div>
                                         <div>
-                                            <label class="block text-sm font-medium text-gray-400 mb-1.5 opacity-0">
+                                            <div class="block text-sm font-medium text-gray-400 mb-1.5 opacity-0">
                                                 Verrouillage
-                                            </label>
+                                            </div>
                                             <div class="flex items-center h-[38px] mt-[1px]">
                                                 <button id="lockRatio" 
                                                         type="button" 
@@ -482,7 +483,7 @@
     <div id="footer-container" style="opacity: 0; transition: opacity 0.4s ease-out;"></div>
 
     <!-- Footer and loading script -->
-    <script type="module" src="assets/js/components/footer.js"></script>
+    <script type="module" src="assets/js/components/ui/footer.js"></script>
 
     <!-- Context Menu -->
     <div id="context-menu" class="fixed hidden bg-gray-900 border border-blue-500 rounded-lg p-3 shadow-xl z-[9999] min-w-[220px]">
@@ -574,17 +575,16 @@
         document.addEventListener('DOMContentLoaded', initializeI18n);
     </script>
     <script type="module" src="assets/js/locale-switcher.js" defer></script>
-    <script src="assets/js/utils/helpers.js" defer></script>
+
     <script type="module" src="assets/js/utils/storage.js" defer></script>
     <script src="assets/js/utils/preferences.js" defer></script>
     <script src="assets/js/utils/constraintHelpers.js" defer></script>
-    <script src="assets/js/components/contextMenu.js" defer></script>
-    <script src="assets/js/components/notifications.js" defer></script>
-    <script src="assets/js/components/visualizer.js" defer></script>
+    <script src="assets/js/components/area/contextMenu.js" defer></script>
+    <script src="assets/js/components/ui/notifications.js" defer></script>
+    <script src="assets/js/components/area/visualizer.js" defer></script>
     <script type="module" src="assets/js/components/favorites/favoritesModule.js" defer></script>
-    <script type="module" src="assets/js/components/tabletSelector.js" defer></script>
     <script type="module">
-        import { toggleLockRatio } from './assets/js/components/toggleLockRatio.js';
+        import { toggleLockRatio } from './assets/js/components/ui/toggleLockRatio.js';
         document.addEventListener('DOMContentLoaded', () => {
             const btn = document.getElementById('lockRatio');
             if (btn) {
@@ -595,7 +595,8 @@
     <script type="module" src="assets/js/app.js"></script>
     <script type="module" src="assets/js/init/rectangleInit.js"></script>
     <script type="module" src="assets/js/init/serviceWorkerRegister.js"></script>
-    <script defer src="https://vercel.com/analytics/script.js"></script>
-    <script defer src="https://speed-insights.vercel.app/script.js"></script>
+    
+    <!-- Test Loader - Load tests for development/debugging -->
+    <script type="module" src="assets/js/tests/test-loader.js" defer></script>
 </body>
 </html>

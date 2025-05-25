@@ -7,7 +7,7 @@
             requestIdleCallback(() => {
                 const resourcesToPrefetch = [
                     'assets/js/app.js',
-                    'assets/js/components/visualizer.js',
+                    'assets/js/components/area/visualizer.js',
                     'assets/js/components/favorites/favoritesModule.js'
                 ];
                 resourcesToPrefetch.forEach(url => {

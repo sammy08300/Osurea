@@ -1,6 +1,6 @@
 /* favorites.css - Styles pour le module de favoris */
 
-/* Animation d'entrée fade-in progressive - SIMPLIFIÉE */
+/* Enter animation  */ 
 @keyframes fadeInSmooth {
     from {
         opacity: 0;

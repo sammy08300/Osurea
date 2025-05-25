@@ -330,7 +330,7 @@ function updateInfoDisplays(dims) {
         areaInfo.textContent = `${areaSurface} mm²`;
     }
     
-    // S'assurer que le ratio est toujours affiché avec 3 décimales
+    // Ensure que le ratio est toujours affiché avec 3 décimales
     if (ratioInfo.textContent !== areaRatio) {
         ratioInfo.textContent = areaRatio;
     }
@@ -436,7 +436,7 @@ function updateInfoDisplaysWithoutRatio(dims) {
         areaInfo.textContent = `${areaSurface} mm²`;
     }
     
-    // S'assurer que le ratio est toujours affiché avec 3 décimales
+    // Ensure que le ratio est toujours affiché avec 3 décimales
     if (ratioInfo.textContent !== areaRatio) {
         ratioInfo.textContent = areaRatio;
     }
@@ -801,3 +801,4 @@ window.addEventListener('load', initVisualizer);
 // Expose functions globally
 window.updateDisplayWithoutRatio = updateDisplayWithoutRatio;
 window.centerArea = centerArea;
+

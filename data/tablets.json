@@ -79,7 +79,7 @@
   },
   {
     "brand": "Wacom",
-    "model": "Intuos S (Ancien, ex: CTL-490)",
+    "model": "Intuos S (Legacy, ex: CTL-490)",
     "width": 152,
     "height": 95
   },
@@ -91,7 +91,7 @@
   },
   {
     "brand": "XP-Pen",
-    "model": "Artist 12 Pro (Écran)",
+    "model": "Artist 12 Pro (Display)",
     "width": 256.32,
     "height": 144.18
   },

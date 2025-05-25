@@ -7,7 +7,7 @@ import { FavoritesInit } from './favorite-init.js';
 import localeManager from '../../../locales/index.js';
 
 /**
- * Formate un nombre avec un certain nombre de décimales
+ * Format a number with a certain number of decimals
  * @param {number} val
  * @param {number} decimals
  * @returns {string}
@@ -18,7 +18,7 @@ function formatNumber(val, decimals = 1) {
 }
 
 /**
- * Module de gestion des actions sur les favoris
+ * Module of actions on favorites
  */
 export const FavoritesActions = {
     editingFavoriteId: null,
@@ -27,7 +27,7 @@ export const FavoritesActions = {
     originalValues: null,
 
     /**
-     * Charge un favori dans le formulaire principal
+     * Load a favorite into the main form
      * @param {string|number} id
      */
     loadFavorite(id) {
@@ -39,7 +39,7 @@ export const FavoritesActions = {
             return;
         }
         try {
-            // Exemple : mise à jour des champs du formulaire (à adapter selon l'app)
+            // Example: update the fields of the form (to adapt according to the application)
             document.getElementById('areaWidth').value = formatNumber(favorite.width);
             document.getElementById('areaHeight').value = formatNumber(favorite.height);
             document.getElementById('areaOffsetX').value = formatNumber(favorite.x || favorite.offsetX, 3);
@@ -53,7 +53,7 @@ export const FavoritesActions = {
                 if (radiusInput) radiusInput.value = favorite.radius;
             }
             
-            // Mettre à jour les dimensions de la tablette si disponibles
+            // Update the tablet dimensions if available
             if (typeof favorite.tabletW !== 'undefined' && typeof favorite.tabletH !== 'undefined') {
                 const tabletWidth = document.getElementById('tabletWidth');
                 const tabletHeight = document.getElementById('tabletHeight');
@@ -62,40 +62,40 @@ export const FavoritesActions = {
                 if (tabletHeight) tabletHeight.value = formatNumber(favorite.tabletH);
             }
             
-            // Mettre à jour l'information du modèle si disponible
+            // Update the model information if available
             if (favorite.presetInfo) {
                 const tabletSelector = document.getElementById('tabletSelectorButton');
                 if (tabletSelector) {
                     const selectorText = tabletSelector.querySelector('#tabletSelectorText');
                     
-                    // Vérifier si c'est une clé de traduction
+                    // Check if it's a translation key
                     if (favorite.presetInfo.startsWith('i18n:')) {
                         const key = favorite.presetInfo.substring(5);
                         
-                        // Appliquer la clé de traduction à l'attribut data-i18n
+                        // Apply the translation key to the data-i18n attribute
                         selectorText.setAttribute('data-i18n', key);
                         
-                        // Utiliser notre fonction de traduction robuste
+                        // Use our robust translation function
                         selectorText.textContent = translateWithFallback(key);
                     } else {
-                        // C'est un nom de modèle normal, pas une clé de traduction
+                        // It's a normal model name, not a translation key
                         selectorText.removeAttribute('data-i18n');
                         selectorText.textContent = favorite.presetInfo;
                     }
                 }
             }
             
-            // Mettre à jour l'affichage si besoin
+            // Update the display if needed
             if (typeof updateDisplay === 'function') {
                 updateDisplay();
             } else if (typeof window.updateDisplay === 'function') {
                 window.updateDisplay();
             }
             
-            // Mettre en évidence le favori chargé sans recharger toute la liste
+            // Highlight the loaded favorite without reloading the entire list
             FavoritesRendering.highlightFavorite(id);
             
-            // Sauvegarder l'état actuel dans les préférences si disponible
+            // Save the current state in preferences if available
             if (typeof window.PreferencesManager !== 'undefined' && typeof window.PreferencesManager.saveCurrentState === 'function') {
                 setTimeout(() => window.PreferencesManager.saveCurrentState(), 100);
             }
@@ -113,8 +113,8 @@ export const FavoritesActions = {
     },
     
     /**
-     * Démarre l'édition d'un favori
-     * @param {string|number} id - ID du favori à éditer
+     * Start the edition of a favorite
+     * @param {string|number} id - ID of the favorite to edit
      */
     editFavorite(id) {
         const favorite = getFavoriteById(id);
@@ -125,10 +125,10 @@ export const FavoritesActions = {
             return;
         }
         
-        // Stocker l'ID du favori en cours d'édition (dans l'état global ou local)
+        // Store the ID of the favorite being edited (in the global state or local)
         this.editingFavoriteId = id;
         
-        // Sauvegarder les valeurs originales pour pouvoir les restaurer
+        // Save the original values to be able to restore them
         this.originalValues = {
             width: favorite.width,
             height: favorite.height,
@@ -143,33 +143,33 @@ export const FavoritesActions = {
             radius: favorite.radius || 0
         };
         
-        // Mise à jour du state global si disponible
+        // Update the global state if available
         if (typeof window.appState !== 'undefined') {
             window.appState.editingFavoriteId = id;
             window.appState.originalValues = this.originalValues;
         }
         
-        // Afficher le bouton pour annuler l'édition
+        // Display the button to cancel the edition
         const cancelBtn = document.getElementById('cancel-edit-btn');
         if (cancelBtn) {
             cancelBtn.classList.remove('hidden');
             cancelBtn.classList.add('flex');
             
-            // Ajouter l'événement d'annulation
+            // Add the cancel event
             cancelBtn.onclick = () => this.cancelEditMode();
         }
         
-        // Remplacer le bouton de sauvegarde par un bouton "Confirmer la modification"
+        // Replace the save button with a "Confirm the modification" button
         const saveBtn = document.getElementById('save-btn');
         if (saveBtn) {
-            // Changer le contenu du bouton
+            // Change the content of the button
             saveBtn.innerHTML = `
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>
                 <span data-i18n="favorites.confirmModification">Confirmer la modification</span>`;
             
-            // S'assurer que la traduction est appliquée
+            // Ensure the translation is applied
             if (typeof localeManager !== 'undefined') {
                 if (typeof localeManager.applyTranslations === 'function') {
                     localeManager.applyTranslations(saveBtn);
@@ -183,7 +183,7 @@ export const FavoritesActions = {
             }
         }
         
-        // Remplir le formulaire avec les valeurs du favori
+        // Fill the form with the favorite values
         document.getElementById('areaWidth').value = formatNumber(favorite.width);
         document.getElementById('areaHeight').value = formatNumber(favorite.height);
         document.getElementById('areaOffsetX').value = formatNumber(favorite.x || favorite.offsetX, 3);
@@ -204,37 +204,37 @@ export const FavoritesActions = {
             window.updateDisplay();
         }
         
-        // Mettre en surbrillance le favori en cours d'édition
+        // Highlight the favorite being edited
         const favoriteElement = document.querySelector(`.favorite-item[data-id="${id}"]`);
         if (favoriteElement) {
             favoriteElement.classList.add('border-blue-500', 'highlight-effect');
-            // Retirer la surbrillance après un délai
+            // Remove the highlight after a delay
             setTimeout(() => {
                 favoriteElement.classList.remove('highlight-effect');
-                // Garder la bordure bleue pour indiquer l'élément en cours d'édition
+                // Keep the blue border to indicate the element being edited
             }, 1500);
         }
         
-        // Afficher une notification
+        // Display a notification
         if (typeof Notifications !== 'undefined' && Notifications.info) {
             Notifications.info(localeManager.translate('notifications.editModeActivated') || 'Mode édition activé - Modifiez les paramètres puis cliquez sur "Confirmer la modification"');
         }
     },
 
     /**
-     * Annule le mode édition et restaure les valeurs originales
-     * @param {boolean} skipNotification - Si vrai, n'affiche pas de notification
+     * Cancel the edit mode and restore the original values
+     * @param {boolean} skipNotification - If true, do not display a notification
      */
     cancelEditMode(skipNotification = false) {
-        // Vérifier qu'il y a un mode d'édition actif et des valeurs à restaurer
+        // Check if there is an active edit mode and values to restore
         if (!this.editingFavoriteId || !this.originalValues) {
             return;
         }
         
-        // Stocker l'ID pour pouvoir l'utiliser après la réinitialisation
+        // Store the ID to be able to use it after the reset
         const previousEditingId = this.editingFavoriteId;
         
-        // Restaurer les valeurs originales
+        // Restore the original values
         const original = this.originalValues;
         
         if (original) {
@@ -253,7 +253,7 @@ export const FavoritesActions = {
                 if (radiusInput) radiusInput.value = original.radius;
             }
             
-            // Mettre à jour l'affichage
+            // Update the display
             if (typeof updateDisplay === 'function') {
                 updateDisplay();
             } else if (typeof window.updateDisplay === 'function') {
@@ -261,17 +261,17 @@ export const FavoritesActions = {
             }
         }
         
-        // Supprimer la mise en évidence du favori en cours d'édition
-        // sans provoquer d'animation indésirable
+        // Remove the highlight of the favorite being edited
+        // without causing undesirable animations
         const favoriteElement = document.querySelector(`.favorite-item[data-id="${previousEditingId}"]`);
         if (favoriteElement) {
-            // Supprimer les classes sans transition
+            // Remove the classes without transition
             requestAnimationFrame(() => {
                 favoriteElement.classList.remove('border-blue-500', 'highlight-effect');
             });
         }
         
-        // Réinitialiser le bouton de sauvegarde
+        // Reset the save button
         const saveBtn = document.getElementById('save-btn');
         if (saveBtn) {
             saveBtn.innerHTML = `
@@ -280,7 +280,7 @@ export const FavoritesActions = {
                 </svg>
                 <span data-i18n="save">Sauvegarder</span>`;
             
-            // S'assurer que la traduction est appliquée
+            // Ensure the translation is applied
             if (typeof localeManager !== 'undefined') {
                 if (typeof localeManager.applyTranslations === 'function') {
                     localeManager.applyTranslations(saveBtn);
@@ -294,57 +294,57 @@ export const FavoritesActions = {
             }
         }
         
-        // Cacher le bouton d'annulation
+        // Hide the cancel button
         const cancelBtn = document.getElementById('cancel-edit-btn');
         if (cancelBtn) {
             cancelBtn.classList.add('hidden');
             cancelBtn.classList.remove('flex');
         }
         
-        // Réinitialiser les états
+        // Reset the states
         this.editingFavoriteId = null;
         this.originalValues = null;
         
-        // Réinitialiser également dans l'état global si disponible
+        // Also reset in the global state if available
         if (typeof window.appState !== 'undefined') {
             window.appState.editingFavoriteId = null;
             window.appState.originalValues = null;
         }
         
-        // Afficher une notification sauf si demandé de ne pas le faire
+        // Display a notification unless requested not to do so
         if (!skipNotification && typeof Notifications !== 'undefined' && Notifications.info) {
-            Notifications.info(localeManager.translate('notifications.editModeCanceled') || 'Mode édition annulé');
+            Notifications.info(localeManager.translate('notifications.editModeCanceled') || 'Edit mode canceled');
         }
     },
 
     /**
-     * Supprime un favori avec confirmation
+     * Delete a favorite with confirmation
      * @param {string|number} id
      */
     deleteFavorite(id) {
         FavoritesPopups.showDeleteDialog((confirmed) => {
             if (confirmed) {
-                // Trouver l'élément avant de le supprimer pour pouvoir l'animer
+                // Find the element before deleting it to be able to animate it
                 const favoriteElement = document.querySelector(`.favorite-item[data-id="${id}"]`);
                 
                 if (favoriteElement) {
-                    // Animer la disparition de l'élément avant de le supprimer
+                    // Animate the disappearance of the element before deleting it
                     favoriteElement.classList.add('animate-fadeOut');
                     
-                    // Attendre que l'animation soit terminée avant de supprimer définitivement
+                    // Wait for the animation to end before deleting it definitively
                     setTimeout(() => {
                         const success = removeFavorite(id);
                         
                         if (success) {
-                            // Supprimer l'élément du DOM
+                            // Remove the element from the DOM
                             if (favoriteElement.parentNode) {
                                 favoriteElement.parentNode.removeChild(favoriteElement);
                             }
                             
-                            // Mettre à jour le cache des favoris et forcer une mise à jour complète
+                            // Update the favorites cache and force a complete update
                             FavoritesInit.updateFavoriteCache(true);
                             
-                            // S'assurer que le favori est également supprimé des préférences
+                            // Ensure the favorite is also deleted from preferences
                             if (typeof window.PreferencesManager !== 'undefined' && typeof window.PreferencesManager.saveCurrentState === 'function') {
                                 setTimeout(() => window.PreferencesManager.saveCurrentState(), 100);
                             }
@@ -353,23 +353,23 @@ export const FavoritesActions = {
                                 Notifications.success(localeManager.translate('notifications.favoriteDeleted') || 'Favori supprimé');
                             }
                         } else {
-                            // Si erreur, retirer l'animation et restaurer l'élément
+                            // If error, remove the animation and restore the element
                             favoriteElement.classList.remove('animate-fadeOut');
                             
                             if (typeof Notifications !== 'undefined' && Notifications.error) {
                                 Notifications.error(localeManager.translate('notifications.errorDeletingFavorite') || 'Erreur lors de la suppression du favori');
                             }
                         }
-                    }, 300); // Durée de l'animation fadeOut
+                    }, 300); // Duration of the fadeOut animation
                 } else {
-                    // Si l'élément n'est pas trouvé dans le DOM, suppression classique
+                    // If the element is not found in the DOM, classic deletion
                     const success = removeFavorite(id);
                     
                     if (success) {
-                        // Mettre à jour le cache et l'interface
+                        // Update the cache and the interface
                         FavoritesInit.updateFavoriteCache(true);
                         
-                        // S'assurer que le favori est également supprimé des préférences
+                        // Ensure the favorite is also deleted from preferences
                         if (typeof window.PreferencesManager !== 'undefined' && typeof window.PreferencesManager.saveCurrentState === 'function') {
                             setTimeout(() => window.PreferencesManager.saveCurrentState(), 100);
                         }
@@ -388,10 +388,10 @@ export const FavoritesActions = {
     },
 
     /**
-     * Sauvegarde un favori (ajout ou mise à jour selon le contexte, avec titre/description)
+     * Save a favorite (add or update depending on the context, with title/description)
      */
     saveFavorite() {
-        // Récupérer les valeurs du formulaire
+        // Get the values of the form
         const areaWidth = parseFloat(document.getElementById('areaWidth').value);
         const areaHeight = parseFloat(document.getElementById('areaHeight').value);
         const areaOffsetX = parseFloat(document.getElementById('areaOffsetX').value);
@@ -399,7 +399,7 @@ export const FavoritesActions = {
         const customRatio = parseFloat(document.getElementById('customRatio').value);
         const areaRadius = parseInt(document.getElementById('areaRadius')?.value) || 0;
         
-        // Récupérer les informations de la tablette si disponibles
+        // Get the tablet information if available
         let tabletWidth = 0;
         let tabletHeight = 0;
         let presetInfo = null;
@@ -415,7 +415,7 @@ export const FavoritesActions = {
             tabletHeight = parseFloat(tabletHeightElement.value) || 0;
         }
         if (tabletSelectorText) {
-            // Vérifier si c'est une clé de traduction
+            // Check if it's a translation key
             if (tabletSelectorText.hasAttribute('data-i18n')) {
                 presetInfo = 'i18n:' + tabletSelectorText.getAttribute('data-i18n');
             } else {
@@ -423,12 +423,12 @@ export const FavoritesActions = {
             }
         }
         
-        // Log pour déboguer
+        // Log for debugging
         console.log('Saving favorite, edit mode:', !!this.editingFavoriteId);
         
-        // Vérifier si on est en mode édition
+        // Check if we are in edit mode
         if (this.editingFavoriteId) {
-            // Mise à jour d'un favori existant - PAS DE DIALOGUE, mise à jour directe
+            // Update an existing favorite - NO DIALOGUE, direct update
             const updatedData = {
                 width: !isNaN(areaWidth) ? areaWidth : this.originalValues.width,
                 height: !isNaN(areaHeight) ? areaHeight : this.originalValues.height,
@@ -441,28 +441,28 @@ export const FavoritesActions = {
                 title: this.originalValues.title,
                 description: this.originalValues.description,
                 radius: !isNaN(areaRadius) ? areaRadius : (this.originalValues.radius || 0),
-                lastModified: new Date().getTime() // Ajouter la date de dernière modification
+                lastModified: new Date().getTime() // Add the last modification date
             };
             
             const success = updateFavorite(this.editingFavoriteId, updatedData);
             if (success) {
-                // Stocker l'ID du favori modifié
+                // Store the ID of the modified favorite
                 const modifiedFavoriteId = this.editingFavoriteId;
                 
-                // Mettre à jour le cache des favoris pour refléter les changements
+                // Update the favorites cache to reflect the changes
                 FavoritesInit.updateFavoriteCache(false);
                 
-                // Annuler le mode édition sans notification
+                // Cancel the edit mode without notification
                 this.cancelEditMode(true);
                 
-                // Trouver l'élément du favori modifié et le mettre en évidence
-                // sans recharger toute la liste
+                // Find the modified favorite element and highlight it
+                // without reloading the entire list
                 const favoriteElement = document.querySelector(`.favorite-item[data-id="${modifiedFavoriteId}"]`);
                 if (favoriteElement) {
-                    // Mettre en évidence la carte modifiée
+                    // Highlight the modified favorite
                     favoriteElement.classList.add('border-blue-500', 'highlight-effect');
                     
-                    // Retirer la mise en évidence après un délai
+                    // Remove the highlight after a delay
                     setTimeout(() => {
                         favoriteElement.classList.remove('border-blue-500', 'highlight-effect');
                     }, 1500);
@@ -477,14 +477,14 @@ export const FavoritesActions = {
                 }
             }
         } else {
-            // Ajout d'un nouveau favori - afficher le dialogue pour le titre et la description
+            // Add a new favorite - show the dialog for the title and description
             FavoritesPopups.showCommentDialog((commentData) => {
-                // Si le titre est vide, utiliser la clé de traduction complète
+                // If the title is empty, use the complete translation key
                 if (!commentData.title || commentData.title.trim() === '') {
                     commentData.title = "i18n:favorites.defaultName";
                 }
                 
-                // Si c'est une clé de traduction, ne pas tronquer
+                // If it's a translation key, do not truncate
                 if (!commentData.title.startsWith('i18n:') && commentData.title.length > 32) {
                     if (typeof Notifications !== 'undefined' && Notifications.warning) {
                         Notifications.warning(localeManager.translate('notifications.titleTruncated') || "Le titre a été tronqué à 32 caractères.");
@@ -516,24 +516,24 @@ export const FavoritesActions = {
                 
                 console.log('Creating new favorite:', newFavorite);
                 
-                // Forcer le nettoyage du cache avant d'ajouter
+                // Force the cache cleaning before adding
                 if (typeof StorageManager !== 'undefined' && typeof StorageManager.clearCache === 'function') {
                     StorageManager.clearCache();
                 }
                 
                 const savedFavorite = addFavorite(newFavorite);
                 if (savedFavorite) {
-                    // Récupérer la liste complète des favoris après l'ajout pour débogage
+                    // Get the complete list of favorites after adding for debugging
                     console.log('All favorites after adding:', getFavorites());
                     
-                    // Mettre à jour le cache et forcer un rafraîchissement complet
+                    // Update the cache and force a complete refresh
                     FavoritesInit.updateFavoriteCache(true);
                     
-                    // Sauvegarder les préférences après un court délai pour s'assurer que l'ajout est terminé
+                    // Save preferences after a short delay to ensure the addition is complete
                     if (typeof window.PreferencesManager !== 'undefined' && typeof window.PreferencesManager.saveCurrentState === 'function') {
-                        // Délai plus long pour garantir que le stockage est terminé
+                        // Longer delay to ensure the storage is complete
                         setTimeout(() => {
-                            // Debug: vérifier si le favori existe avant de sauvegarder les préférences
+                            // Debug: check if the favorite exists before saving preferences
                             const allFavs = getFavorites();
                             const favExists = allFavs.some(f => f.id === savedFavorite.id);
                             console.log(`Favorite ${savedFavorite.id} exists before saving prefs: ${favExists}`);
@@ -542,9 +542,9 @@ export const FavoritesActions = {
                         }, 300);
                     }
                     
-                    // Attendre un court instant pour permettre au DOM de se mettre à jour
+                    // Wait a short moment to allow the DOM to update
                     setTimeout(() => {
-                        // Mettre en évidence le favori ajouté
+                        // Highlight the added favorite
                         const favoriteElement = document.querySelector(`.favorite-item[data-id="${savedFavorite.id}"]`);
                         if (favoriteElement) {
                             favoriteElement.classList.add('highlight-effect');
@@ -567,7 +567,7 @@ export const FavoritesActions = {
     },
 
     /**
-     * Programme une sauvegarde automatique après un délai
+     * Schedule an automatic save after a delay
      */
     scheduleAutoSave() {
         if (this.autoSaveTimer) {
@@ -575,11 +575,11 @@ export const FavoritesActions = {
         }
         
         this.autoSaveTimer = setTimeout(() => {
-            // Sauvegarder les changements
+            // Save changes
             const needsUpdate = this.saveChangesIfNeeded();
             
-            // Si les données ont été modifiées, forcer un rafraîchissement 
-            // des favoris dans l'interface pour refléter les changements
+            // If the data has been modified, force a refresh 
+            // of the favorites in the interface to reflect the changes
             if (needsUpdate) {
                 FavoritesInit.updateFavoriteCache(true);
             }
@@ -587,8 +587,8 @@ export const FavoritesActions = {
     },
     
     /**
-     * Sauvegarde les modifications apportées aux champs du favori si nécessaire
-     * @returns {boolean} - true si des modifications ont été effectuées, false sinon
+     * Save the modifications made to the favorite fields if necessary
+     * @returns {boolean} - true if modifications have been made, false otherwise
      */
     saveChangesIfNeeded() {
         const favoriteId = this.currentDetailedFavoriteId;
@@ -608,21 +608,21 @@ export const FavoritesActions = {
             return false;
         }
         
-        // Récupérer les valeurs
+        // Get the values
         const newTitleValue = titleInput.value.trim();
         const newDescription = descriptionInput.value.trim();
         
-        // Vérifier si on doit préserver le format i18n
+        // Check if we need to preserve the i18n format
         let newTitle = newTitleValue;
         
-        // Si on a un titre original stocké et c'était une clé i18n,
-        // et l'utilisateur n'a pas changé le texte affiché, préserver la clé i18n
+        // If we have an original title stored and it was an i18n key,
+        // and the user hasn't changed the displayed text, preserve the i18n key
         const originalTitle = titleInput.dataset.originalTitle;
         if (originalTitle && originalTitle.startsWith('i18n:')) {
             const key = originalTitle.substring(5);
             let currentTranslation = '';
             
-            // Obtenir la traduction actuelle pour comparaison
+            // Get the current translation for comparison
             if (typeof localeManager !== 'undefined' && typeof localeManager.translate === 'function') {
                 currentTranslation = localeManager.translate(key);
             } else {
@@ -630,13 +630,13 @@ export const FavoritesActions = {
             }
             
             if (currentTranslation === newTitleValue) {
-                // L'utilisateur n'a pas modifié le texte traduit, garder la clé i18n
+                // The user hasn't changed the translated text, keep the i18n key
                 newTitle = originalTitle;
             } else if (newTitleValue === key) {
-                // L'utilisateur a entré la clé brute, garder le format i18n
+                // The user entered the raw key, keep the i18n format
                 newTitle = originalTitle;
             } else if (key === 'favorites.defaultName') {
-                // Pour favorites.defaultName, vérifier s'ils ont tapé l'une des traductions standard
+                // For favorites.defaultName, check if they typed one of the standard translations
                 let isDefaultTranslation = false;
                 
                 if (newTitleValue === 'Configuration sauvegardée' ||
@@ -651,26 +651,26 @@ export const FavoritesActions = {
             }
         }
         
-        // Vérifier si les valeurs ont changé
+        // Check if the values have changed
         const titleChanged = newTitle !== (favorite.title || '');
         const descChanged = newDescription !== (favorite.description || '');
         
         if (titleChanged || descChanged) {
-            // Mettre à jour la date de dernière modification
+            // Update the last modification date
             const now = new Date().getTime();
             
-            // Mettre à jour le titre et la description
+            // Update the title and description
             const updatedData = {
                 ...favorite,
                 title: newTitle,
                 description: newDescription,
-                lastModified: now // Ajouter la date de dernière modification
+                lastModified: now // Add the last modification date
             };
             
             const success = updateFavorite(favoriteId, updatedData);
             
             if (success) {
-                // Mise à jour de l'affichage de la date de dernière modification dans la popup
+                // Update the display of the last modification date in the popup
                 const lastModifiedContainer = document.getElementById('details-last-modified-container');
                 const lastModifiedContent = document.getElementById('details-last-modified');
                 
@@ -682,20 +682,20 @@ export const FavoritesActions = {
                     lastModifiedContainer.classList.add('flex');
                 }
                 
-                // Mettre à jour le cache pour refléter les changements
+                // Update the cache to reflect the changes
                 FavoritesInit.cachedFavorites = getFavorites();
-                // Forcer une mise à jour complète des favoris pour assurer la persistance
+                // Force a complete refresh of the favorites to ensure persistence
                 FavoritesInit.updateFavoriteCache(true);
                 
-                return true; // Des modifications ont été effectuées
+                return true; // Modifications have been made
             }
         }
         
-        return false; // Aucune modification n'a été effectuée
+        return false; // No modifications have been made
     },
 
     /**
-     * Affiche un popup détaillé pour un favori
+     * Display a detailed popup for a favorite
      * @param {Object} favorite 
      */
     showFavoriteDetails(favorite) {

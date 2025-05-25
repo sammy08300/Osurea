@@ -1,11 +1,11 @@
 const es = {
-    // Informations générales de l'application
+    // General application information
     app: {
         title: "Visualizador de Área",
         description: "Visualizador de área para jugadores de osu! que usan tableta gráfica. Configura y visualiza tu área activa con precisión, guarda tus configuraciones como favoritos y compártelas."
     },
     
-    // Paramètres de la tablette
+    // Tablet settings
     tablet: {
         settings: "Configuración de la Tableta",
         model: "Modelo de Tableta",
@@ -46,7 +46,7 @@ const es = {
         visualization: "Visualización"
     },
     
-    // Système de favoris
+    // Favorites system
     favorites: {
         title: "Favoritos",
         noFavorites: "No hay favoritos guardados. Guarda una configuración para encontrarla aquí.",
@@ -77,7 +77,7 @@ const es = {
         itemTitle: "Título"
     },
     
-    // Résumé et informations
+    // Summary and information
     summary: {
         title: "Resumen",
         currentConfig: "Configuración actual",
@@ -99,7 +99,7 @@ const es = {
         bottomRight: "Abajo-Derecha"
     },
     
-    // Messages généraux
+    // General messages
     messages: {
         confirmDelete: "¿Estás seguro de que quieres eliminar este favorito?",
         yes: "Sí",
@@ -109,7 +109,7 @@ const es = {
         offlineFeature: "Esta función requiere conexión a internet."
     },
     
-    // Langue et paramètres linguistiques
+    // Language and linguistic settings
     language: {
         title: "Idioma",
         fr: "Français",
@@ -152,8 +152,12 @@ const es = {
         areaPositionBottomLeft: "Área activa posicionada abajo a la izquierda",
         areaPositionBottomRight: "Área activa posicionada abajo a la derecha",
         copiedInfo: "¡Información copiada!",
-        copyError: "Error al copiar la información"
+        copyError: "Error al copiar la información",
+        invalidDimensions: "Dimensiones inválidas para la alineación",
+        tabletDataError: "Error al cargar los datos de la tableta",
+        errorSavingPreferences: "No se pudieron guardar las preferencias",
+        preferencesReset: "Preferencias restablecidas"
     }
 };
 
-export default es; 
+export default es;

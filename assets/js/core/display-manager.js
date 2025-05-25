@@ -25,7 +25,7 @@ export class DisplayManager {
         });
 
         // Create debounced and throttled functions
-        this.debouncedSave = Utils.Performance.debounce(() => {
+        this.debouncedSave = Utils.DOM.debounce(() => {
             if (dependencyManager.has('PreferencesManager')) {
                 const preferencesManager = dependencyManager.get('PreferencesManager');
                 if (preferencesManager.saveCurrentState) {
@@ -34,7 +34,7 @@ export class DisplayManager {
             }
         }, 1000);
 
-        this.throttledUpdate = Utils.Performance.throttle(() => {
+        this.throttledUpdate = Utils.DOM.throttle(() => {
             this.update();
         }, 16); // ~60fps
 
@@ -93,7 +93,7 @@ export class DisplayManager {
      */
     getConstrainedOffsets(offsetX, offsetY, isOffsetXFocused, isOffsetYFocused, dims) {
         // Use the utility function for constraint calculation
-        const constrained = Utils.Number.constrainAreaOffset(
+        const constrained = Utils.Numbers.constrainAreaOffset(
             offsetX, offsetY,
             dims.areaWidth, dims.areaHeight,
             dims.tabletWidth, dims.tabletHeight

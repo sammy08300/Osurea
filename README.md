@@ -67,7 +67,6 @@ Osu!rea is an active area visualizer for osu! players who use a graphics tablet.
 
 - **Privacy**: All data is stored only on your device
 - **Optimal performance**: Lightweight and responsive app
-- **Automatic updates**: Regular improvements without user intervention
 - **Offline accessible**: After the first load, the site remains accessible at any time, even without an internet connection, using the same URL
 
 ---

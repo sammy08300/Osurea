@@ -3,25 +3,25 @@ import en from './en.js';
 import es from './es.js';
 
 /**
- * Trouve une valeur de traduction par sa clé de chemin
- * @param {Object} locale - L'objet de traduction
- * @param {string} path - Le chemin sous forme de chaîne (ex: "app.title")
- * @param {Object} fallback - Traduction de secours si la clé n'est pas trouvée
- * @returns {string} La valeur traduite ou la clé si non trouvée
+ * Finds a translation value by its path key
+ * @param {Object} locale - The translation object
+ * @param {string} path - The path as a string (e.g., "app.title")
+ * @param {Object} fallback - Fallback translation if key is not found
+ * @returns {string} The translated value or the key if not found
  * @private
  */
 function getTranslationByPath(locale, path, fallback = null) {
   if (!locale || !path) return path;
   
   try {
-    // Diviser le chemin en segments (app.title -> ['app', 'title'])
+    // Split the path into segments (app.title -> ['app', 'title'])
     const segments = path.split('.');
     
-    // Parcourir l'objet de traduction pour trouver la valeur
+    // Traverse the translation object to find the value
     let current = locale;
     for (const segment of segments) {
       if (current[segment] === undefined) {
-        // Si le segment n'existe pas, essayer le fallback
+        // If the segment doesn't exist, try the fallback
         if (fallback) {
           return getTranslationByPath(fallback, path);
         }
@@ -38,10 +38,10 @@ function getTranslationByPath(locale, path, fallback = null) {
 }
 
 /**
- * Transforme une traduction hiérarchique en objet plat
- * @param {Object} locale - L'objet de traduction hiérarchique
- * @param {string} prefix - Préfixe pour les clés
- * @returns {Object} Un objet plat avec les clés au format "category_key"
+ * Transforms a hierarchical translation into a flat object
+ * @param {Object} locale - The hierarchical translation object
+ * @param {string} prefix - Prefix for the keys
+ * @returns {Object} A flat object with keys in "category_key" format
  * @private
  */
 function flattenTranslations(locale, prefix = '') {
@@ -53,10 +53,10 @@ function flattenTranslations(locale, prefix = '') {
     const newKey = prefix ? `${prefix}_${key}` : key;
     
     if (value && typeof value === 'object') {
-      // Si la valeur est un objet, on continue la récursion
+      // If the value is an object, continue recursion
       Object.assign(result, flattenTranslations(value, newKey));
     } else {
-      // Sinon, on ajoute la clé avec sa valeur
+      // Otherwise, add the key with its value
       result[newKey] = value;
     }
   });
@@ -65,53 +65,53 @@ function flattenTranslations(locale, prefix = '') {
 }
 
 /**
- * Gestionnaire de localisation pour l'application
- * Gère le chargement, le changement et l'utilisation des traductions
+ * Localization manager for the application
+ * Handles loading, changing and using translations
  */
 class LocaleManager {
   /**
-   * Initialise le gestionnaire de localisation
+   * Initializes the localization manager
    */
   constructor() {
-    // Traductions structurées (nouvelles)
+    // Structured translations (new)
     this.translations = {
       fr,
       en,
       es
     };
 
-    // Traductions aplaties pour compatibilité avec l'ancien code
+    // Flattened translations for compatibility with old code
     this.flatTranslations = {
       fr: flattenTranslations(fr),
       en: flattenTranslations(en),
       es: flattenTranslations(es)
     };
     
-    // Liste des locales disponibles
+    // List of available locales
     this.availableLocales = Object.keys(this.translations);
     
-    // Anglais par défaut
+    // English by default
     this.currentLocale = 'en';
     
-    // Initialisation de la locale
+    // Locale initialization
     this.initializeLocale();
   }
   
   /**
-   * Initialise la locale à partir des préférences utilisateur ou du navigateur
+   * Initializes locale from user preferences or browser
    * @private
    */
   initializeLocale() {
     try {
-      // Récupérer la préférence utilisateur
+      // Get user preference
       const savedLocale = this.getSafeLocalStorage('osureaLocale');
       
       if (savedLocale && this.translations[savedLocale]) {
-        // Si une préférence valide existe, l'utiliser
+        // If a valid preference exists, use it
         this.currentLocale = savedLocale;
         this.safeSetLang(this.currentLocale);
       } else {
-        // Sinon, détecter la langue du navigateur
+        // Otherwise, detect browser language
         const browserLang = this.getBrowserLanguage();
         if (browserLang) {
           this.currentLocale = browserLang;
@@ -124,9 +124,9 @@ class LocaleManager {
   }
   
   /**
-   * Récupère une valeur depuis le localStorage de manière sécurisée
-   * @param {string} key - Clé de stockage
-   * @returns {string|null} Valeur stockée ou null en cas d'erreur
+   * Safely retrieves a value from localStorage
+   * @param {string} key - Storage key
+   * @returns {string|null} Stored value or null on error
    */
   getSafeLocalStorage(key) {
     try {
@@ -138,10 +138,10 @@ class LocaleManager {
   }
   
   /**
-   * Écrit une valeur dans le localStorage de manière sécurisée
-   * @param {string} key - Clé de stockage
-   * @param {string} value - Valeur à stocker
-   * @returns {boolean} True si l'opération a réussi, false sinon
+   * Safely writes a value to localStorage
+   * @param {string} key - Storage key
+   * @param {string} value - Value to store
+   * @returns {boolean} True if operation succeeded, false otherwise
    */
   setSafeLocalStorage(key, value) {
     try {
@@ -154,8 +154,8 @@ class LocaleManager {
   }
   
   /**
-   * Définit l'attribut lang du document de manière sécurisée
-   * @param {string} lang - Code de langue à 2 lettres
+   * Safely sets the document's lang attribute
+   * @param {string} lang - 2-letter language code
    */
   safeSetLang(lang) {
     try {
@@ -168,16 +168,16 @@ class LocaleManager {
   }
   
   /**
-   * Détecte la langue du navigateur
-   * @returns {string|null} Code de langue à 2 lettres ou null si non supportée
+   * Detects browser language
+   * @returns {string|null} 2-letter language code ou null si non supportée
    */
   getBrowserLanguage() {
     try {
       const browserLang = navigator && (navigator.language || navigator.userLanguage);
       if (browserLang) {
-        // Récupérer les 2 premiers caractères (fr-FR -> fr)
+        // Get the first 2 characters (fr-FR -> fr)
         const langCode = browserLang.substring(0, 2).toLowerCase();
-        // Vérifier si cette langue est disponible
+        // Check if this language is available
         return this.availableLocales.includes(langCode) ? langCode : null;
       }
     } catch (e) {
@@ -187,61 +187,61 @@ class LocaleManager {
   }
   
   /**
-   * Récupère la traduction actuelle
-   * @returns {Object} Objet de traduction
+   * Gets the current translation
+   * @returns {Object} Translation object
    */
   get() {
     return this.translations[this.currentLocale || 'en'];
   }
   
   /**
-   * Récupère la traduction actuelle au format plat (pour rétrocompatibilité)
-   * @returns {Object} Objet de traduction au format plat
+   * Gets the current translation au format plat (for backward compatibility)
+   * @returns {Object} Translation object au format plat
    */
   getFlat() {
     return this.flatTranslations[this.currentLocale || 'en'];
   }
   
   /**
-   * Obtient la locale actuelle
-   * @returns {string} Code de langue à 2 lettres
+   * Gets the current locale
+   * @returns {string} 2-letter language code
    */
   getCurrentLocale() {
     return this.currentLocale || 'en';
   }
   
   /**
-   * Change la langue et met à jour la page
-   * @param {string} locale - Code de langue à 2 lettres
-   * @returns {Promise<boolean>} True si la langue a été changée, false sinon
+   * Changes language and updates the page
+   * @param {string} locale - 2-letter language code
+   * @returns {Promise<boolean>} True if language was changed, false otherwise
    */
   async setLocale(locale) {
     try {
       if (this.translations[locale]) {
         this.currentLocale = locale;
-        // Sauvegarder la préférence utilisateur
+        // Save user preference
         this.setSafeLocalStorage('osureaLocale', locale);
         this.safeSetLang(locale);
         
-        // Déclencher un événement pour notifier du changement de langue
+        // Trigger an event to notify language change
         this.triggerLocaleChangedEvent(locale);
         
-        // Mettre à jour les textes affichés
+        // Update displayed texts
         await this.updatePageTranslations();
         
         return true;
       }
     } catch (e) {
       console.error('Error during language change:', e);
-      // En cas d'erreur, revenir à l'anglais
+      // In case of error, revert to English
       this.setLocale('en');
     }
     return false;
   }
   
   /**
-   * Déclenche un événement customisé pour le changement de langue
-   * @param {string} locale - Code de langue
+   * Triggers a custom event for language change
+   * @param {string} locale - Language code
    * @private
    */
   triggerLocaleChangedEvent(locale) {
@@ -254,18 +254,18 @@ class LocaleManager {
   }
   
   /**
-   * Traduit une clé dans la langue actuelle
-   * @param {string} key - Clé de traduction (peut être une clé plate ou un chemin)
-   * @returns {string} Texte traduit ou la clé si non trouvée
+   * Translates a key in the current language
+   * @param {string} key - Translation key (can be a flat key or path)
+   * @returns {string} Translated text or the key if not found
    */
   translate(key) {
     try {
-      // Si la clé contient un point, c'est un chemin
+      // If the key contains a dot, it's a path
       if (key.includes('.')) {
         return getTranslationByPath(this.get(), key, this.translations['en']) || key;
       }
       
-      // Sinon, essayer dans les traductions plates (rétrocompatibilité)
+      // Otherwise, try in flat translations (for backward compatibility)
       const flatTranslations = this.getFlat();
       return (flatTranslations && flatTranslations[key]) || key;
     } catch (e) {
@@ -275,8 +275,8 @@ class LocaleManager {
   }
   
   /**
-   * Met à jour tous les textes de la page avec les traductions
-   * @returns {Promise<boolean>} True si la mise à jour a réussi
+   * Updates all page texts with translations
+   * @returns {Promise<boolean>} True if update succeeded
    */
   async updatePageTranslations() {
     try {
@@ -285,7 +285,7 @@ class LocaleManager {
       this.updateMetaTags();
       this.updateSpecificPopups();
       
-      // Pour éviter les erreurs, on ajoute cette implémentation vide
+      // To avoid errors, we add this empty implementation
       await this.updateTranslations();
       
       return true;
@@ -296,12 +296,12 @@ class LocaleManager {
   }
   
   /**
-   * Met à jour les éléments HTML avec l'attribut data-i18n
+   * Updates HTML elements with data-i18n attribute
    * @private
    */
   updateTextElements() {
     try {
-      // Sélectionner tous les éléments avec l'attribut data-i18n
+      // Select all elements with data-i18n attribute
       const elements = document.querySelectorAll('[data-i18n]');
       
       elements.forEach(element => {
@@ -309,7 +309,7 @@ class LocaleManager {
           const key = element.getAttribute('data-i18n');
           const translation = this.translate(key);
           
-          // Mettre à jour le contenu de l'élément selon son type
+          // Update element content according to its type
           if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
             if (element.placeholder) {
               element.placeholder = translation;
@@ -317,7 +317,21 @@ class LocaleManager {
               element.value = translation;
             }
           } else {
+            // For other elements, update textContent
             element.textContent = translation;
+            
+            // Special case for buttons with SVG icons
+            // If parent element is a button and contains SVGs, preserve SVGs
+            if (element.parentElement && element.parentElement.tagName === 'BUTTON') {
+              const button = element.parentElement;
+              const svgs = button.querySelectorAll('svg');
+              if (svgs.length > 0) {
+                // Rebuild button content while preserving SVGs
+                button.innerHTML = '';
+                svgs.forEach(svg => button.appendChild(svg.cloneNode(true)));
+                button.appendChild(element);
+              }
+            }
           }
         } catch (e) {
           console.warn('Error updating element:', e);
@@ -329,12 +343,12 @@ class LocaleManager {
   }
   
   /**
-   * Met à jour les éléments avec des placeholders traduits
+   * Updates elements with translated placeholders
    * @private
    */
   updatePlaceholderElements() {
     try {
-      // Sélectionner tous les éléments avec l'attribut data-i18n-placeholder
+      // Select all elements with data-i18n attribute-placeholder
       const placeholderElements = document.querySelectorAll('[data-i18n-placeholder]');
       
       placeholderElements.forEach(element => {
@@ -352,18 +366,18 @@ class LocaleManager {
   }
   
   /**
-   * Met à jour les balises meta avec les traductions
+   * Updates meta tags with translations
    * @private
    */
   updateMetaTags() {
     try {
-      // Mettre à jour la description
+      // Update description
       const metaDescription = document.querySelector('meta[name="description"]');
       if (metaDescription) {
         metaDescription.content = this.translate('app.description');
       }
       
-      // Mettre à jour la description Open Graph
+      // Update description Open Graph
       const ogDescription = document.querySelector('meta[property="og:description"]');
       if (ogDescription) {
         ogDescription.content = this.translate('app.description');
@@ -374,18 +388,18 @@ class LocaleManager {
   }
   
   /**
-   * Met à jour des popups spécifiques qui nécessitent une attention particulière
+   * Updates specific popups that require special attention
    * @private
    */
   updateSpecificPopups() {
     try {
-      // Gérer spécifiquement les popups de favoris
+      // Specifically handle favorite popups
       const favoritePopup = document.getElementById('favorite-details-popup');
       if (favoritePopup) {
         this.triggerPopupEvent('favorite-details-popup');
       }
       
-      // Gérer d'autres popups spécifiques si nécessaire
+      // Handle other specific popups if needed
       const commentDialog = document.getElementById('comment-dialog');
       if (commentDialog) {
         this.triggerPopupEvent('comment-dialog');
@@ -396,8 +410,8 @@ class LocaleManager {
   }
   
   /**
-   * Déclenche un événement de création de popup pour mettre à jour son contenu
-   * @param {string} popupId - ID du popup
+   * Triggers a popup creation event to update its content
+   * @param {string} popupId - Popup ID
    * @private
    */
   triggerPopupEvent(popupId) {
@@ -412,8 +426,8 @@ class LocaleManager {
   }
   
   /**
-   * Implémentation vide d'updateTranslations pour éviter les erreurs
-   * @returns {Promise<boolean>} True (toujours)
+   * Empty implementation of updateTranslations to avoid errors
+   * @returns {Promise<boolean>} True (always)
    * @private
    */
   async updateTranslations() {
@@ -422,39 +436,39 @@ class LocaleManager {
   }
   
   /**
-   * Retourne la liste des langues disponibles
-   * @returns {Array<string>} Liste des codes de langues disponibles
+   * Returns the list of available languages
+   * @returns {Array<string>} List of available language codes
    */
   getAvailableLocales() {
     return this.availableLocales;
   }
   
   /**
-   * Réinitialise la préférence de langue et force la détection automatique
-   * @returns {Promise<boolean>} True si l'opération a réussi
+   * Resets language preference and forces automatic detection
+   * @returns {Promise<boolean>} True if operation succeeded
    */
   async resetLocale() {
     try {
-      // Supprimer la préférence de langue du localStorage
+      // Remove language preference from localStorage
       try {
         localStorage.removeItem('osureaLocale');
       } catch (e) {
         console.warn('Error removing language preference:', e);
       }
       
-      // Réinitialiser la langue actuelle
+      // Reset current language
       this.currentLocale = null;
       
-      // Forcer la détection de langue du navigateur si la fonction existe
+      // Force browser language detection if function exists
       if (window.forceLanguageDetection && typeof window.forceLanguageDetection === 'function') {
         window.forceLanguageDetection();
       }
       
-      // Utiliser la langue détectée par le navigateur
+      // Use browser-detected language
       const browserLang = this.getBrowserLanguage();
       this.currentLocale = browserLang || 'en';
       
-      // Effectuer la mise à jour après un bref délai pour plus de stabilité
+      // Perform update after a brief delay for more stability
       await this.setLocale(this.currentLocale);
       return true;
     } catch (e) {
@@ -464,7 +478,7 @@ class LocaleManager {
   }
 }
 
-// Créer une instance unique du gestionnaire de traduction
+// Create a unique instance of the translation manager
 const localeManager = new LocaleManager();
 
 export default localeManager; 

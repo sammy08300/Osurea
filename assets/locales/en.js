@@ -1,11 +1,11 @@
 const en = {
-    // Informations générales de l'application
+    // General application information
     app: {
         title: "Area Visualizer",
         description: "Area visualizer for osu! players who use a graphics tablet. Configure and precisely visualize your active area, save your configurations as favorites and share them."
     },
     
-    // Paramètres de la tablette
+    // Tablet settings
     tablet: {
         settings: "Tablet Settings",
         model: "Tablet Model",
@@ -46,7 +46,7 @@ const en = {
         visualization: "Visualization"
     },
     
-    // Système de favoris
+    // Favorites system
     favorites: {
         title: "Favorites",
         noFavorites: "No favorites saved. Save a configuration to find it here.",
@@ -77,7 +77,7 @@ const en = {
         itemTitle: "Title"
     },
     
-    // Résumé et informations
+    // Summary and information
     summary: {
         title: "Summary",
         currentConfig: "Current configuration",
@@ -99,7 +99,7 @@ const en = {
         bottomRight: "Bottom-Right"
     },
     
-    // Messages généraux
+    // General messages
     messages: {
         confirmDelete: "Are you sure you want to delete this favorite?",
         yes: "Yes",
@@ -109,7 +109,7 @@ const en = {
         offlineFeature: "This feature requires an internet connection."
     },
     
-    // Langue et paramètres linguistiques
+    // Language and linguistic settings
     language: {
         title: "Language",
         fr: "Français",
@@ -152,8 +152,12 @@ const en = {
         areaPositionBottomLeft: "Active area positioned at bottom-left",
         areaPositionBottomRight: "Active area positioned at bottom-right",
         copiedInfo: "Information copied!",
-        copyError: "Error copying information"
+        copyError: "Error copying information",
+        invalidDimensions: "Invalid dimensions for alignment",
+        tabletDataError: "Error loading tablet data",
+        errorSavingPreferences: "Unable to save your preferences",
+        preferencesReset: "Preferences reset"
     }
 };
 
-export default en; 
+export default en;

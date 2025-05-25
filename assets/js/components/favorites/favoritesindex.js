@@ -20,7 +20,7 @@ export const FavoritesUI = {
     originalValues: null,
     currentSortCriteria: 'date',
     
-    // Méthodes d'initialisation
+    // Initialization methods
     init() {
         FavoritesInit.init();
         // Synchroniser les états

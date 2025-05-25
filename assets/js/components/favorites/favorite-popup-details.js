@@ -63,7 +63,7 @@ export const FavoritesDetailsPopup = {
         const titleCounter = popup.querySelector('#details-title-counter');
         const descriptionCounter = popup.querySelector('#details-description-counter');
         
-        // Stocker l'ID du favori actuellement affiché dans le gestionnaire d'actions
+        // Store l'ID du favori actuellement affiché dans le gestionnaire d'actions
         actionsHandler.currentDetailedFavoriteId = favorite.id;
         
         let title = favorite.title || favorite.comment || 'i18n:favorites.defaultName';
@@ -75,7 +75,7 @@ export const FavoritesDetailsPopup = {
         }
         
         titleInput.value = translatedTitle;
-        titleInput.dataset.originalTitle = title; // Stocker le titre original pour la sauvegarde
+        titleInput.dataset.originalTitle = title; // Store le titre original pour la sauvegarde
         descriptionInput.value = favorite.description || '';
         dateSpan.textContent = formattedDate;
         
@@ -103,7 +103,7 @@ export const FavoritesDetailsPopup = {
             }
         }
         
-        // Afficher la date de dernière modification si elle existe
+        // Display la date de dernière modification si elle existe
         const lastModifiedContainer = popup.querySelector('#details-last-modified-container');
         const lastModifiedContent = popup.querySelector('#details-last-modified');
         
@@ -151,18 +151,18 @@ export const FavoritesDetailsPopup = {
             dialogContent.style.transform = 'scale(0.95)';
         }
         
-        // Afficher la popup
+        // Display la popup
         popup.classList.remove('hidden');
         popup.classList.add('flex');
         popup.style.opacity = '0';
         
-        // Ajouter la classe show après un court délai pour assurer une transition fluide
+        // Add la classe show après un court délai pour assurer une transition fluide
         // Retarder légèrement pour permettre à l'animation de clic de la carte de se terminer
         setTimeout(() => {
             popup.classList.add('show');
             popup.style.opacity = '1';
             
-            // S'assurer que le contenu est également animé correctement
+            // Ensure que le contenu est également animé correctement
             if (dialogContent) {
                 dialogContent.style.transform = 'scale(1)';
             }
@@ -183,7 +183,7 @@ export const FavoritesDetailsPopup = {
         deleteBtn.onclick = null;
         closeBtn.onclick = null;
         
-        // Ajouter les nouveaux gestionnaires
+        // Add les nouveaux gestionnaires
         loadBtn.onclick = () => {
             actionsHandler.loadFavorite(favorite.id);
             this.closeDetailsPopup(actionsHandler);
@@ -203,7 +203,7 @@ export const FavoritesDetailsPopup = {
             this.closeDetailsPopup(actionsHandler);
         };
         
-        // Fermer la popup en cliquant à l'extérieur
+        // Close la popup en cliquant à l'extérieur
         popup.onclick = (e) => {
             if (e.target === popup) {
                 this.closeDetailsPopup(actionsHandler);
@@ -215,7 +215,7 @@ export const FavoritesDetailsPopup = {
      * Configure l'auto-sauvegarde des champs de la popup
      */
     setupAutoSave(titleInput, descriptionInput, titleCounter, descriptionCounter, actionsHandler) {
-        // Supprimer les anciens écouteurs pour éviter les doublons
+        // Remove les anciens écouteurs pour éviter les doublons
         const oldTitleListener = titleInput._inputListener;
         const oldDescListener = descriptionInput._inputListener;
         
@@ -262,11 +262,11 @@ export const FavoritesDetailsPopup = {
             actionsHandler.scheduleAutoSave();
         };
         
-        // Stocker les références pour pouvoir les supprimer plus tard
+        // Store les références pour pouvoir les supprimer plus tard
         titleInput._inputListener = titleInputListener;
         descriptionInput._inputListener = descInputListener;
         
-        // Ajouter les écouteurs
+        // Add les écouteurs
         titleInput.addEventListener('input', titleInputListener);
         descriptionInput.addEventListener('input', descInputListener);
         
@@ -518,7 +518,7 @@ export const FavoritesDetailsPopup = {
         // Référencer le popup pour une utilisation future
         this.detailsPopup = popup;
         
-        // Ajouter la classe pour les animations
+        // Add la classe pour les animations
         popup.addEventListener('transitionend', () => {
             if (!popup.classList.contains('show')) {
                 popup.classList.add('hidden');
@@ -535,7 +535,7 @@ export const FavoritesDetailsPopup = {
             console.error("[ERROR] Impossible de déclencher l'événement popup:created", e);
         }
         
-        // Ajouter les styles CSS pour les animations
+        // Add les styles CSS pour les animations
         if (!document.getElementById('favorite-details-popup-styles')) {
             const style = document.createElement('style');
             style.id = 'favorite-details-popup-styles';

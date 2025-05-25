@@ -1,11 +1,11 @@
 const fr = {
-    // Informations générales de l'application
+    // General application information
     app: {
         title: "Area Visualizer",
         description: "Visualiseur d'area pour les joueurs d'osu! Configurez et visualisez votre zone active précisément, sauvegardez vos configurations dans des favoris et partagez-les."
     },
     
-    // Paramètres de la tablette
+    // Tablet settings
     tablet: {
         settings: "Paramètres Tablette",
         model: "Modèle de Tablette",
@@ -46,7 +46,7 @@ const fr = {
         visualization: "Visualisation"
     },
     
-    // Système de favoris
+    // Favorites system
     favorites: {
         title: "Favoris",
         noFavorites: "Aucun favori enregistré. Sauvegardez une configuration pour la retrouver ici.",
@@ -77,7 +77,7 @@ const fr = {
         itemTitle: "Titre"
     },
     
-    // Résumé et informations
+    // Summary and information
     summary: {
         title: "Récapitulatif",
         currentConfig: "Configuration actuelle",
@@ -99,7 +99,7 @@ const fr = {
         bottomRight: "Bas-Droite"
     },
     
-    // Messages généraux
+    // General messages
     messages: {
         confirmDelete: "Êtes-vous sûr de vouloir supprimer ce favori ?",
         yes: "Oui",
@@ -109,7 +109,7 @@ const fr = {
         offlineFeature: "Cette fonctionnalité nécessite une connexion internet."
     },
     
-    // Langue et paramètres linguistiques
+    // Language and linguistic settings
     language: {
         title: "Langue",
         fr: "Français",
@@ -160,4 +160,4 @@ const fr = {
     }
 };
 
-export default fr; 
+export default fr;

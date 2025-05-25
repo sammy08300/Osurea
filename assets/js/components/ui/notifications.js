@@ -158,3 +158,4 @@ const Notifications = {
         return this.show(message, 'warning', duration);
     }
 };
+

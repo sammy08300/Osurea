@@ -58,7 +58,7 @@ export function registerLegacyGlobals() {
     };
 
     // Constraint helpers (from constraintHelpers.js)
-    window.constrainAreaOffset = Utils.Number.constrainAreaOffset;
+    window.constrainAreaOffset = Utils.Numbers.constrainAreaOffset;
 
     console.log('Legacy global functions registered for backward compatibility');
 }
@@ -95,6 +95,15 @@ export function migrateLegacyDependencies() {
  * Check for potential conflicts and warn about deprecated usage
  */
 export function checkLegacyConflicts() {
+    // Désactiver les warnings en production pour éviter le spam de console
+    const isDevelopment = window.location.hostname === 'localhost' || 
+                         window.location.hostname === '127.0.0.1' ||
+                         window.location.search.includes('debug=true');
+    
+    if (!isDevelopment) {
+        return; // Pas de warnings en production
+    }
+
     const potentialConflicts = [
         'updateDisplay',
         'updateDisplayWithoutRatio',
@@ -110,8 +119,8 @@ export function checkLegacyConflicts() {
     );
 
     if (conflicts.length > 0) {
-        console.warn('Legacy global functions detected:', conflicts);
-        console.warn('Consider migrating to the new modular system for better maintainability');
+        console.info('Legacy global functions detected:', conflicts);
+        console.info('Consider migrating to the new modular system for better maintainability');
     }
 }
 

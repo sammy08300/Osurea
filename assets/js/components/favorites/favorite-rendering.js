@@ -36,7 +36,7 @@ export const FavoritesRendering = {
      * @param {boolean} isInitialLoad - Si c'est le chargement initial (pas d'animation de sortie)
      */
     loadFavoritesWithAnimation(isInitialLoad = false) {
-        // Récupérer tous les favoris depuis le module d'initialisation
+        // Get all favorites from the initialization module
         const favorites = FavoritesInit.cachedFavorites || getFavorites();
         
         // Cas où il n'y a pas de favoris
@@ -64,7 +64,7 @@ export const FavoritesRendering = {
         // Trier les favoris selon le critère actuel
         const sortedFavorites = favoriteSortFavorites(favorites, FavoritesInit.currentSortCriteria);
         
-        // Supprimer tous les éléments existants
+        // Remove tous les éléments existants
         const existingCards = FavoritesInit.favoritesList.querySelectorAll('.favorite-item');
         existingCards.forEach(card => card.remove());
         
@@ -84,7 +84,7 @@ export const FavoritesRendering = {
                 // Animation complète après un court délai
                 setTimeout(() => {
                     cardElement.style.opacity = '1';
-                    // Ajouter un gestionnaire pour marquer l'animation comme terminée
+                    // Add un gestionnaire pour marquer l'animation comme terminée
                     cardElement.addEventListener('animationend', () => {
                         cardElement.classList.remove('animate-fadeIn-smooth');
                         cardElement.classList.add('animation-complete');
@@ -174,7 +174,7 @@ export const FavoritesRendering = {
                 </div>
             </div>`;
 
-        // Ajouter un gestionnaire de clic à la carte elle-même (excluant les boutons)
+        // Add un gestionnaire de clic à la carte elle-même (excluant les boutons)
         item.addEventListener('click', (e) => {
             // Si le clic est sur un bouton ou à l'intérieur d'un bouton, ne rien faire
             if (e.target.closest('.favorite-btn')) {
@@ -184,13 +184,13 @@ export const FavoritesRendering = {
             // Sinon, ajouter un effet visuel de clic avant d'ouvrir la popup
             e.stopPropagation();
             
-            // S'assurer que nous avons l'élément de carte correct
+            // Ensure que nous avons l'élément de carte correct
             const card = e.currentTarget;
             
-            // Ajouter une classe pour l'effet visuel de clic
+            // Add une classe pour l'effet visuel de clic
             card.classList.add('card-click-effect');
             
-            // Stocker les données originales
+            // Store les données originales
             favorite._originalTitle = title;
             
             // Attendre un court instant pour que l'effet de clic soit visible
@@ -198,12 +198,12 @@ export const FavoritesRendering = {
                 // Retirer la classe d'effet
                 card.classList.remove('card-click-effect');
                 
-                // Ouvrir la popup des détails
+                // Open la popup des détails
                 FavoritesActions.showFavoriteDetails && FavoritesActions.showFavoriteDetails(favorite);
             }, 80); // Réduit de 150ms à 80ms pour une réaction plus rapide
         });
         
-        // Ajouter des gestionnaires de clic séparés pour chaque bouton
+        // Add des gestionnaires de clic séparés pour chaque bouton
         const loadBtn = item.querySelector('.load-favorite-btn');
         const editBtn = item.querySelector('.edit-favorite-btn');
         const deleteBtn = item.querySelector('.delete-favorite-btn');
@@ -228,7 +228,7 @@ export const FavoritesRendering = {
         
         item.style.marginTop = '8px';
         
-        // Ajouter la classe animate-fadeIn-smooth pour l'animation d'entrée
+        // Add la classe animate-fadeIn-smooth pour l'animation d'entrée
         if (FavoritesInit.isInitialized) {
             item.classList.add('animate-fadeIn-smooth');
         }
@@ -303,7 +303,7 @@ export const FavoritesRendering = {
      * @param {boolean} withScroll - Si true, fait défiler la vue pour montrer le favori
      */
     highlightFavorite(id, withScroll = true) {
-        // Supprimer toutes les mises en évidence existantes
+        // Remove toutes les mises en évidence existantes
         const highlightedFavorites = document.querySelectorAll('.favorite-item.border-blue-500, .favorite-item.highlight-effect');
         highlightedFavorites.forEach(item => {
             requestAnimationFrame(() => {
@@ -323,7 +323,7 @@ export const FavoritesRendering = {
                 favoriteItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
             
-            // Supprimer l'effet après un délai
+            // Remove l'effet après un délai
             setTimeout(() => {
                 favoriteItem.classList.remove('highlight-effect');
             }, 1500);

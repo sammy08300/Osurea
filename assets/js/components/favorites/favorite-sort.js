@@ -12,7 +12,7 @@ export function favoriteSortFavorites(favorites, criteria) {
                 return areaB - areaA;
             case 'modified':
                 // Prioriser lastModified si disponible, sinon utiliser l'ID
-                // S'assurer que les éléments modifiés récemment apparaissent en premier
+                // Ensure que les éléments modifiés récemment apparaissent en premier
                 const modifiedA = a.lastModified || a.id || 0;
                 const modifiedB = b.lastModified || b.id || 0;
                 return modifiedB - modifiedA; // Tri décroissant (plus récent d'abord)

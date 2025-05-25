@@ -11,7 +11,7 @@ import { Utils } from './utils/index.js';
 
 // Import existing modules
 import { FavoritesUI } from './components/favorites/favoritesindex.js';
-import TabletSelector from './components/tabletSelector.js';
+import TabletSelector from './components/tablet/tabletSelector.js';
 import { translateWithFallback } from './i18n-init.js';
 import { UIManager } from './ui/ui-manager.js';
 import { FormManager } from './ui/form-manager.js';
@@ -36,11 +36,13 @@ class AppState {
      */
     async loadTabletData() {
         try {
+            console.log('Loading tablet data from data/tablets.json...');
             const response = await fetch('data/tablets.json');
             if (!response.ok) {
                 throw new Error('Failed to load tablet data');
             }
             this.tabletData = await response.json();
+            console.log('Tablet data loaded successfully:', this.tabletData.length, 'tablets');
             
             // Initialize the tablet selector
             TabletSelector.init(this.tabletData);
@@ -48,7 +50,7 @@ class AppState {
             console.error('Error loading tablet data:', error);
             notificationManager.error(
                 translateWithFallback('notifications.tabletDataError') || 
-                'Erreur de chargement des données tablettes'
+                'Error loading tablet data'
             );
         }
     }
@@ -86,7 +88,7 @@ class AppState {
             
             notificationManager.info(
                 translateWithFallback('notifications.editModeCanceled') || 
-                'Modifications annulées'
+                'Changes cancelled'
             );
         }
     }
@@ -172,7 +174,7 @@ class AppState {
             });
             
             // Create debounced ratio update function
-            this.debouncedUpdateRatio = Utils.Performance.debounce(() => {
+            this.debouncedUpdateRatio = Utils.DOM.debounce(() => {
                 const formManager = dependencyManager.get('FormManager');
                 const elements = formManager.getFormElements();
                 const width = Utils.parseFloatSafe(elements.areaWidth.value);
@@ -195,7 +197,7 @@ class AppState {
             
         } catch (error) {
             console.error('Error initializing application:', error);
-            notificationManager.error('Erreur lors de l\'initialisation de l\'application');
+            notificationManager.error('Error initializing application');
         }
     }
 
@@ -280,6 +282,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (error) {
         console.error('Failed to initialize application:', error);
         // Fallback notification if the notification system fails
-        alert('Erreur lors du chargement de l\'application. Veuillez recharger la page.');
+                    alert('Error loading application. Please reload the page.');
     }
 });
