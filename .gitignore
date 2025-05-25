@@ -49,3 +49,22 @@ OLD FAVORITES
 dist/
 build/
 
+# Test files (temporary)
+test-integration.html
+*.test.html
+test-*.html
+
+# Documentation temporaire
+RESOLUTION_*.md
+REFACTORING_GUIDE.md
+
+# Backup files
+*.backup
+*.bak
+*.orig
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
