@@ -8,12 +8,19 @@ const ContextMenu = {
     rectangle: null,
     tabletBoundary: null,
     isVisible: false,
+    isInitialized: false, // Track initialization state
     eventListeners: [], // Track event listeners for cleanup
 
     /**
      * Initialize the context menu
      */
     init() {
+        // Prevent multiple initializations
+        if (this.isInitialized) {
+            console.warn('ContextMenu: Already initialized, skipping duplicate initialization');
+            return;
+        }
+        
         // Initializing context menu
         
         // Get existing elements
@@ -26,6 +33,7 @@ const ContextMenu = {
         }
         
         this.setupEventListeners();
+        this.isInitialized = true;
         // Context menu ready
     },
     
@@ -155,6 +163,7 @@ const ContextMenu = {
     
     /**
      * Set up handlers for alignment buttons with IDs using event delegation pattern
+     * This only handles alignment buttons OUTSIDE the context menu
      */
     setupAlignmentButtonHandlers() {
         const alignmentButtons = [
@@ -169,7 +178,7 @@ const ContextMenu = {
             { id: 'align-bottom-right', position: 'bottom-right' }
         ];
         
-        // Find a common parent for these buttons if possible
+        // Find a common parent for these buttons if possible, but exclude the context menu
         const buttonsContainer = document.querySelector('.alignment-buttons-container') || document.body;
         
         // Using event delegation for better performance
@@ -177,11 +186,16 @@ const ContextMenu = {
             const button = e.target.closest('[id^="align-"]');
             if (!button) return;
             
+            // CRITICAL: Skip ALL buttons inside the context menu - they are handled by handleMenuClick()
+            if (this.menu && this.menu.contains(button)) {
+                return; // Let handleMenuClick handle this instead
+            }
+            
             // Find the matching position from our predefined list
             const config = alignmentButtons.find(item => item.id === button.id);
             if (config) {
                 this.alignArea(config.position);
-                this.hide();
+                this.hide(); // Hide menu if it was open
             }
         };
         
@@ -203,11 +217,41 @@ const ContextMenu = {
      * @param {MouseEvent} e - The mouse event
      */
     handleMenuClick(e) {
+        // Handle buttons with class .align-btn (from template)
         const alignBtn = e.target.closest('.align-btn');
         if (alignBtn && alignBtn.dataset.position) {
+            e.stopPropagation(); // Prevent event from bubbling up to document.body
+            e.preventDefault();
             const position = alignBtn.dataset.position;
             this.alignArea(position);
             this.hide();
+            return;
+        }
+        
+        // Handle buttons with IDs (from HTML) that are inside the menu
+        // This is the ONLY place where menu buttons with IDs should be handled
+        const idButton = e.target.closest('[id^="align-"]');
+        if (idButton) {
+            e.stopPropagation(); // Prevent event from bubbling up to document.body
+            e.preventDefault();
+            const buttonId = idButton.id;
+            const positionMap = {
+                'align-top-left': 'top-left',
+                'align-top': 'top',
+                'align-top-right': 'top-right',
+                'align-left': 'left',
+                'align-center': 'center',
+                'align-right': 'right',
+                'align-bottom-left': 'bottom-left',
+                'align-bottom': 'bottom',
+                'align-bottom-right': 'bottom-right'
+            };
+            
+            const position = positionMap[buttonId];
+            if (position) {
+                this.alignArea(position);
+                this.hide();
+            }
         }
     },
     
@@ -280,6 +324,7 @@ const ContextMenu = {
             element.removeEventListener(type, handler);
         });
         this.eventListeners = [];
+        this.isInitialized = false; // Reset initialization state
     },
     
     /**

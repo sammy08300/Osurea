@@ -272,12 +272,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return false;
         });
         
-        // Initialize context menu after a delay
-        setTimeout(() => {
-            if (typeof ContextMenu !== 'undefined') {
-                ContextMenu.init();
-            }
-        }, 500);
+        // Context menu is initialized by visualizer.js
         
     } catch (error) {
         console.error('Failed to initialize application:', error);
