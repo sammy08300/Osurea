@@ -298,8 +298,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Setup refresh handlers
         appState._setupRefreshHandlers();
         
-        // Block context menu
+        // Block context menu globally except on rectangle
         document.addEventListener('contextmenu', (e) => {
+            // Allow context menu on rectangle for positioning
+            const rectangle = document.getElementById('rectangle');
+            if (rectangle && (e.target === rectangle || rectangle.contains(e.target))) {
+                return true; // Allow context menu on rectangle
+            }
             e.preventDefault();
             return false;
         });

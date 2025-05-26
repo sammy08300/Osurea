@@ -283,6 +283,12 @@ const ContextMenu = {
         // Position the menu
         this.menu.style.left = `${adjustedX}px`;
         this.menu.style.top = `${adjustedY}px`;
+        
+        // Add show class for animation
+        requestAnimationFrame(() => {
+            this.menu.classList.add('show');
+        });
+        
         this.isVisible = true;
     },
     
@@ -309,8 +315,11 @@ const ContextMenu = {
      */
     hide() {
         if (this.menu) {
-            this.menu.style.display = 'none';
-            this.menu.classList.add('hidden');
+            this.menu.classList.remove('show');
+            setTimeout(() => {
+                this.menu.style.display = 'none';
+                this.menu.classList.add('hidden');
+            }, 200);
             this.isVisible = false;
         }
     },

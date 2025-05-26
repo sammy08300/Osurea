@@ -16,7 +16,7 @@ export const FavoritesDialogs = {
             commentDialog.id = 'favorite-comment-dialog';
             commentDialog.className = 'fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden animate-fadeIn';
             commentDialog.innerHTML = `
-                <div class="bg-gray-900 rounded-xl p-6 shadow-xl max-w-md w-full border border-gray-800 scale-100 transition-transform animate-scaleIn">
+                <div class="bg-gray-900 rounded-xl p-6 shadow-xl max-w-xl w-full border border-gray-800 scale-100 transition-transform animate-scaleIn">
                     <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-800">
                         <h2 class="text-xl font-semibold text-white flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -88,7 +88,7 @@ export const FavoritesDialogs = {
             deleteDialog.id = 'favorite-delete-dialog';
             deleteDialog.className = 'fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden animate-fadeIn';
             deleteDialog.innerHTML = `
-                <div class="bg-gray-900 rounded-xl p-6 shadow-xl max-w-md w-full border border-gray-800 scale-100 transition-transform animate-scaleIn">
+                <div class="bg-gray-900 rounded-xl p-6 shadow-xl max-w-xl w-full border border-gray-800 scale-100 transition-transform animate-scaleIn">
                     <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-800">
                         <h2 class="text-xl font-semibold text-white flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -51,7 +51,7 @@ export const FavoritesInit = {
             this.cachedFavorites = getFavorites();
         }
         
-        this.favoritesPlaceholder = this.favoritesList.querySelector('p');
+        this.favoritesPlaceholder = this.favoritesList.querySelector('.col-span-full');
         this.setupSortButtons();
         
         // Create dialogs in advance to avoid creation during use
@@ -147,14 +147,10 @@ export const FavoritesInit = {
             const currentLang = document.documentElement.lang || 
                                (typeof localeManager !== 'undefined' ? localeManager.getCurrentLocale() : 'unknown');
             
-            // Vider complètement la liste (y compris le placeholder)
+            // Vider seulement les favoris, pas le placeholder
             if (this.favoritesList) {
-                this.favoritesList.innerHTML = '';
-                
-                // Réinsérer le placeholder
-                if (this.favoritesPlaceholder) {
-                    this.favoritesList.appendChild(this.favoritesPlaceholder);
-                }
+                const existingCards = this.favoritesList.querySelectorAll('.favorite-item');
+                existingCards.forEach(card => card.remove());
             }
             
             // Forcer un rechargement propre en retardant légèrement le chargement des favoris

@@ -32,7 +32,6 @@ const TabletSelector = {
             modelsList: '#tabletModelsList',
             customButton: '#customTabletButton',
             searchInput: '#tabletSearch',
-            searchInputMobile: '#tabletSearchMobile',
             tabletWidth: '#tabletWidth',
             tabletHeight: '#tabletHeight',
             tabletDimensionsContainer: '#tablet-dimensions-container',
@@ -103,10 +102,9 @@ const TabletSelector = {
      * Initialize translations for UI elements
      */
     initializeTranslations() {
-        const { searchInput, searchInputMobile, customButton } = this.elements;
+        const { searchInput, customButton } = this.elements;
         
         this.translatePlaceholder(searchInput);
-        this.translatePlaceholder(searchInputMobile);
         
         // Translate custom button
         this.translateElement(customButton);
@@ -319,10 +317,12 @@ const TabletSelector = {
      * Add the event listeners
      */
     addEventListeners() {
-        const { selectorButton, selectorPopup, customButton, searchInput, searchInputMobile } = this.elements;
+        const { selectorButton, selectorPopup, customButton, searchInput } = this.elements;
         
         // Open/close the popup on button click
-        selectorButton?.addEventListener('click', () => this.togglePopup());
+        selectorButton?.addEventListener('click', () => {
+            this.togglePopup();
+        });
         
         // Custom dimensions
         customButton?.addEventListener('click', () => {
@@ -332,16 +332,13 @@ const TabletSelector = {
         
         // Search functionality
         searchInput?.addEventListener('input', (e) => this.handleSearch(e.target.value));
-        searchInputMobile?.addEventListener('input', (e) => this.handleSearch(e.target.value));
         
         // Close popup on outside click, scroll, or resize
         this.addOutsideClickListener();
-        document.addEventListener('scroll', () => this.hidePopup());
-        window.addEventListener('resize', () => this.hidePopup());
     },
     
     /**
-     * Add listener to close popup on outside click
+     * Add listener to close popup on outside click, scroll, and resize
      */
     addOutsideClickListener() {
         const { selectorPopup, selectorButton } = this.elements;
@@ -353,6 +350,16 @@ const TabletSelector = {
                 this.hidePopup();
             }
         });
+        
+        // Close popup on scroll or resize for better UX
+        const closePopup = () => {
+            if (!selectorPopup.classList.contains('hidden')) {
+                this.hidePopup();
+            }
+        };
+        
+        window.addEventListener('scroll', closePopup, { passive: true });
+        window.addEventListener('resize', closePopup, { passive: true });
     },
     
     /**
@@ -360,7 +367,6 @@ const TabletSelector = {
      * @param {string} query - Search terms
      */
     handleSearch(query) {
-        const { searchInput, searchInputMobile } = this.elements;
         query = query.toLowerCase().trim();
         
         // If search is empty, reset display
@@ -371,9 +377,6 @@ const TabletSelector = {
             }
             return;
         }
-        
-        // Synchronize search fields if necessary
-        this.syncSearchFields(query, searchInput, searchInputMobile);
         
         // Filter tablets matching the search
         this.state.filteredModels = this.state.tabletData.filter(tablet => 
@@ -386,18 +389,7 @@ const TabletSelector = {
         this.displaySearchResults();
     },
     
-    /**
-     * Synchronize search fields values
-     * @param {string} query - Search query
-     * @param {...HTMLInputElement} fields - Fields to synchronize
-     */
-    syncSearchFields(query, ...fields) {
-        fields.forEach(field => {
-            if (field && field.value !== query) {
-                field.value = query;
-            }
-        });
-    },
+
     
     /**
      * Display the search results
@@ -857,14 +849,19 @@ const TabletSelector = {
      * Display the popup
      */
     showPopup() {
-        const { selectorPopup, searchInput, searchInputMobile } = this.elements;
+        const { selectorPopup, searchInput } = this.elements;
         const { selectedBrand } = this.state;
         
+        // Simple: just remove hidden class, CSS handles positioning
         selectorPopup.classList.remove('hidden');
+        
+        // Reset any inline styles that might interfere
+        selectorPopup.style.left = '';
+        selectorPopup.style.top = '';
+        selectorPopup.style.width = '';
         
         // Reset search
         if (searchInput) searchInput.value = '';
-        if (searchInputMobile) searchInputMobile.value = '';
         
         // Refresh models display
         if (selectedBrand) {
@@ -876,7 +873,8 @@ const TabletSelector = {
      * Hide the popup
      */
     hidePopup() {
-        this.elements.selectorPopup.classList.add('hidden');
+        const { selectorPopup } = this.elements;
+        selectorPopup.classList.add('hidden');
     }
 }; 
 

@@ -14,13 +14,14 @@ const radiusControlGroup = document.getElementById('radius-control-group');
 
 // Cache of frequently used DOM elements 
 const cachedElements = { 
-    tabletDimensionsInfo: document.getElementById('tablet-dimensions-info'),
-    tabletRatioInfo: document.getElementById('tablet-ratio-info'),
-    dimensionsInfo: document.getElementById('dimensions-info'),
-    areaInfo: document.getElementById('area-info'),
-    ratioInfo: document.getElementById('ratio-info'),
-    positionInfo: document.getElementById('position-info'),
-    radiusInfo: document.getElementById('radius-info'),
+    // Note: Summary section elements removed - using console commands instead
+    tabletDimensionsInfo: null, // Removed with summary section
+    tabletRatioInfo: null, // Removed with summary section
+    dimensionsInfo: null, // Removed with summary section
+    areaInfo: null, // Removed with summary section
+    ratioInfo: null, // Removed with summary section
+    positionInfo: null, // Removed with summary section
+    radiusInfo: null, // Removed with summary section
     customRatioInput: document.getElementById('customRatio'),
     lockRatioCheckbox: document.getElementById('lockRatio'),
     tabletWidthInput: document.getElementById('tabletWidth'),
@@ -299,38 +300,18 @@ if (!throttledUpdateDisplay && typeof throttle === 'function') {
 
 /**
  * Update information displays with current dimensions
+ * Note: Summary section removed - info now available via console commands (dims() or checkDimensions())
  */
 function updateInfoDisplays(dims) {
     // Get the elements from the cache
     const { 
-        tabletDimensionsInfo, tabletRatioInfo, 
-        dimensionsInfo, areaInfo, ratioInfo, positionInfo, radiusInfo,
         customRatioInput, lockRatioCheckbox
     } = cachedElements;
     
-    // Tablet info
-    const tabletRatio = calculateRatio(dims.tabletWidth, dims.tabletHeight);
+    // Only update the ratio input if the lock is activated
+    const isLocked = lockRatioCheckbox && lockRatioCheckbox.getAttribute('aria-pressed') === 'true';
     
-    // Avoid unnecessary DOM rewrites by checking changes
-    const newTabletDimensions = `${formatNumber(dims.tabletWidth)} × ${formatNumber(dims.tabletHeight)} mm`;
-    if (tabletDimensionsInfo.textContent !== newTabletDimensions) {
-        tabletDimensionsInfo.textContent = newTabletDimensions;
-    }
-    
-    // Toujours formater le ratio de la tablette avec 3 décimales
-    const formattedTabletRatio = formatNumber(tabletRatio, 3);
-    if (tabletRatioInfo.textContent !== formattedTabletRatio) {
-        tabletRatioInfo.textContent = formattedTabletRatio;
-    }
-    
-    // Area info
-    const areaRatio = formatNumber(calculateRatio(dims.areaWidth, dims.areaHeight), 3);
-    const areaSurface = formatNumber(dims.areaWidth * dims.areaHeight);
-    
-    // Update the ratio only if the lock is activated
-    const isLocked = lockRatioCheckbox.getAttribute('aria-pressed') === 'true';
-    
-    if (isLocked) {
+    if (isLocked && customRatioInput) {
         // Don't update the customRatioInput if the user is editing it
         if (!customRatioInput.matches(':focus') && !customRatioInput.dataset.editing) {
             const newRatio = formatNumber(dims.areaWidth / dims.areaHeight, 3);
@@ -348,35 +329,7 @@ function updateInfoDisplays(dims) {
         appState.debouncedUpdateRatio();
     }
     
-    // Update area info displays
-    const newDimensions = `${formatNumber(dims.areaWidth)} × ${formatNumber(dims.areaHeight)} mm`;
-    if (dimensionsInfo.textContent !== newDimensions) {
-        dimensionsInfo.textContent = newDimensions;
-    }
-    
-    if (areaInfo.textContent !== `${areaSurface} mm²`) {
-        areaInfo.textContent = `${areaSurface} mm²`;
-    }
-    
-    // Ensure que le ratio est toujours affiché avec 3 décimales
-    if (ratioInfo.textContent !== areaRatio) {
-        ratioInfo.textContent = areaRatio;
-    }
-    
-    // Update position info
-    const newPosition = `X: ${formatNumber(dims.areaOffsetX, DECIMAL_PRECISION_POSITION)}, Y: ${formatNumber(dims.areaOffsetY, DECIMAL_PRECISION_POSITION)}`;
-    if (positionInfo.textContent !== newPosition) {
-        positionInfo.textContent = newPosition;
-    }
-    
-    // Update radius info
-    if (radiusInfo) {
-        const radiusValue = window.currentRadius || 0;
-        const radiusText = `${radiusValue}%`;
-        if (radiusInfo.textContent !== radiusText) {
-            radiusInfo.textContent = radiusText;
-        }
-    }
+    // Note: Summary display elements removed. Use dims() or checkDimensions() in console for detailed info
 }
 
 /**
@@ -427,62 +380,11 @@ function updateDisplayWithoutRatio() {
 
 /**
  * Update information displays with current dimensions without updating the ratio input
+ * Note: Summary section removed - info now available via console commands (dims() or checkDimensions())
  */
 function updateInfoDisplaysWithoutRatio(dims) {
-    // Get the elements from the cache
-    const { 
-        tabletDimensionsInfo, tabletRatioInfo, 
-        dimensionsInfo, areaInfo, ratioInfo, positionInfo, radiusInfo
-    } = cachedElements;
-    
-    // Tablet info
-    const tabletRatio = calculateRatio(dims.tabletWidth, dims.tabletHeight);
-    
-    // Update tablet info
-    const newTabletDimensions = `${formatNumber(dims.tabletWidth)} × ${formatNumber(dims.tabletHeight)} mm`;
-    if (tabletDimensionsInfo.textContent !== newTabletDimensions) {
-        tabletDimensionsInfo.textContent = newTabletDimensions;
-    }
-    
-    // Toujours formater le ratio de la tablette avec 3 décimales
-    const formattedTabletRatio = formatNumber(tabletRatio, 3);
-    if (tabletRatioInfo.textContent !== formattedTabletRatio) {
-        tabletRatioInfo.textContent = formattedTabletRatio;
-    }
-    
-    // Area info
-    const areaRatio = formatNumber(calculateRatio(dims.areaWidth, dims.areaHeight), 3);
-    const areaSurface = formatNumber(dims.areaWidth * dims.areaHeight);
-    
-    // Update area info displays
-    const newDimensions = `${formatNumber(dims.areaWidth)} × ${formatNumber(dims.areaHeight)} mm`;
-    if (dimensionsInfo.textContent !== newDimensions) {
-        dimensionsInfo.textContent = newDimensions;
-    }
-    
-    if (areaInfo.textContent !== `${areaSurface} mm²`) {
-        areaInfo.textContent = `${areaSurface} mm²`;
-    }
-    
-    // Ensure que le ratio est toujours affiché avec 3 décimales
-    if (ratioInfo.textContent !== areaRatio) {
-        ratioInfo.textContent = areaRatio;
-    }
-    
-    // Update position info
-    const newPosition = `X: ${formatNumber(dims.areaOffsetX, DECIMAL_PRECISION_POSITION)}, Y: ${formatNumber(dims.areaOffsetY, DECIMAL_PRECISION_POSITION)}`;
-    if (positionInfo.textContent !== newPosition) {
-        positionInfo.textContent = newPosition;
-    }
-    
-    // Update radius info
-    if (radiusInfo) {
-        const radiusValue = window.currentRadius || 0;
-        const radiusText = `${radiusValue}%`;
-        if (radiusInfo.textContent !== radiusText) {
-            radiusInfo.textContent = radiusText;
-        }
-    }
+    // Note: Summary display elements removed. Use dims() or checkDimensions() in console for detailed info
+    // This function now serves as a placeholder for compatibility
 }
 
 /**
@@ -772,11 +674,8 @@ function setupRadiusControl() {
             window.currentRadius = currentRadius;
             radiusInputField.value = currentRadius;
             
-            // Update the radius info in the summary
-            const radiusInfo = document.getElementById('radius-info');
-            if (radiusInfo) {
-                radiusInfo.textContent = `${currentRadius}%`;
-            }
+            // Note: radius-info element removed with summary section
+            // Use dims() or checkDimensions() in console to see radius value
             
             updateDisplay();
         });
@@ -794,11 +693,8 @@ function setupRadiusControl() {
             window.currentRadius = currentRadius;
             areaRadiusInput.value = value;
             
-            // Update the radius info in the summary
-            const radiusInfo = document.getElementById('radius-info');
-            if (radiusInfo) {
-                radiusInfo.textContent = `${currentRadius}%`;
-            }
+            // Note: radius-info element removed with summary section
+            // Use dims() or checkDimensions() in console to see radius value
             
             // Only update the input value if it's different from what was entered
             if (parseInt(this.value, 10) !== value && !isNaN(parseInt(this.value, 10))) {

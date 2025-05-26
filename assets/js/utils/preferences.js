@@ -528,6 +528,17 @@ const PreferencesManager = {
             
             const radiusInput = document.getElementById('radius-input');
             if (radiusInput) radiusInput.value = radius;
+            
+            // Mettre à jour la barre de progression rose du slider
+            if (typeof window.updateSliderProgress === 'function') {
+                window.updateSliderProgress();
+            } else {
+                // Fallback si la fonction globale n'existe pas
+                const value = radiusElement.value;
+                const max = radiusElement.max;
+                const percentage = (value / max) * 100;
+                radiusElement.style.setProperty('--range-progress', percentage + '%');
+            }
         }
     },
     

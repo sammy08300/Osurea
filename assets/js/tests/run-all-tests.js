@@ -14,6 +14,7 @@ export async function runAllTests() {
         translations: null,
         storage: null,
         visualization: null,
+        dimensions: null,
         total: { passed: 0, failed: 0, tests: 0 }
     };
     
@@ -38,6 +39,11 @@ export async function runAllTests() {
         const visualizationModule = await import('./visualization-test.js');
         results.visualization = visualizationModule.runVisualizationTest();
         
+        // Dimensions tests
+        console.log('\n🎯 Dimensions console commands tests...');
+        const dimensionsModule = await import('./dimensions-test.js');
+        results.dimensions = dimensionsModule.testDimensionsCommands();
+        
         // Calculate totals
         if (results.utils) {
             results.total.passed += results.utils.passed || 0;
@@ -61,6 +67,12 @@ export async function runAllTests() {
             results.total.passed += results.visualization.passed || 0;
             results.total.failed += results.visualization.failed || 0;
             results.total.tests += results.visualization.total || 0;
+        }
+        
+        if (results.dimensions) {
+            results.total.passed += results.dimensions.passed || 0;
+            results.total.failed += results.dimensions.failed || 0;
+            results.total.tests += results.dimensions.total || 0;
         }
         
         // Display summary

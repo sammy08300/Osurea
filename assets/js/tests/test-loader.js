@@ -65,12 +65,19 @@
         // Import drag debug script
         const dragDebugModule = await import('./drag-debug.js');
         
+        // Import dimensions test module
+        const dimensionsModule = await import('./dimensions-test.js');
+        
         // Create global test object
         window.OsureaTest = {
             runAll: testModule.runAllTests,
             runCritical: testModule.runCriticalTests,
             diagnose: testModule.quickDiagnosis,
             debugDrag: dragDebugModule.debugDragFunctionality,
+            testDimensions: dimensionsModule.testDimensionsCommands,
+            quickDimensions: dimensionsModule.quickDimensionsTest,
+            diagnoseDimensions: dimensionsModule.diagnoseDimensionsIssues,
+            performanceDimensions: dimensionsModule.testDimensionsPerformance,
             init: () => {
                 console.log('🧪 Osurea Test Suite Initialized');
                 console.log('📋 Available Test Commands:');
@@ -86,6 +93,12 @@
                 console.log('  • quickDragDiagnosis()       - Quick drag system check');
                 console.log('  • forceTestMove()            - Test rectangle movement');
                 console.log('  • forceReattachEvents()      - Reattach drag event listeners');
+                console.log('');
+                console.log('📏 DIMENSIONS CONSOLE COMMANDS:');
+                console.log('  • OsureaTest.testDimensions()     - Test dimensions commands');
+                console.log('  • OsureaTest.quickDimensions()    - Quick dimensions test');
+                console.log('  • OsureaTest.diagnoseDimensions() - Diagnose dimensions issues');
+                console.log('  • OsureaTest.performanceDimensions() - Performance test');
                 console.log('');
                 console.log('🔧 UTILITY FUNCTIONS:');
                 console.log('  • initThrottledFunctions()   - Initialize throttled display updates');

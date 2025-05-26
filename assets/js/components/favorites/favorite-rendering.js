@@ -41,16 +41,15 @@ export const FavoritesRendering = {
         
         // Cas où il n'y a pas de favoris
         if (favorites.length === 0) {
-            if (FavoritesInit.favoritesPlaceholder) {
-                FavoritesInit.favoritesPlaceholder.classList.remove('hidden');
-                if (!FavoritesInit.favoritesPlaceholder.classList.contains('col-span-full')) {
-                    FavoritesInit.favoritesPlaceholder.classList.add('col-span-full');
-                }
-            }
-            
-            // Vider la liste (excepté le placeholder)
+            // Vider la liste de tous les favoris
             const existingCards = FavoritesInit.favoritesList.querySelectorAll('.favorite-item');
             existingCards.forEach(card => card.remove());
+            
+            // Afficher le placeholder s'il existe
+            if (FavoritesInit.favoritesPlaceholder) {
+                FavoritesInit.favoritesPlaceholder.classList.remove('hidden');
+                FavoritesInit.favoritesPlaceholder.style.display = 'block';
+            }
             
             FavoritesInit.favoritesList.classList.remove('favorites-loading');
             return;
@@ -59,6 +58,7 @@ export const FavoritesRendering = {
         // Masquer le placeholder s'il y a des favoris
         if (FavoritesInit.favoritesPlaceholder) {
             FavoritesInit.favoritesPlaceholder.classList.add('hidden');
+            FavoritesInit.favoritesPlaceholder.style.display = 'none';
         }
         
         // Trier les favoris selon le critère actuel
@@ -226,7 +226,7 @@ export const FavoritesRendering = {
             FavoritesActions.deleteFavorite && FavoritesActions.deleteFavorite(favorite.id);
         });
         
-        item.style.marginTop = '8px';
+        item.style.marginTop = '0';
         
         // Add la classe animate-fadeIn-smooth pour l'animation d'entrée
         if (FavoritesInit.isInitialized) {

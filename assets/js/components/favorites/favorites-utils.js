@@ -200,6 +200,32 @@ export function logError(context, error, additionalData = null) {
 export function validateFavorite(favorite) {
     if (!favorite || typeof favorite !== 'object') return false;
     
-    const requiredFields = ['id', 'width', 'height'];
-    return requiredFields.every(field => favorite.hasOwnProperty(field));
+    // Check for required numeric fields
+    const requiredNumericFields = ['width', 'height', 'x', 'y'];
+    const hasRequiredFields = requiredNumericFields.every(field => 
+        favorite.hasOwnProperty(field) && 
+        typeof favorite[field] === 'number' && 
+        !isNaN(favorite[field])
+    );
+    
+    if (!hasRequiredFields) return false;
+    
+    // Check for optional fields with proper types
+    if (favorite.hasOwnProperty('ratio') && (typeof favorite.ratio !== 'number' || isNaN(favorite.ratio))) {
+        return false;
+    }
+    
+    if (favorite.hasOwnProperty('radius') && (typeof favorite.radius !== 'number' || isNaN(favorite.radius))) {
+        return false;
+    }
+    
+    if (favorite.hasOwnProperty('title') && typeof favorite.title !== 'string') {
+        return false;
+    }
+    
+    if (favorite.hasOwnProperty('description') && typeof favorite.description !== 'string') {
+        return false;
+    }
+    
+    return true;
 } 

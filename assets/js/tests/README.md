@@ -38,6 +38,9 @@ assets/js/tests/
 ├── quick-test.js          # Tests utilitaires
 ├── translation-test.js    # Tests de traduction
 ├── storage.test.js        # Tests de stockage
+├── dimensions-test.js     # Tests des commandes console de dimensions
+├── visualization-test.js  # Tests de visualisation
+├── drag-debug.js          # Debug du système de drag
 └── utils.test.js          # Tests Jest (développement avancé)
 ```
 
@@ -73,6 +76,16 @@ import('./assets/js/tests/translation-test.js').then(m => {
 import('./assets/js/tests/storage.test.js').then(m => m.runStorageTests());
 ```
 
+### Tests de Dimensions Console
+```javascript
+import('./assets/js/tests/dimensions-test.js').then(m => {
+    m.testDimensionsCommands();        // Tests complets
+    m.quickDimensionsTest();           // Test rapide
+    m.diagnoseDimensionsIssues();      // Diagnostic
+    m.testDimensionsPerformance();     // Performance
+});
+```
+
 ### Tests Utilitaires
 ```javascript
 import('./assets/js/tests/quick-test.js').then(m => m.runQuickTest());
@@ -93,6 +106,28 @@ OsureaTest.runCritical(); // Tests rapides
 ### ✅ **Pour déboguer**
 ```javascript
 OsureaTest.diagnose(); // Identifier les problèmes
+```
+
+### 📏 **Tests Spécifiques aux Dimensions**
+
+#### **Après suppression de la section récapitulatif**
+```javascript
+OsureaTest.testDimensions(); // Vérifier que les commandes console fonctionnent
+```
+
+#### **Test rapide des commandes**
+```javascript
+OsureaTest.quickDimensions(); // Vérification basique
+```
+
+#### **Diagnostic des problèmes**
+```javascript
+OsureaTest.diagnoseDimensions(); // Identifier les problèmes spécifiques
+```
+
+#### **Test de performance**
+```javascript
+OsureaTest.performanceDimensions(); // Mesurer les performances des calculs
 ```
 
 ## 🚨 Résolution de Problèmes
@@ -117,6 +152,8 @@ Les tests vérifient :
 - ✅ **Système de stockage** (favoris, données utilisateur)
 - ✅ **Système de traduction** (changement de langue, boutons)
 - ✅ **Fonctions utilitaires** (DOM, nombres, performance)
+- ✅ **Commandes console de dimensions** (checkDimensions, dims, calculs)
+- ✅ **Système de visualisation** (drag, rectangle, affichage)
 - ✅ **Compatibilité legacy** (ancien code)
 - ✅ **Gestion d'erreurs** (récupération, validation)
 
@@ -134,6 +171,12 @@ Les tests vérifient :
 OsureaTest.runAll();
 OsureaTest.runCritical();
 OsureaTest.diagnose();
+
+// Tests spécifiques aux dimensions
+OsureaTest.testDimensions();
+OsureaTest.quickDimensions();
+OsureaTest.diagnoseDimensions();
+OsureaTest.performanceDimensions();
 
 // Syntaxe alternative (aussi valide)
 osureaTests.runAll();

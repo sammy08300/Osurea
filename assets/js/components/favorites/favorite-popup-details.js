@@ -333,9 +333,9 @@ export const FavoritesDetailsPopup = {
         popup.className = 'fixed inset-0 items-center justify-center bg-black bg-opacity-50 z-50 hidden transition-opacity duration-300 opacity-0';
         
         popup.innerHTML = `
-            <div class="bg-gray-900 rounded-xl p-6 shadow-xl max-w-md w-full border border-gray-800 transform transition-all duration-300 scale-95 mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="bg-gray-900 rounded-xl p-6 shadow-xl max-w-5xl w-full border border-gray-800 transform transition-all duration-300 scale-95 mx-4 max-h-[90vh] overflow-y-auto custom-scrollbar">
                 <!-- En-tête avec bouton de fermeture -->
-                <div class="flex justify-between items-center mb-4">
+                <div class="flex justify-between items-center mb-6">
                     <h2 class="text-xl font-semibold text-white flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -349,165 +349,147 @@ export const FavoritesDetailsPopup = {
                     </button>
                 </div>
                 
-                <!-- Titre -->
-                <div class="mb-4 pb-3 border-b border-gray-800">
-                    <h3 class="text-lg font-medium text-white pb-2 mb-3 border-b border-gray-700 flex items-center justify-between">
-                        <div class="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                            <span data-i18n="favorites.name">Titre</span>
-                        </div>
-                        <span id="details-title-counter" class="text-xs font-medium px-2 py-1 bg-gray-800 rounded-md text-gray-400">0/32</span>
-                    </h3>
-                    <input type="text" id="details-title" maxlength="32" data-i18n-placeholder="favorites.namePlaceholder" placeholder="" 
-                            class="w-full bg-gray-800 border border-gray-700 rounded-md p-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 mb-0 transition-colors duration-200">
-                </div>
-                
-                <!-- Date de création -->
-                <div class="text-sm text-gray-300 mb-2 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 flex-shrink-0 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <span class="text-gray-400 mr-1" data-i18n="favorites.creationDate">Création:</span>
-                    <span id="details-date" class="break-words"></span>
-                </div>
-                
-                <!-- Date de dernière modification -->
-                <div id="details-last-modified-container" class="text-sm text-gray-300 mb-4 items-center hidden">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 flex-shrink-0 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                    <span class="text-gray-400 mr-1" data-i18n="favorites.lastModified">Dernière modification:</span>
-                    <span id="details-last-modified" class="break-words"></span>
-                </div>
-                
-                <!-- Description -->
-                <div id="details-description-container" class="mb-5">
-                    <h3 class="text-lg font-medium text-white pb-2 mb-3 border-b border-gray-700 flex items-center justify-between">
-                        <div class="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                            </svg>
-                            <span data-i18n="favorites.description">Description</span>
-                        </div>
-                        <span id="details-description-counter" class="text-xs font-medium px-2 py-1 bg-gray-800 rounded-md text-gray-400">0/144</span>
-                    </h3>
-                    <textarea id="details-description" maxlength="144" data-i18n-placeholder="favorites.descriptionPlaceholder" placeholder="" rows="4"
-                                class="w-full bg-gray-800 border border-gray-700 rounded-md p-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 mb-2 resize-none transition-colors duration-200 min-h-[90px]"></textarea>
-                </div>
-                
-                <!-- Informations Tablette -->
-                <div class="mb-5 bg-gray-750 rounded-lg p-3 border border-gray-700">
-                    <h4 class="text-md font-semibold text-white mb-3 pb-2 border-b border-gray-700/70 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 flex-shrink-0 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
-                        </svg>
-                        <span data-i18n="tablet.settings">TABLETTE</span>
-                    </h4>
-                    <div class="grid gap-y-3 gap-x-4 text-sm pl-1">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1.5 text-white flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                                <span class="text-gray-300" data-i18n="tablet.model">Modèle:</span>
-                            </div>
-                            <div class="text-white font-medium" id="details-tablet-name" data-i18n="tablet.selectModel">Sélectionner un modèle</div>
+                <!-- Contenu principal en deux colonnes -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    
+                    <!-- COLONNE GAUCHE : Édition -->
+                    <div class="space-y-6">
+                        <!-- Titre -->
+                        <div class="bg-gray-800/30 p-4 rounded-lg border border-gray-700/50">
+                            <h3 class="text-lg font-medium text-white pb-2 mb-3 border-b border-gray-700 flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                    <span data-i18n="favorites.name">Titre</span>
+                                </div>
+                                <span id="details-title-counter" class="text-xs font-medium px-2 py-1 bg-gray-800 rounded-md text-gray-400">0/32</span>
+                            </h3>
+                            <input type="text" id="details-title" maxlength="32" data-i18n-placeholder="favorites.namePlaceholder" placeholder="" 
+                                    class="w-full bg-gray-800 border border-gray-700 rounded-md p-3 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-colors duration-200">
                         </div>
                         
-                        <div class="grid grid-cols-2 gap-y-3 gap-x-4">
-                            <div class="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1.5 text-white flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                                </svg>
-                                <span class="text-gray-300" data-i18n="tablet.dimensions">Dimensions:</span>
-                            </div>
-                            <div class="text-right text-white font-medium" id="details-tablet-dimensions"></div>
-                            
-                            <div class="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1.5 text-white flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                                </svg>
-                                <span class="text-gray-300" data-i18n="ratio">Ratio:</span>
-                            </div>
-                            <div class="text-right text-white font-medium" id="details-tablet-ratio"></div>
+                        <!-- Description -->
+                        <div class="bg-gray-800/30 p-4 rounded-lg border border-gray-700/50">
+                            <h3 class="text-lg font-medium text-white pb-2 mb-3 border-b border-gray-700 flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                                    </svg>
+                                    <span data-i18n="favorites.description">Description</span>
+                                </div>
+                                <span id="details-description-counter" class="text-xs font-medium px-2 py-1 bg-gray-800 rounded-md text-gray-400">0/144</span>
+                            </h3>
+                            <textarea id="details-description" maxlength="144" data-i18n-placeholder="favorites.descriptionPlaceholder" placeholder="" rows="5"
+                                        class="w-full bg-gray-800 border border-gray-700 rounded-md p-3 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 resize-none transition-colors duration-200 min-h-[120px]"></textarea>
                         </div>
                     </div>
-                </div>
+                    
+                    <!-- COLONNE DROITE : Informations techniques -->
+                    <div class="space-y-6">
                 
-                <!-- Informations Area -->
-                <div class="mb-5 bg-gray-750 rounded-lg p-3 border border-gray-700">
-                    <h4 class="text-md font-semibold text-white mb-3 pb-2 border-b border-gray-700/70 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 flex-shrink-0 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                        </svg>
-                        <span data-i18n="area.settings">ZONE ACTIVE</span>
-                    </h4>
-                    <div class="grid grid-cols-2 gap-y-3 gap-x-4 text-sm pl-1">
-                        <div class="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1.5 text-white flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                            </svg>
-                            <span class="text-gray-300" data-i18n="area.dimensions">Dimensions:</span>
+                        <!-- Informations Tablette -->
+                        <div class="bg-gray-800/30 p-4 rounded-lg border border-gray-700/50">
+                            <h4 class="text-lg font-semibold text-white mb-3 pb-2 border-b border-gray-700 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 flex-shrink-0 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+                                </svg>
+                                <span data-i18n="tablet.settings">Tablette</span>
+                            </h4>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-300 text-sm" data-i18n="tablet.model">Modèle:</span>
+                                    <span class="text-white font-medium text-sm" id="details-tablet-name" data-i18n="tablet.selectModel">Sélectionner un modèle</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-3 text-sm">
+                                    <div class="flex flex-col">
+                                        <span class="text-gray-400 text-xs" data-i18n="tablet.dimensions">Dimensions:</span>
+                                        <span class="text-white font-medium" id="details-tablet-dimensions">--</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-gray-400 text-xs" data-i18n="ratio">Ratio:</span>
+                                        <span class="text-white font-medium" id="details-tablet-ratio">--</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="text-right text-white font-medium" id="details-area-dimensions"></div>
                         
-                        <div class="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1.5 text-white flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                            </svg>
-                            <span class="text-gray-300" data-i18n="favorites.surfaceArea">Surface:</span>
+                        <!-- Informations Zone Active -->
+                        <div class="bg-gray-800/30 p-4 rounded-lg border border-gray-700/50">
+                            <h4 class="text-lg font-semibold text-white mb-3 pb-2 border-b border-gray-700 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 flex-shrink-0 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                                </svg>
+                                <span data-i18n="area.settings">Zone Active</span>
+                            </h4>
+                            <div class="grid grid-cols-2 gap-3 text-sm">
+                                <div class="flex flex-col">
+                                    <span class="text-gray-400 text-xs" data-i18n="area.dimensions">Dimensions:</span>
+                                    <span class="text-white font-medium" id="details-area-dimensions">--</span>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="text-gray-400 text-xs" data-i18n="area.ratio">Ratio:</span>
+                                    <span class="text-white font-medium" id="details-area-ratio">--</span>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="text-gray-400 text-xs" data-i18n="favorites.surfaceArea">Surface:</span>
+                                    <span class="text-white font-medium" id="details-area-size">--</span>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="text-gray-400 text-xs" data-i18n="area.radius">Rayon:</span>
+                                    <span class="text-white font-medium" id="details-area-radius">--</span>
+                                </div>
+                                <div class="flex flex-col col-span-2">
+                                    <span class="text-gray-400 text-xs" data-i18n="area.position">Position:</span>
+                                    <span class="text-white font-medium" id="details-area-position">--</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="text-right text-white font-medium" id="details-area-size"></div>
                         
-                        <div class="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1.5 text-white flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                            </svg>
-                            <span class="text-gray-300" data-i18n="area.ratio">Ratio:</span>
+                        <!-- Dates -->
+                        <div class="bg-gray-800/30 p-4 rounded-lg border border-gray-700/50">
+                            <h4 class="text-lg font-semibold text-white mb-3 pb-2 border-b border-gray-700 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 flex-shrink-0 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                <span data-i18n="favorites.dates">Dates</span>
+                            </h4>
+                            <div class="space-y-3">
+                                <div class="text-sm text-gray-300 flex items-center justify-between">
+                                    <span class="text-gray-400" data-i18n="favorites.creationDate">Création:</span>
+                                    <span id="details-date" class="text-white font-medium"></span>
+                                </div>
+                                <div id="details-last-modified-container" class="text-sm text-gray-300 items-center justify-between hidden">
+                                    <span class="text-gray-400" data-i18n="favorites.lastModified">Modifiée:</span>
+                                    <span id="details-last-modified" class="text-white font-medium"></span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="text-right text-white font-medium" id="details-area-ratio"></div>
-                        
-                        <div class="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1.5 text-white flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            <span class="text-gray-300" data-i18n="area.position">Position:</span>
-                        </div>
-                        <div class="text-right text-white font-medium" id="details-area-position"></div>
-                        
-                        <div class="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1.5 text-white flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4a8 8 0 100 16 8 8 0 000-16z" />
-                            </svg>
-                            <span class="text-gray-300" data-i18n="area.radius">Rayon:</span>
-                        </div>
-                        <div class="text-right text-white font-medium" id="details-area-radius">--</div>
                     </div>
                 </div>
                 
                 <!-- Boutons d'action -->
-                <div class="mt-6 grid grid-cols-3 gap-3">
-                    <button id="details-load-btn" class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors flex items-center justify-center shadow-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                        </svg>
-                        <span class="text-sm font-medium" data-i18n="favorites.load">Charger</span>
-                    </button>
-                    <button id="details-edit-btn" class="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md transition-colors flex items-center justify-center shadow-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                        <span class="text-sm font-medium" data-i18n="favorites.editButton">Modifier</span>
-                    </button>
-                    <button id="details-delete-btn" class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors flex items-center justify-center shadow-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                        <span class="text-sm font-medium" data-i18n="favorites.deleteButton">Supprimer</span>
-                    </button>
+                <div class="mt-6 pt-4 border-t border-gray-700">
+                    <div class="grid grid-cols-3 gap-4">
+                        <button id="details-load-btn" class="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center shadow-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            <span class="text-sm font-medium" data-i18n="favorites.load">Charger</span>
+                        </button>
+                        <button id="details-edit-btn" class="px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors flex items-center justify-center shadow-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                            <span class="text-sm font-medium" data-i18n="favorites.editButton">Modifier</span>
+                        </button>
+                        <button id="details-delete-btn" class="px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors flex items-center justify-center shadow-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            <span class="text-sm font-medium" data-i18n="favorites.deleteButton">Supprimer</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         `;

@@ -67,6 +67,7 @@ const en = {
         sortModified: "Modified",
         creationDate: "Creation:",
         lastModified: "Last modified:",
+        dates: "Dates",
         dimensions: "Dimensions:",
         surfaceArea: "Surface:",
         load: "Load",
