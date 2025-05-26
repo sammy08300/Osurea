@@ -18,6 +18,7 @@ export const FormManager = {
         this.setupAreaDimensionInputs();
         this.setupRatioHandling();
         this.setupOffsetInputs();
+        this.setupRadiusInputs();
     },
     
     /**
@@ -410,6 +411,111 @@ export const FormManager = {
             if (typeof updateDisplay === 'function') {
                 updateDisplay();
             }
+        });
+    },
+    
+    /**
+     * Set up radius input event listeners
+     */
+    setupRadiusInputs() {
+        const elements = this.getFormElements();
+        const radiusInput = document.getElementById('radius-input');
+        
+        if (!elements.areaRadius || !radiusInput) return;
+        
+        // Check if the slider is already being managed by radiusSlider.js
+        if (typeof window.updateSliderProgress === 'function') {
+            console.log('Radius slider already initialized by radiusSlider.js');
+            return;
+        }
+        
+        // Find the slider container (parent element)
+        const sliderContainer = elements.areaRadius.closest('.slider-container');
+        
+        if (!sliderContainer) {
+            console.warn('Slider container not found');
+            return;
+        }
+        
+        // Create the progress track element if it doesn't exist
+        let progressTrack = sliderContainer.querySelector('.slider-progress');
+        if (!progressTrack) {
+            progressTrack = document.createElement('div');
+            progressTrack.className = 'slider-progress';
+            
+            // Check if the slider is a child of the container before inserting
+            if (elements.areaRadius.parentNode === sliderContainer) {
+                // Insert the progress track before the slider in the container
+                sliderContainer.insertBefore(progressTrack, elements.areaRadius);
+            } else {
+                // If the slider isn't a direct child, append to the container instead
+                console.warn('Slider is not a direct child of container, appending progress track');
+                sliderContainer.appendChild(progressTrack);
+            }
+        }
+        
+        // Update the slider's color fill based on its value
+        const updateSliderFill = (value) => {
+            const percent = (value / elements.areaRadius.max) * 100;
+            
+            // Update the progress track width
+            progressTrack.style.width = `${percent}%`;
+        };
+        
+        // Update both the slider and the input with the given value
+        const updateRadiusValue = (value) => {
+            value = Math.max(0, Math.min(100, parseInt(value) || 0));
+            
+            // Update both elements if they don't already have this value
+            if (elements.areaRadius.value != value) {
+                elements.areaRadius.value = value;
+            }
+            
+            if (radiusInput.value != value) {
+                radiusInput.value = value;
+            }
+            
+            // Update the slider's color fill using the global function if available
+            if (typeof window.updateSliderProgress === 'function') {
+                window.updateSliderProgress();
+            } else {
+                updateSliderFill(value);
+            }
+            
+            // Cancel edit mode if active
+            if (this.appState && !this.appState.editingFavoriteId) {
+                this.appState.cancelEditMode();
+            }
+            
+            // Trigger display update if it exists
+            if (typeof updateDisplay === 'function') {
+                updateDisplay();
+            }
+        };
+        
+        // Initialize slider fill on page load (if the global function isn't available)
+        if (typeof window.updateSliderProgress !== 'function') {
+            updateSliderFill(elements.areaRadius.value);
+        }
+        
+        // Set up event listener for the range slider
+        elements.areaRadius.addEventListener('input', function() {
+            updateRadiusValue(this.value);
+        });
+        
+        // Set up event listener for the number input
+        radiusInput.addEventListener('input', function() {
+            updateRadiusValue(this.value);
+        });
+        
+        // Update on blur to ensure valid values
+        radiusInput.addEventListener('blur', function() {
+            updateRadiusValue(this.value);
+        });
+        
+        // Update on window resize to handle responsive layouts
+        window.addEventListener('resize', function() {
+            updateSliderFill(elements.areaRadius.value);
         });
     },
     

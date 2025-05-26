@@ -149,8 +149,8 @@ class AppState {
             // Initialize storage diagnostics
             this._initializeStorageDiagnostics();
             
-            // Initialize favorites UI
-            if (typeof FavoritesUI !== 'undefined') {
+            // Initialize favorites UI only if not already initialized
+            if (typeof FavoritesUI !== 'undefined' && !FavoritesUI.isReady()) {
                 FavoritesUI.init();
             }
             

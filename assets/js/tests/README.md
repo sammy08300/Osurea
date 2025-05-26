@@ -42,6 +42,7 @@ assets/js/tests/
 ├── visualization-test.js  # Tests de visualisation
 ├── drag-debug.js          # Debug du système de drag
 └── utils.test.js          # Tests Jest (développement avancé)
+├── animation-performance.js # Tests de performance d'animation
 ```
 
 ## 📊 Comprendre les Résultats
@@ -49,14 +50,14 @@ assets/js/tests/
 ### ✅ **Succès**
 ```
 🎉 All tests passed! Your application is ready.
-📊 Tests: 45 passed, 0 failed
+📊 Tests: < passed, > failed
 🎯 Success rate: 100%
 ```
 
 ### ❌ **Échecs**
 ```
 ⚠️ Some tests failed. Check the details above.
-📊 Tests: 42 passed, 3 failed
+📊 Tests: > passed, < failed
 🎯 Success rate: 93%
 ```
 

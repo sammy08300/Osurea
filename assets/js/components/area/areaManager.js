@@ -18,6 +18,9 @@ const AreaManager = {
     _offsetXInput: null, // Cache DOM element
     _offsetYInput: null, // Cache DOM element
     _rafId: null, // For requestAnimationFrame
+    _lastX: 0,
+    _lastY: 0,
+    _lastMoveTime: 0,
 
     // Initialize the area manager
     init({ container, area, formatNumber, updateDisplay }) {
@@ -68,16 +71,16 @@ const AreaManager = {
         this._onMouseUp = this._stopDrag.bind(this);
         this._onTouchEnd = this._stopDrag.bind(this);
 
-        // Add mouse event listeners
-        this.area.addEventListener('mousedown', this._onMouseDown);
-        document.addEventListener('mousemove', this._onMouseMove, { passive: false });
-        document.addEventListener('mouseup', this._onMouseUp);
+        // Add mouse event listeners with capture phase for better responsiveness
+        this.area.addEventListener('mousedown', this._onMouseDown, { passive: false });
+        document.addEventListener('mousemove', this._onMouseMove, { passive: false, capture: true });
+        document.addEventListener('mouseup', this._onMouseUp, { capture: true });
         
-        // Add touch event listeners
+        // Add touch event listeners with capture phase
         this.area.addEventListener('touchstart', this._onTouchStart, { passive: false });
-        document.addEventListener('touchmove', this._onTouchMove, { passive: false });
-        document.addEventListener('touchend', this._onTouchEnd);
-        document.addEventListener('touchcancel', this._onTouchEnd);
+        document.addEventListener('touchmove', this._onTouchMove, { passive: false, capture: true });
+        document.addEventListener('touchend', this._onTouchEnd, { capture: true });
+        document.addEventListener('touchcancel', this._onTouchEnd, { capture: true });
     },
 
     destroy() {
@@ -93,11 +96,11 @@ const AreaManager = {
             this.area.removeEventListener('touchstart', this._onTouchStart);
         }
         
-        document.removeEventListener('mousemove', this._onMouseMove);
-        document.removeEventListener('mouseup', this._onMouseUp);
-        document.removeEventListener('touchmove', this._onTouchMove);
-        document.removeEventListener('touchend', this._onTouchEnd);
-        document.removeEventListener('touchcancel', this._onTouchEnd);
+        document.removeEventListener('mousemove', this._onMouseMove, { capture: true });
+        document.removeEventListener('mouseup', this._onMouseUp, { capture: true });
+        document.removeEventListener('touchmove', this._onTouchMove, { capture: true });
+        document.removeEventListener('touchend', this._onTouchEnd, { capture: true });
+        document.removeEventListener('touchcancel', this._onTouchEnd, { capture: true });
     },
 
     _startDrag(event) {
@@ -105,17 +108,47 @@ const AreaManager = {
         const areaRect = this.area.getBoundingClientRect();
         this.dragStartX = event.clientX - areaRect.left;
         this.dragStartY = event.clientY - areaRect.top;
+        
+        // Disable any transitions during drag for improved performance
+        this.area.style.transition = 'none';
+        
+        // Force hardware acceleration to improve performance
+        this.area.style.transform = 'translateZ(0)';
+        
+        // Add dragging class for CSS optimizations
+        this.area.classList.add('dragging');
+        
+        // Store current position
+        this._lastX = parseFloat(this.area.style.left) || 0;
+        this._lastY = parseFloat(this.area.style.top) || 0;
+        this._lastMoveTime = performance.now();
     },
 
     _queueDragUpdate(event) {
+        // Store event data to prevent loss between frames
+        const clientX = event.clientX;
+        const clientY = event.clientY;
+        const now = performance.now();
+        
+        // Limit updates to every 16ms (~ 60fps) for consistent behavior across browsers
+        if (now - this._lastMoveTime < 16) {
+            // If we already have an animation frame request, just update the stored position
+            if (this._rafId) {
+                return;
+            }
+        }
+        
         // Cancel any existing animation frame
         if (this._rafId) {
             cancelAnimationFrame(this._rafId);
         }
         
+        this._lastMoveTime = now;
+        
         // Queue the update on the next animation frame for better performance
         this._rafId = requestAnimationFrame(() => {
-            this._handleAreaDrag(event);
+            // Use the stored event coordinates
+            this._handleAreaDrag({ clientX, clientY });
             this._rafId = null;
         });
     },
@@ -125,10 +158,7 @@ const AreaManager = {
         let x = (event.clientX - containerRect.left - this.dragStartX) / this.scale;
         let y = (event.clientY - containerRect.top - this.dragStartY) / this.scale;
         
-        // Optional: add bounds checking to prevent dragging outside container
-        // x = Math.max(0, Math.min(x, this.containerWidth - this.area.offsetWidth)); 
-        // y = Math.max(0, Math.min(y, this.containerHeight - this.area.offsetHeight));
-        
+        // Apply using transform for smoother performance in all browsers
         this.area.style.left = `${x}px`;
         this.area.style.top = `${y}px`;
 
@@ -144,10 +174,22 @@ const AreaManager = {
         if (typeof this.updateDisplay === 'function') {
             this.updateDisplay();
         }
+        
+        // Store current position
+        this._lastX = x;
+        this._lastY = y;
     },
 
     _stopDrag() {
+        if (!this.isDragging) return;
+        
         this.isDragging = false;
+        
+        // Re-enable transitions after drag ends
+        this.area.style.transition = '';
+        
+        // Remove dragging class
+        this.area.classList.remove('dragging');
     },
 
     updateScale(scale) {
@@ -163,7 +205,7 @@ const AreaManager = {
         this.mmPerPixel = value;
     },
     
-    // New method to set position programmatically
+    // Set position programmatically
     setPosition(x, y, inMillimeters = false) {
         if (inMillimeters) {
             // Convert from mm to pixels

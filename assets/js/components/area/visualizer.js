@@ -136,7 +136,13 @@ function updateRectangleDisplay(areaWidth, areaHeight, areaOffsetX, areaOffsetY)
     // Rectangle updated silently for performance
     
     // Update border radius
-    const radiusValue = window.currentRadius;
+    let radiusValue;
+    if (typeof window.getRadiusValue === 'function') {
+        radiusValue = window.getRadiusValue();
+    } else {
+        radiusValue = parseInt(areaRadiusInput?.value || window.currentRadius || 0);
+    }
+    window.currentRadius = radiusValue; // Synchroniser la variable globale
     currentRadius = radiusValue;
     
     let borderRadius;
@@ -149,6 +155,7 @@ function updateRectangleDisplay(areaWidth, areaHeight, areaOffsetX, areaOffsetY)
         borderRadius = `${maxRadius * (radiusValue / 100)}px`;
     }
     
+    // Application du border-radius au rectangle de visualisation
     rectangle.style.borderRadius = borderRadius;
 }
 

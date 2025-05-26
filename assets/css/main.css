@@ -218,16 +218,23 @@ input[type="range"]::-webkit-slider-thumb:hover {
     backdrop-filter: blur(5px);
     pointer-events: auto;
     z-index: 10;
+    will-change: transform, left, top;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
 }
 
 .page-loaded #rectangle {
-    transition: width var(--transition-fast), height var(--transition-fast), transform var(--transition-fast);
+    transition: width var(--transition-fast), height var(--transition-fast);
+}
+
+#rectangle.dragging {
+    transition: none !important;
 }
 
 #rectangle:active {
     cursor: grabbing;
     box-shadow: 0 0 30px rgba(59, 130, 246, 0.8);
-    transform: scale(1.02);
 }
 
 /*

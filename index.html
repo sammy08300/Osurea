@@ -27,6 +27,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preload" href="assets/css/styles.css" as="style" fetchpriority="high">
     <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/radius-slider.css">
 
     <style>
         .custom-checkbox:checked ~ .checkbox-indicator { transform: scale(1); }
@@ -262,7 +263,12 @@
                                         Corner Radius
                                     </label>
                                     <div class="flex items-center gap-4">
-                                        <input type="range" id="areaRadius" min="0" max="100" value="0" class="flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                                        <div class="slider-container flex-1">
+                                            <div class="slider-track"></div>
+                                            <div class="slider-progress"></div>
+                                            <div class="slider-thumb"></div>
+                                            <input type="range" id="areaRadius" min="0" max="100" value="0" step="1">
+                                        </div>
                                         <div class="relative w-20">
                                             <input type="number" id="radius-input" value="0" min="0" max="100" class="w-full glass-card rounded-lg p-2 pr-8 text-right text-gray-100 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
                                             <span class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">%</span>
@@ -379,6 +385,9 @@
 
     <!-- Footer and loading script -->
     <script type="module" src="assets/js/components/ui/footer.js"></script>
+    
+    <!-- Radius slider component -->
+    <script type="module" src="assets/js/components/ui/radiusSlider.js"></script>
 
     <!-- Context Menu -->
     <div id="context-menu" class="fixed hidden">
@@ -498,41 +507,19 @@
     <!-- Test Loader - Load tests for development/debugging -->
     <script type="module" src="assets/js/tests/test-loader.js" defer></script>
     
-    <!-- Range Slider Progress Script -->
-    <script>
-        function initializeSliderProgress() {
-            const rangeSlider = document.getElementById('areaRadius');
-            
-            function updateSliderProgress() {
-                if (!rangeSlider) return;
-                const value = rangeSlider.value;
-                const max = rangeSlider.max;
-                const percentage = (value / max) * 100;
-                rangeSlider.style.setProperty('--range-progress', percentage + '%');
-            }
-            
-            // Rendre la fonction globalement accessible
-            window.updateSliderProgress = updateSliderProgress;
-            
-            if (rangeSlider) {
-                rangeSlider.addEventListener('input', updateSliderProgress);
-                updateSliderProgress(); // Initial call
-                
-                // Also update on window load and after a delay
-                setTimeout(updateSliderProgress, 100);
-                setTimeout(updateSliderProgress, 500);
-            }
-        }
+    <!-- Range slider is now handled by radiusSlider.js -->
+    
+    <!-- Ensure proper initialization order -->
+    <script type="module">
+        import { initializeRadiusSlider } from './assets/js/components/ui/radiusSlider.js';
         
-        // Initialize immediately and on DOM ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initializeSliderProgress);
-        } else {
-            initializeSliderProgress();
-        }
-        
-        // Also initialize on window load as fallback
-        window.addEventListener('load', initializeSliderProgress);
+        document.addEventListener('DOMContentLoaded', () => {
+            // Force reinitialization of the radius slider after a short delay
+            setTimeout(() => {
+                console.log('Force reinitialization of radius slider');
+                initializeRadiusSlider();
+            }, 500);
+        });
     </script>
     
     <!-- Console Debug Commands -->

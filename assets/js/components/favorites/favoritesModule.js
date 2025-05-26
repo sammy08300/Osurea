@@ -11,6 +11,12 @@ import { logError } from './favorites-utils.js';
  */
 async function initializeFavorites() {
     try {
+        // Check if already initialized to prevent duplicate initialization
+        if (FavoritesUI.isReady && FavoritesUI.isReady()) {
+            console.log('Favorites module already initialized, skipping');
+            return;
+        }
+        
         console.log('Starting favorites initialization...');
         const success = await FavoritesUI.init();
         
