@@ -43,20 +43,20 @@ export function getFavoriteById(id) {
 /**
  * Add a new favorite to storage
  * @param {Object} favorite - The favorite object to add
- * @returns {boolean} True if successfully added, false otherwise
+ * @returns {Object|null} The added favorite with ID or null if failed
  */
 export function addFavorite(favorite) {
     try {
         if (!validateFavorite(favorite)) {
             console.warn('addFavorite: Invalid favorite object provided', favorite);
-            return false;
+            return null;
         }
         
         const result = StorageManager.addFavorite(favorite);
-        return result !== null && result !== undefined;
+        return result; // Return the newly created favorite with ID
     } catch (error) {
         logError('addFavorite', error, { favorite });
-        return false;
+        return null;
     }
 }
 

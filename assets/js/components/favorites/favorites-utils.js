@@ -200,6 +200,13 @@ export function logError(context, error, additionalData = null) {
 export function validateFavorite(favorite) {
     if (!favorite || typeof favorite !== 'object') return false;
     
-    const requiredFields = ['id', 'width', 'height'];
-    return requiredFields.every(field => favorite.hasOwnProperty(field));
+    // For existing favorites with an ID
+    if (favorite.hasOwnProperty('id')) {
+        const requiredFields = ['id', 'width', 'height'];
+        return requiredFields.every(field => favorite.hasOwnProperty(field));
+    }
+    
+    // For new favorites without an ID yet
+    const requiredForNew = ['width', 'height'];
+    return requiredForNew.every(field => favorite.hasOwnProperty(field));
 } 
