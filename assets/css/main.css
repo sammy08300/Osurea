@@ -1,5 +1,6 @@
 @import './favorites.css';
 @import './favorite-fix.css';
+@import './header-footer.css';
 
 /*
 ====================================================
@@ -88,5 +89,3 @@ html.loading, body.loading {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: var(--scrollbar-thumb-hover);
 }
-
-/* Le reste du fichier CSS reste inchangé... */
