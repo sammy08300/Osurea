@@ -8,8 +8,6 @@ const tabletBoundary = document.getElementById('tablet-boundary');
 const rectangle = document.getElementById('rectangle');
 const backgroundGrid = document.getElementById('backgroundGrid');
 const toggleGridCheckbox = document.getElementById('toggleGridCheckbox');
-const areaRadiusInput = document.getElementById('areaRadius');
-const radiusInputField = document.getElementById('radius-input');
 const radiusControlGroup = document.getElementById('radius-control-group');
 
 // Cache of frequently used DOM elements 
@@ -39,14 +37,28 @@ let dragStartX = 0;
 let dragStartY = 0;
 let dragStartOffsetX = 0;
 let dragStartOffsetY = 0;
-window.currentRadius = 0;
-let currentRadius = window.currentRadius;
 let containerSize = { width: 0, height: 0 };
 let tabletSize = { width: 0, height: 0 };
 const containerPadding = 40;
 
 // Throttled update function will be defined after updateDisplay function
 let throttledUpdateDisplay;
+
+// Define the standard animated transition for the rectangle
+const RECTANGLE_ANIMATED_TRANSITION = 'width var(--transition-fast), height var(--transition-fast), border-radius 0.25s ease-out, left 0.2s ease-out, top 0.2s ease-out';
+
+/**
+ * Helper function to apply animated transition to the rectangle
+ */
+function setRectangleToAnimatedTransition() {
+    if (rectangle) {
+        // Check if the dragging class is present. If so, CSS will override this.
+        // This is mainly for discrete changes when not dragging.
+        if (!rectangle.classList.contains('dragging')) {
+            rectangle.style.transition = RECTANGLE_ANIMATED_TRANSITION;
+        }
+    }
+}
 
 /**
  * Updates the container size when it changes
@@ -106,6 +118,9 @@ function updateDisplaySizes(tabletWidth, tabletHeight) {
  * Updates rectangle display
  */
 function updateRectangleDisplay(areaWidth, areaHeight, areaOffsetX, areaOffsetY) {
+    const currentAreaRadiusForDebug = document.getElementById('areaRadius'); // DEBUG STEP 3
+    console.log('updateRectangleDisplay called. Radius value from #areaRadius:', currentAreaRadiusForDebug?.value); // DEBUG STEP 3
+
     const rectWidth = (typeof mmToPx === 'function') ? mmToPx(areaWidth, currentScale) : areaWidth * currentScale;
     const rectHeight = (typeof mmToPx === 'function') ? mmToPx(areaHeight, currentScale) : areaHeight * currentScale;
     
@@ -136,14 +151,8 @@ function updateRectangleDisplay(areaWidth, areaHeight, areaOffsetX, areaOffsetY)
     // Rectangle updated silently for performance
     
     // Update border radius
-    let radiusValue;
-    if (typeof window.getRadiusValue === 'function') {
-        radiusValue = window.getRadiusValue();
-    } else {
-        radiusValue = parseInt(areaRadiusInput?.value || window.currentRadius || 0);
-    }
-    window.currentRadius = radiusValue; // Synchroniser la variable globale
-    currentRadius = radiusValue;
+    const currentAreaRadiusInput = document.getElementById('areaRadius');
+    let radiusValue = parseInt(currentAreaRadiusInput?.value || 0);
     
     let borderRadius;
     if (radiusValue === 0) {
@@ -155,8 +164,8 @@ function updateRectangleDisplay(areaWidth, areaHeight, areaOffsetX, areaOffsetY)
         borderRadius = `${maxRadius * (radiusValue / 100)}px`;
     }
     
-    // Application du border-radius au rectangle de visualisation
-    rectangle.style.borderRadius = borderRadius;
+    // Application du border-radius au rectangle de visualisation via CSS custom property
+    rectangle.style.setProperty('--dynamic-border-radius', borderRadius);
 }
 
 /**
@@ -582,15 +591,17 @@ function handleDragEnd() {
     // Drag operation completed
     isDragging = false;
     
-    // Reset cursor to grab
-    rectangle.style.cursor = 'grab';
-    
+    // Reset cursor to grab - .dragging class (which sets transition:none) will be removed by AreaManager
+    // rectangle.style.cursor = 'grab'; // Already handled by AreaManager removing .dragging class
+
     // Ensure the body has the page-loaded class to activate transitions
     if (!document.body.classList.contains('page-loaded')) {
         document.body.classList.add('page-loaded');
     }
     
-    // Force a final update without throttle
+    // Force a final update without throttle.
+    // Set the animated transition before this update for any discrete jumps.
+    setRectangleToAnimatedTransition();
     updateDisplay();
     
     // Save preferences after movement
@@ -619,6 +630,9 @@ function centerArea() {
     // Avoid redundant calculations
     if (dims.tabletWidth <= 0 || dims.tabletHeight <= 0) return;
     
+    // Ensure transitions are enabled for programmatic move
+    setRectangleToAnimatedTransition();
+
     // Check if the inputs are focused (manual editing)
     const isOffsetXFocused = document.activeElement === cachedElements.areaOffsetXInput;
     const isOffsetYFocused = document.activeElement === cachedElements.areaOffsetYInput;
@@ -671,49 +685,6 @@ function setupResizeObserver() {
 }
 
 /**
- * Setup border radius control
- */
-function setupRadiusControl() {
-    if (areaRadiusInput && radiusInputField) {
-        // Slider change event
-        areaRadiusInput.addEventListener('input', function() {
-            currentRadius = parseInt(this.value, 10);
-            window.currentRadius = currentRadius;
-            radiusInputField.value = currentRadius;
-            
-            // Note: radius-info element removed with summary section
-            // Use dims() or checkDimensions() in console to see radius value
-            
-            updateDisplay();
-        });
-
-        // Manual input change event
-        radiusInputField.addEventListener('input', function() {
-            let value = parseInt(this.value, 10);
-            
-            // Ensure value is within bounds
-            if (isNaN(value) || value < 0) value = 0;
-            if (value > 100) value = 100;
-            
-            // Update both the display value and the slider
-            currentRadius = value;
-            window.currentRadius = currentRadius;
-            areaRadiusInput.value = value;
-            
-            // Note: radius-info element removed with summary section
-            // Use dims() or checkDimensions() in console to see radius value
-            
-            // Only update the input value if it's different from what was entered
-            if (parseInt(this.value, 10) !== value && !isNaN(parseInt(this.value, 10))) {
-                this.value = value;
-            }
-            
-            updateDisplay();
-        });
-    }
-}
-
-/**
  * Initialize throttled functions and ensure proper order
  */
 function initThrottledFunctions() {
@@ -733,36 +704,56 @@ function initVisualizer() {
         return;
     }
     
-    // Add a data-loading attribute to the body to indicate that the visualizer is loading
     document.body.setAttribute('data-loading', 'true');
-    
-    // Temporarily disable interactions during initial loading
     rectangle.style.pointerEvents = 'none';
-    
-    // Initialize throttled functions first
     initThrottledFunctions();
     
-    // Configure the rectangle to its correct initial position before activating transitions
-    updateContainerSize();
-    updateDisplay();
-    
-    // Add the page-loaded class to the body to activate CSS transitions after initial loading
+    let initialVisualsUpdated = false;
+
+    function setupInitialVisuals() {
+        if (initialVisualsUpdated) return;
+        console.log("Visualizer: Setting up initial visuals.");
+        updateContainerSize();
+        updateDisplay();
+        initialVisualsUpdated = true;
+    }
+
+    // Écouter l'événement personnalisé de radiusSlider.js
+    document.addEventListener('radiusSliderReady', function handleRadiusReady(event) {
+        console.log('Visualizer: Event radiusSliderReady received', event.detail);
+        setupInitialVisuals();
+
+        // Attach listener to the newly ready radius input
+        const areaRadiusInput = document.getElementById('areaRadius');
+        if (areaRadiusInput) {
+            // To prevent multiple listeners on the same element if this event fires unexpectedly multiple times
+            // without the element being replaced, we can store and remove the old one.
+            // radiusSlider.js replaces the element, so this primarily guards against unforeseen scenarios.
+            if (areaRadiusInput._visualizerInputListener) {
+                areaRadiusInput.removeEventListener('input', areaRadiusInput._visualizerInputListener);
+                console.log('Visualizer: Removed old input listener from #areaRadius.');
+            }
+            areaRadiusInput._visualizerInputListener = function() {
+                console.log('Input event on #areaRadius in visualizer.js (from radiusSliderReady handler), value:', this.value);
+                updateDisplay();
+            };
+            areaRadiusInput.addEventListener('input', areaRadiusInput._visualizerInputListener);
+            console.log('Visualizer: Attached input listener to #areaRadius.');
+        } else {
+            console.warn('Visualizer: #areaRadius element not found when radiusSliderReady was received.');
+        }
+        // Optionnel: supprimer l'écouteur s'il ne doit s'exécuter qu'une fois pour l'init
+        // document.removeEventListener('radiusSliderReady', handleRadiusReady);
+    });
+
     setTimeout(() => {
-        // Activate CSS transitions
         document.body.classList.add('page-loaded');
-        
-        // Reactivate interactions with the rectangle
         rectangle.style.pointerEvents = 'auto';
-        
-        // Set the grab cursor on the rectangle
         rectangle.style.cursor = 'grab';
-        
-        // Indicate that the loading is finished
         document.body.removeAttribute('data-loading');
         document.documentElement.classList.remove('loading');
         document.body.classList.remove('loading');
         
-        // Hide the loading overlay definitively
         const loadingOverlay = document.getElementById('loading-overlay');
         if (loadingOverlay) {
             loadingOverlay.style.opacity = '0';
@@ -772,36 +763,44 @@ function initVisualizer() {
             }, 150);
         }
         
-        // Setup all event listeners and controls
+        // S'assurer que l'affichage initial a eu lieu, au cas où l'événement radiusSliderReady n'aurait pas été capturé
+        // ou si le slider n'est pas sur la page.
+        if (!initialVisualsUpdated) {
+            console.warn("Visualizer: radiusSliderReady event not caught in time or slider not present, forcing initial visual setup.");
+            setupInitialVisuals();
+        }
+
         setupDragFunctionality();
         setupResizeObserver();
-        setupRadiusControl();
         
-        // Initialize context menu
         if (typeof ContextMenu !== 'undefined') {
             ContextMenu.init();
         }
         
-        // Center button
         const centerBtn = document.getElementById('center-btn');
         if (centerBtn) {
             centerBtn.addEventListener('click', centerArea);
         }
         
-        // Toggle grid
         if (toggleGridCheckbox) {
             toggleGridCheckbox.addEventListener('change', throttle(() => {
                 backgroundGrid.classList.toggle('hidden', !toggleGridCheckbox.checked);
             }, 50));
         }
         
-        // Listen for tablet selection to show/hide radius control
         document.addEventListener('tablet:custom', function() {
             if (radiusControlGroup) {
                 radiusControlGroup.classList.remove('hidden');
             }
         });
-    }, 300);
+
+        // Set initial animated transition for the rectangle after all setup
+        // Call after a very short delay to ensure styles are settled
+        requestAnimationFrame(() => {
+             setRectangleToAnimatedTransition();
+        });
+
+    }, 300); // Ce timeout agit comme un fallback et un délai pour les transitions CSS.
 
     // Ensure the container is properly configured for centering
     if (visualContainer) {

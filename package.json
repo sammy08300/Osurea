@@ -21,12 +21,13 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "npm run watch:css",
+    "dev": "npm-run-all --parallel watch:css serve:public",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npm run build:css && node build.js",
     "build:prod": "cross-env NODE_ENV=production npm run build:css && node build.js",
     "build:css": "postcss assets/css/main.css -o assets/css/styles.css",
     "watch:css": "postcss assets/css/main.css -o assets/css/styles.css --watch",
+    "serve:public": "npx http-server ./public -o",
     "analyze": "echo \"Bundle analysis would go here - consider adding webpack-bundle-analyzer\"",
     "perf:test": "echo \"Performance testing - consider adding lighthouse-ci\"",
     "optimize": "npm run build:prod && echo \"Optimization complete\""
@@ -35,6 +36,7 @@
     "autoprefixer": "^10.4.14",
     "cross-env": "^7.0.3",
     "cssnano": "^6.1.2",
+    "npm-run-all": "^4.1.5",
     "postcss": "^8.5.3",
     "postcss-cli": "^10.1.0",
     "tailwindcss": "^3.3.2"

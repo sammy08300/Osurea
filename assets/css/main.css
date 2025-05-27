@@ -218,14 +218,16 @@ input[type="range"]::-webkit-slider-thumb:hover {
     backdrop-filter: blur(5px);
     pointer-events: auto;
     z-index: 10;
-    will-change: transform, left, top;
+    will-change: transform, left, top, border-radius;
     transform: translateZ(0);
     backface-visibility: hidden;
     perspective: 1000px;
+    border-radius: var(--dynamic-border-radius, 0px);
+    transition: width var(--transition-fast), height var(--transition-fast), border-radius 0.15s ease-out;
 }
 
 .page-loaded #rectangle {
-    transition: width var(--transition-fast), height var(--transition-fast);
+    transition: width var(--transition-fast), height var(--transition-fast), border-radius 0.15s ease-out;
 }
 
 #rectangle.dragging {
