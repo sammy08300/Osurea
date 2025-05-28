@@ -1,4 +1,4 @@
-import { addTimestampToResponse } from '../../service-worker.js'; // Use .js as it will be compiled
+import { addTimestampToResponse } from '../../../service-worker.js'; // Use .js as it will be compiled
 
 // Mock global Response and Headers for the test environment
 // These are simplified mocks focusing on what addTimestampToResponse uses.
@@ -58,6 +58,18 @@ describe('Service Worker Utilities', () => {
   });
 
   describe('addTimestampToResponse', () => {
+    let dateNowSpy: jest.SpyInstance<number, []>;
+
+    beforeEach(() => {
+      // Mock Date.now to return a fixed timestamp
+      dateNowSpy = jest.spyOn(Date, 'now').mockImplementation(() => 1678886400000);
+    });
+
+    afterEach(() => {
+      // Restore original Date.now
+      dateNowSpy.mockRestore();
+    });
+
     test('should return the original response if response or response.body is null', () => {
       const nullResponse = null as any as Response;
       expect(addTimestampToResponse(nullResponse)).toBeNull();
@@ -87,7 +99,8 @@ describe('Service Worker Utilities', () => {
       expect(newResponse).not.toBe(originalResponse);
       expect(originalResponse.clone).toHaveBeenCalled(); // Ensure clone was called on the original
 
-      Date.now.mockRestore(); // Restore original Date.now
+      // Date.now.mockRestore(); // Restore original Date.now
+      dateNowSpy.mockRestore(); // Use the spy's mockRestore
     });
 
     test('should preserve original status and statusText', () => {
@@ -105,23 +118,57 @@ describe('Service Worker Utilities', () => {
         const newResponse = addTimestampToResponse(originalResponse);
         expect(newResponse.headers.has('sw-cache-timestamp')).toBe(true);
         expect(newResponse.headers.get('sw-cache-timestamp')).toBe(now.toString());
-        Date.now.mockRestore();
+        dateNowSpy.mockRestore();
+    });
+
+    test('should not modify headers if X-Timestamp is already present', async () => {
+      const existingTimestamp = '1678886000000';
+      const request = new Request('/');
+      const originalResponse = new Response('Hello world', {
+        headers: { 'X-Timestamp': existingTimestamp }
+      });
+
+      // No need to spy here, it's done in beforeEach
+      // const dateNowSpy = jest.spyOn(Date, 'now');
+
+      const response = await addTimestampToResponse(originalResponse.clone());
+      const headers = Object.fromEntries(response.headers.entries());
+
+      expect(headers['x-timestamp']).toBe(existingTimestamp);
+      expect(dateNowSpy).not.toHaveBeenCalled();
+
+      // No need to restore here, it's done in afterEach
+      // dateNowSpy.mockRestore(); 
+    });
+
+    test('should handle responses with no pre-existing headers correctly', async () => {
+        const request = new Request('/');
+        const originalResponse = new Response('Hello world'); // No headers object initially
+        
+        // No need to spy here, it's done in beforeEach
+        // const dateNowSpy = jest.spyOn(Date, 'now');
+        // dateNowSpy.mockReturnValue(1678886400000); 
+
+        const response = await addTimestampToResponse(originalResponse.clone());
+        const headers = Object.fromEntries(response.headers.entries());
+
+        expect(headers['x-timestamp']).toBe('1678886400000');
+        expect(dateNowSpy).toHaveBeenCalled();
+        
+        // No need to restore here, it's done in afterEach
+        // dateNowSpy.mockRestore(); 
     });
   });
 });
 
-// Minimal Jest setup if not already present globally by a test runner
-if (typeof describe === 'undefined') {
-    global.describe = (name, fn) => fn();
-    global.test = (name, fn) => fn();
-    global.expect = (val) => ({
-        toBe: (exp) => { if (val !== exp) throw new Error(`Expected ${val} to be ${exp}`); },
-        toEqual: (exp) => { if (JSON.stringify(val) !== JSON.stringify(exp)) throw new Error(`Expected ${JSON.stringify(val)} to equal ${JSON.stringify(exp)}`); },
-        toHaveProperty: (prop) => { if (typeof val !== 'object' || !val.hasOwnProperty(prop)) throw new Error(`Expected ${val} to have property ${prop}`);},
-        not: { toBe: (exp) => { if (val === exp) throw new Error(`Expected ${val} not to be ${exp}`); } },
-        // Add more matchers if needed by tests
-    });
-     (global as any).beforeEach = (fn: Function) => fn();
-     (global as any).afterAll = (fn: Function) => fn();
-     (global as any).jest = { spyOn: () => ({mockRestore: () => {}}) }; // very minimal jest.spyOn mock
-}
+// Minimalistic mock for Jest-like functions if not running in Jest
+// if (typeof describe === 'undefined') {
+//     global.describe = (name, fn) => fn();
+//     global.test = (name, fn) => fn();
+//     global.expect = (val) => ({
+//         toBe: (exp) => { if (val !== exp) throw new Error(`Expected ${val} to be ${exp}`); },
+//         toEqual: (exp) => { if (JSON.stringify(val) !== JSON.stringify(exp)) throw new Error(`Expected ${JSON.stringify(val)} to equal ${JSON.stringify(exp)}`); },
+//         toHaveProperty: (prop) => { if (typeof val !== 'object' || !val.hasOwnProperty(prop)) throw new Error(`Expected ${val} to have property ${prop}`);},
+//         not: { toBe: (exp) => { if (val === exp) throw new Error(`Expected ${val} not to be ${exp}`); } },
+//     });
+// }

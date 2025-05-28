@@ -1,4 +1,4 @@
-import { generatePerformanceReport } from '../../build.js'; // Use .js as it will be compiled
+import { generatePerformanceReport } from '../../../build.js'; // Use .js as it will be compiled
 
 // Mock process.env.NODE_ENV
 const originalNodeEnv = process.env.NODE_ENV;
@@ -65,17 +65,3 @@ describe('Build Script Utilities', () => {
     });
   });
 });
-
-// Minimal Jest setup if not already present globally by a test runner
-if (typeof describe === 'undefined') {
-    global.describe = (name, fn) => fn();
-    global.test = (name, fn) => fn();
-    global.expect = (val) => ({
-        toBe: (exp) => { if (val !== exp) throw new Error(`Expected ${val} to be ${exp}`); },
-        toEqual: (exp) => { if (JSON.stringify(val) !== JSON.stringify(exp)) throw new Error(`Expected ${JSON.stringify(val)} to equal ${JSON.stringify(exp)}`); },
-        toHaveProperty: (prop) => { if (typeof val !== 'object' || !val.hasOwnProperty(prop)) throw new Error(`Expected ${val} to have property ${prop}`);},
-        // Add more matchers if needed by tests
-    });
-    (global as any).beforeEach = (fn: Function) => fn();
-    (global as any).afterAll = (fn: Function) => fn();
-}

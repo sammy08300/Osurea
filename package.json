@@ -24,9 +24,9 @@
     "start": "npx http-server ./public -o",
     "dev": "npm-run-all --parallel watch:css watch:ts serve:public",
     "test": "jest",
-    "build": "npm run build:css && tsc build.ts --target ES2020 --module commonjs --resolveJsonModule --esModuleInterop --skipLibCheck && mv build.js build.cjs && node build.cjs && rm build.cjs",
-    "build:full": "npm run build:css && tsc build.ts --target ES2020 --module commonjs --resolveJsonModule --esModuleInterop --skipLibCheck && mv build.js build.cjs && node build.cjs && rm build.cjs && tsc verify-build.ts --target ES2020 --module commonjs --resolveJsonModule --esModuleInterop --skipLibCheck && mv verify-build.js verify.cjs && node verify.cjs && rm verify.cjs",
-    "build:prod": "cross-env NODE_ENV=production npm run build:css && tsc build.ts --target ES2020 --module commonjs --resolveJsonModule --esModuleInterop --skipLibCheck && mv build.js build.cjs && node build.cjs && rm build.cjs",
+    "build": "npm run build:css && tsc build.ts --target ES2020 --module commonjs --resolveJsonModule --esModuleInterop --skipLibCheck && move build.js build.cjs && node build.cjs && del build.cjs",
+    "build:full": "npm run build:css && tsc build.ts --target ES2020 --module commonjs --resolveJsonModule --esModuleInterop --skipLibCheck && move build.js build.cjs && node build.cjs && del build.cjs && tsc verify-build.ts --target ES2020 --module commonjs --resolveJsonModule --esModuleInterop --skipLibCheck && move verify-build.js verify.cjs && node verify.cjs && del verify.cjs",
+    "build:prod": "cross-env NODE_ENV=production npm run build:css && tsc build.ts --target ES2020 --module commonjs --resolveJsonModule --esModuleInterop --skipLibCheck && move build.js build.cjs && node build.cjs && del build.cjs",
     "build:css": "postcss assets/css/main.css -o assets/css/styles.css",
     "watch:css": "postcss assets/css/main.css -o assets/css/styles.css --watch",
     "watch:ts": "npx tsc --watch",
@@ -34,7 +34,7 @@
     "analyze": "echo \"Bundle analysis would go here - consider adding webpack-bundle-analyzer\"",
     "perf:test": "echo \"Performance testing - consider adding lighthouse-ci\"",
     "optimize": "npm run build:prod && echo \"Optimization complete\"",
-    "verify:build": "tsc verify-build.ts --target ES2020 --module commonjs --resolveJsonModule --esModuleInterop --skipLibCheck && mv verify-build.js verify.cjs && node verify.cjs && rm verify.cjs"
+    "verify:build": "tsc verify-build.ts --target ES2020 --module commonjs --resolveJsonModule --esModuleInterop --skipLibCheck && move verify-build.js verify.cjs && node verify.cjs && del verify.cjs"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
