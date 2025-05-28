@@ -2,7 +2,7 @@
  * Utility functions for handling constraints on area dimensions and position
  */
 
-import { isValidNumber, clamp } from './number-utils';
+import { isValidNumber, clamp } from './number-utils.js';
 
 // Minimum thresholds for the dimensions of the active area
 const MIN_AREA_DIMENSION = 10; // mm

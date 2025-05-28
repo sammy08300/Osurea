@@ -5,8 +5,8 @@
 
 // Assume Utils is an external library for now, or has a .d.ts file elsewhere.
 // For this exercise, we'll treat its methods as `any` if not specifically typed.
-import { Utils as ImportedUtils } from '../utils/index';
-import { dependencyManager } from './dependency-manager';
+import { Utils as ImportedUtils } from '../utils/index.js';
+import { dependencyManager } from './dependency-manager.js';
 
 // Use 'as any' for Utils if its structure is complex and not defined.
 const Utils: any = ImportedUtils;
@@ -241,4 +241,4 @@ export function registerLegacyGlobals(): void {
     if (typeof (window as any).updateDisplayWithoutRatio !== 'function') {
         (window as any).updateDisplayWithoutRatio = () => displayManager.updateWithoutRatio();
     }
-} 
+}

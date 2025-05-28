@@ -1,10 +1,10 @@
 // favorite-rendering.ts - Module de création et rendu des éléments de favoris
-import { translateWithFallback } from '../../../js/i18n-init';
-import { getFavorites } from './favorite-storage';
-import { sortFavorites as favoriteSortFavorites } from './favorite-sort'; // Renamed for clarity
-import { FavoritesActions } from './favorite-actions';
-import { FavoritesInit } from './favorite-init';
-import { FavoriteObject } from './types'; // Import types
+import { translateWithFallback } from '../../../js/i18n-init.js';
+import { getFavorites } from './favorite-storage.js';
+import { sortFavorites as favoriteSortFavorites } from './favorite-sort.js'; // Renamed for clarity
+import { FavoritesActions } from './favorite-actions.js';
+import { FavoritesInit } from './favorite-init.js';
+import { FavoriteObject } from './types.js'; // Import types
 
 /**
  * Formate un nombre avec un certain nombre de décimales
@@ -50,7 +50,7 @@ export const FavoritesRendering: FavoritesRenderingModule = {
 
         if (favorites.length === 0) {
             const existingCards = FavoritesInit.favoritesList.querySelectorAll<HTMLElement>('.favorite-item');
-            existingCards.forEach(card => card.remove());
+            existingCards.forEach((card: HTMLElement) => card.remove());
             
             if (FavoritesInit.favoritesPlaceholder) {
                 FavoritesInit.favoritesPlaceholder.classList.remove('hidden');
@@ -65,14 +65,14 @@ export const FavoritesRendering: FavoritesRenderingModule = {
             (FavoritesInit.favoritesPlaceholder as HTMLElement).style.display = 'none';
         }
         
-        const sortedFavorites = favoriteSortFavorites(favorites, FavoritesInit.currentSortCriteria);
+        const sortedFavorites: FavoriteObject[] = favoriteSortFavorites(favorites, FavoritesInit.currentSortCriteria);
         
         const existingCards = FavoritesInit.favoritesList.querySelectorAll<HTMLElement>('.favorite-item');
-        existingCards.forEach(card => card.remove());
+        existingCards.forEach((card: HTMLElement) => card.remove());
         
-        const lastAddedId = Math.max(...sortedFavorites.map(f => parseInt(f.id as string))); // Assuming id is string or number
+        const lastAddedId = Math.max(...sortedFavorites.map((f: FavoriteObject) => parseInt(f.id as string))); // Assuming id is string or number
         
-        sortedFavorites.forEach(favorite => {
+        sortedFavorites.forEach((favorite: FavoriteObject) => {
             const cardElement = this.createFavoriteElement(favorite);
             if (!isInitialLoad && favorite.id == lastAddedId) { // Use == for potential string/number comparison
                 cardElement.style.opacity = '0';
@@ -179,7 +179,7 @@ export const FavoritesRendering: FavoritesRenderingModule = {
             }
             e.stopPropagation();
             currentTarget.classList.add('card-click-effect');
-            favorite._originalTitle = title; // Assuming _originalTitle is a dynamic property
+            (favorite as any)._originalTitle = title; // Assuming _originalTitle is a dynamic property
             
             setTimeout(() => {
                 currentTarget.classList.remove('card-click-effect');

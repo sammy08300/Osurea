@@ -1,5 +1,5 @@
-import localeManager from '../locales/index'; // Remove extension - will be resolved by TS
-import { detectAndApplyBrowserLanguage } from './browser-language-detector';
+import localeManager from '../locales/index.js'; // Remove extension - will be resolved by TS
+import { detectAndApplyBrowserLanguage } from './browser-language-detector.js';
 
 // Define types for global objects if they are expected
 interface LocaleManager {

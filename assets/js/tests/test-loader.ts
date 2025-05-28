@@ -6,7 +6,7 @@
 // Define expected module structures and their functions
 // These are simplified; more detailed types would come from the modules themselves if they were TS already.
 
-import { FavoriteObject } from '../components/favorites/types';
+import { FavoriteObject } from '../components/favorites/types.js';
 
 interface UtilsModule {
     Utils: any; // Replace 'any' with a more specific type if Utils structure is known
@@ -97,7 +97,7 @@ declare global {
 async function initializeTestEnvironment(): Promise<boolean> {
     try {
         // Load core utilities
-        const utilsModule = await import('../utils') as UtilsModule;
+        const utilsModule = await import('../utils/index.js') as UtilsModule;
         window.Utils = utilsModule.Utils;
         window.DOM = utilsModule.DOM;
         window.Numbers = utilsModule.Numbers;
@@ -130,11 +130,11 @@ async function initializeTestEnvironment(): Promise<boolean> {
 
         // Load localization
         if (!window.localeManager) {
-            const localeModule = await import('../../locales/index') as LocaleModule;
+            const localeModule = await import('../../locales/index.js') as LocaleModule;
             window.localeManager = localeModule.default;
             
             try {
-                const i18nModule = await import('../i18n-init') as I18nInitModule;
+                const i18nModule = await import('../i18n-init.js') as I18nInitModule;
                 if (i18nModule.translateWithFallback) {
                     window.translateWithFallback = i18nModule.translateWithFallback;
                 }
@@ -143,12 +143,12 @@ async function initializeTestEnvironment(): Promise<boolean> {
             }
         }
         
-        const storageModule = await import('../utils/storage') as StorageModule;
+        const storageModule = await import('../utils/storage.js') as StorageModule;
         window.StorageManager = storageModule.StorageManager;
         
-        const testModule = await import('./run-all-tests') as TestRunnerModule;
-        const dragDebugModule = await import('./drag-debug') as DragDebugModule;
-        const dimensionsModule = await import('./dimensions-test') as DimensionsTestModule;
+        const testModule = await import('./run-all-tests.js') as TestRunnerModule;
+        const dragDebugModule = await import('./drag-debug.js') as DragDebugModule;
+        const dimensionsModule = await import('./dimensions-test.js') as DimensionsTestModule;
         
         window.OsureaTest = {
             runAll: testModule.runAllTests,

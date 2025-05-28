@@ -1,36 +1,42 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "ESNext",
-    "moduleResolution": "node",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "strict": true,
-    "rootDir": "./assets/js",
-    "outDir": "./public/assets/js",
+    "rootDir": ".", // Changed to root of the project
+    "outDir": "./public", // Changed to public
     "sourceMap": true,
-    "allowJs": true,
+    "allowJs": true, // Kept for now, but consider setting to false later
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true, // Added
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "moduleDetection": "force"
+    "moduleDetection": "force",
+    "baseUrl": ".", // Optional: helps with path aliases if you use them
+    "paths": { // Optional: example for path aliases
+      "@/*": ["assets/js/*"]
+    }
   },
+  "ts-node": { // Added for ts-node ESM support
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  },
+  // build.ts and verify-build.ts are compiled separately now
   "include": [
-    "assets/js/core/**/*.ts",
-    "assets/js/utils/**/*.ts",
-    "assets/js/components/area/**/*.ts",
-    "assets/js/components/tablet/**/*.ts",
-    "assets/js/components/ui/**/*.ts",
-    "assets/js/components/favorites/**/*.ts",
-    "assets/js/init/**/*.ts",
-    "assets/js/tests/**/*.ts",
-    "assets/js/ui/*.ts",
-    "assets/js/*.ts"
+    "assets/js/**/*.ts",
+    "assets/locales/**/*.ts",
+    // "build.ts", // Removed
+    "service-worker.ts"
+    // "verify-build.ts" // Removed
+    // No need for more specific paths like "assets/js/ui/*.ts" if "assets/js/**/*.ts" is used.
   ],
   "exclude": [
-    "node_modules", "./public", "./compiled_ts",
-    "build.js", "service-worker.js", "assets/js/utils/README.md"
-  ],
-  "scripts": {
-    "build": "tsc"
-  }
+    "node_modules",
+    "./public", // Exclude the output directory
+    "./compiled_ts",
+    "assets/js/utils/README.md"
+    // Removed build.js, service-worker.js from exclude
+  ]
 }

@@ -3,8 +3,8 @@
  * Handles sorting functionality for favorites
  */
 
-import { FAVORITES_CONFIG } from './favorites-config';
-import { FavoriteObject, SortCriteria } from './types'; // Import types
+import { FAVORITES_CONFIG } from './favorites-config.js';
+import { FavoriteObject, SortCriteria } from './types.js'; // Import types
 
 /**
  * Sort favorites based on specified criteria

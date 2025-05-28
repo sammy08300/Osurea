@@ -3,10 +3,10 @@
  * Common utility functions for the favorites component
  */
 
-import { FAVORITES_CONFIG } from './favorites-config';
-import { translateWithFallback } from '../../../js/i18n-init';
-import localeManager from '../../../locales'; // Assuming localeManager has types or is any
-import { FavoriteObject, NotificationType } from './types'; // Import types
+import { FAVORITES_CONFIG } from './favorites-config.js';
+import { translateWithFallback } from '../../../js/i18n-init.js';
+import localeManager from '../../../locales/index.js'; // Assuming localeManager has types or is any
+import { FavoriteObject, NotificationType } from './types.js'; // Import types
 
 // Define types for global objects if not already typed elsewhere
 declare global {

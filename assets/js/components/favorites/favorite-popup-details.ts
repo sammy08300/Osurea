@@ -1,8 +1,8 @@
 // favorite-popup-details.ts - Module de gestion des popups détaillées
-import { translateWithFallback } from '../../../js/i18n-init';
-import { getFavoriteById } from './favorite-storage';
-import { FavoriteObject } from './types'; // Import types
-import { FavoritesInit } from './favorite-init'; // Import FavoritesInit for type checking
+import { translateWithFallback } from '../../../js/i18n-init.js';
+import { getFavoriteById } from './favorite-storage.js';
+import { FavoriteObject } from './types.js'; // Import types
+import { FavoritesInit } from './favorite-init.js'; // Import FavoritesInit for type checking
 
 // Define a type for the actionsHandler for better type safety
 interface ActionsHandler {

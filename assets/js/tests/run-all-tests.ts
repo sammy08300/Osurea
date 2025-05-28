@@ -54,23 +54,23 @@ export async function runAllTests(): Promise<AllTestsResult | null> {
     
     try {
         console.log('📦 Utility tests...');
-        const utilsModule = await import('./quick-test'); // .ts is implicit
+        const utilsModule = await import('./quick-test.js'); // .ts is implicit
         results.utils = utilsModule.runQuickTest();
         
         console.log('\n🌍 Translation tests...');
-        const translationsModule = await import('./translation-test');
+        const translationsModule = await import('./translation-test.js');
         results.translations = translationsModule.testTranslations();
         
         console.log('\n💾 Storage tests...');
-        const storageModule = await import('./storage.test');
+        const storageModule = await import('./storage.test.js');
         results.storage = storageModule.runStorageTests();
         
         console.log('\n🎨 Visualization tests...');
-        const visualizationModule = await import('./visualization-test');
+        const visualizationModule = await import('./visualization-test.js');
         results.visualization = visualizationModule.runVisualizationTest();
         
         console.log('\n🎯 Dimensions console commands tests...');
-        const dimensionsModule = await import('./dimensions-test');
+        const dimensionsModule = await import('./dimensions-test.js');
         results.dimensions = dimensionsModule.testDimensionsCommands();
         
         // Calculate totals more safely
@@ -116,11 +116,11 @@ export async function runCriticalTests(): Promise<CriticalTestResult | null> {
     console.log('🚨 Critical tests only...\n');
     try {
         console.log('🌍 Translation tests...');
-        const translationsModule = await import('./translation-test');
+        const translationsModule = await import('./translation-test.js');
         const translationResults = translationsModule.testTranslations();
         
         console.log('\n💾 Storage tests...');
-        const storageModule = await import('./storage.test');
+        const storageModule = await import('./storage.test.js');
         const storageResults = storageModule.runStorageTests();
         
         const totalPassed = (translationResults?.passed || 0) + (storageResults?.passed || 0);
@@ -144,7 +144,7 @@ export async function runCriticalTests(): Promise<CriticalTestResult | null> {
 export async function quickDiagnosis(): Promise<void> {
     console.log('🔍 Quick diagnosis...\n');
     try {
-        const translationsModule = await import('./translation-test');
+        const translationsModule = await import('./translation-test.js');
         // Assuming diagnoseTranslationIssues doesn't return a value or its return is not used here
         await translationsModule.diagnoseTranslationIssues(); 
         

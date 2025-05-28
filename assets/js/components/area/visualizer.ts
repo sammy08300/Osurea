@@ -3,10 +3,10 @@
  */
 
 // Import ContextMenu if it's in a separate module (assuming it will be after conversion)
-import ContextMenu from './contextMenu'; 
-import { Utils } from '../../utils'; // Import Utils
-import { appState } from '../../app'; // Import appState
-import { PreferencesManager } from '../../utils/preferences'; // Import PreferencesManager
+import ContextMenu from './contextMenu.js'; 
+import { Utils } from '../../utils/index.js'; // Import Utils
+import { appState } from '../../app.js'; // Import appState
+import { PreferencesManager } from '../../utils/preferences.js'; // Import PreferencesManager
 
 // Define types for global functions and variables if they exist, or ensure they are imported/defined.
 // These are placeholders and should be adjusted based on actual definitions.

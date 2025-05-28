@@ -3,9 +3,9 @@
  * Handles data persistence and retrieval for favorites
  */
 
-import { FavoriteObject } from './types';
-import { FAVORITES_CONFIG } from './favorites-config';
-import { logError } from './favorites-utils';
+import { FavoriteObject } from './types.js';
+import { FAVORITES_CONFIG } from './favorites-config.js';
+import { logError } from './favorites-utils.js';
 
 interface FavoriteItem {
     id: string | number;
@@ -248,12 +248,12 @@ const StorageManager = {
 
 // Global export for StorageManager related functions
 export function getFavorites(): FavoriteObject[] {
-    return StorageManager.getFavorites();
+    return StorageManager.getFavorites() as FavoriteObject[]; // Cast to FavoriteObject[]
 }
 
 export function getFavoriteById(id: string | number): FavoriteObject | null {
     const result = StorageManager.getFavoriteById(id);
-    return result; 
+    return result as FavoriteObject | null; // Cast to FavoriteObject | null
 }
 
 export function addFavorite(favorite: Omit<FavoriteObject, 'id' | 'createdAt'>): FavoriteObject | null {
@@ -264,7 +264,7 @@ export function addFavorite(favorite: Omit<FavoriteObject, 'id' | 'createdAt'>):
         height: favorite.height ?? 0,
     };
     const result = StorageManager.addFavorite(favoriteForItem);
-    return result;
+    return result as FavoriteObject | null; // Cast to FavoriteObject | null
 }
 
 export function updateFavorite(id: string | number, data: Partial<FavoriteObject>): boolean {

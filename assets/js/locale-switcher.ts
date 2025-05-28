@@ -1,4 +1,4 @@
-import localeManager from '../locales/index'; // .ts extension will be resolved
+import localeManager from '../locales/index.js'; // .ts extension will be resolved
 
 // Define types for better code clarity and safety
 interface LocaleSwitcherElements {
@@ -16,11 +16,11 @@ interface EventListenersMap {
 }
 
 // Assuming localeManager has a more specific type if available, else use 'any' for now
-interface LocaleManager {
+interface LocaleManagerInterface { // Renamed to avoid conflict with imported instance
     getCurrentLocale: () => string | null;
     getAvailableLocales: () => string[];
     translate: (key: string) => string;
-    setLocale: (locale: string) => Promise<void> | void; // Assuming setLocale might be async
+    setLocale: (locale: string) => Promise<boolean>; // Updated signature
 }
 
 class LocaleSwitcher {
@@ -75,7 +75,7 @@ class LocaleSwitcher {
         }
         
         try {
-            const currentLocale = (localeManager as LocaleManager).getCurrentLocale();
+            const currentLocale = (localeManager as LocaleManagerInterface).getCurrentLocale();
             if (currentLocale) {
                 const { selector } = this.getElements();
                 
@@ -106,8 +106,8 @@ class LocaleSwitcher {
         
         dropdown.innerHTML = '';
         const fragment = document.createDocumentFragment();
-        const currentLocale = (localeManager as LocaleManager).getCurrentLocale();
-        const availableLocales = (localeManager as LocaleManager).getAvailableLocales();
+        const currentLocale = (localeManager as LocaleManagerInterface).getCurrentLocale();
+        const availableLocales = (localeManager as LocaleManagerInterface).getAvailableLocales();
         
         if (!availableLocales?.length) {
             console.warn('LocaleSwitcher: No available languages');
@@ -116,7 +116,7 @@ class LocaleSwitcher {
         
         const getLocaleName = (locale: string): string => {
             try {
-                return (localeManager as LocaleManager).translate(`language_${locale}`) || locale;
+                return (localeManager as LocaleManagerInterface).translate(`language_${locale}`) || locale;
             } catch { return locale; }
         };
         
@@ -165,7 +165,7 @@ class LocaleSwitcher {
             const locale = option.getAttribute('data-locale');
             if (locale) {
                 try {
-                    (localeManager as LocaleManager).setLocale(locale);
+                    (localeManager as LocaleManagerInterface).setLocale(locale);
                     this.updateSelectedLocale();
                     dropdown.classList.add('hidden');
                     button.setAttribute('aria-expanded', 'false');
@@ -204,7 +204,7 @@ class LocaleSwitcher {
     
     updateSelectedLocale(): void {
         const { selectedText } = this.getElements();
-        const currentLocale = (localeManager as LocaleManager).getCurrentLocale();
+        const currentLocale = (localeManager as LocaleManagerInterface).getCurrentLocale();
         
         if (!currentLocale) {
             console.warn('LocaleSwitcher: No current language set');
@@ -212,7 +212,7 @@ class LocaleSwitcher {
         }
         if (selectedText) {
             try {
-                selectedText.textContent = (localeManager as LocaleManager).translate(`language_${currentLocale}`) || currentLocale;
+                selectedText.textContent = (localeManager as LocaleManagerInterface).translate(`language_${currentLocale}`) || currentLocale;
             } catch { selectedText.textContent = currentLocale; }
         }
         

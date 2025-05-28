@@ -1,7 +1,7 @@
 /**
  * RecapManager module for handling the collapsible recap menu
  */
-import { DOMUtils } from '../utils/dom-utils';
+import { DOMUtils } from '../utils/dom-utils.js';
 
 interface RecapElements {
     card: HTMLElement | null;

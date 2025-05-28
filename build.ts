@@ -1,19 +1,30 @@
-const fs = require('fs').promises;
-const fsSync = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
+import * as fs from 'fs/promises';
+import * as fsSync from 'fs';
+import * as path from 'path';
+import { execSync } from 'child_process';
 
-// Configuration
-const CONFIG = {
+interface OptimizationConfig {
+  minifyHTML: boolean;
+  compressAssets: boolean;
+  generateSourceMaps: boolean;
+}
+
+interface BuildConfig {
+  publicDir: string;
+  rootFiles: string[];
+  dirsToCopy: string[];
+  optimization: OptimizationConfig;
+}
+
+const CONFIG: BuildConfig = {
   publicDir: 'public',
   rootFiles: [
     'index.html',
     '404.html',
-    'service-worker.js',
+    // 'service-worker.js', // Removed, will be compiled by tsc to public/service-worker.js
     'manifest.webmanifest'
   ],
   dirsToCopy: ['assets', 'data'],
-  // Performance optimization settings
   optimization: {
     minifyHTML: process.env.NODE_ENV === 'production',
     compressAssets: process.env.NODE_ENV === 'production',
@@ -21,20 +32,18 @@ const CONFIG = {
   }
 };
 
-// Create directory if it doesn't exist
-async function ensureDir(dirPath) {
+async function ensureDir(dirPath: string): Promise<void> {
   try {
     await fs.mkdir(dirPath, { recursive: true });
     console.log(`Created directory ${dirPath}`);
-  } catch (err) {
+  } catch (err: any) {
     if (err.code !== 'EEXIST') {
       throw err;
     }
   }
 }
 
-// Copy a single file
-async function copyFile(src, dest) {
+async function copyFile(src: string, dest: string): Promise<void> {
   try {
     await fs.copyFile(src, dest);
     console.log(`- Copied ${src} to ${dest}`);
@@ -43,8 +52,7 @@ async function copyFile(src, dest) {
   }
 }
 
-// Copy all root files to public directory
-async function copyRootFiles() {
+async function copyRootFiles(): Promise<void> {
   console.log("Copying root files to public...");
   
   const copyPromises = CONFIG.rootFiles.map(file => {
@@ -54,25 +62,17 @@ async function copyRootFiles() {
   await Promise.allSettled(copyPromises);
 }
 
-// Recursively copy directory
-async function copyDir(src, dest) {
+async function copyDir(src: string, dest: string): Promise<void> {
   try {
-    // Create destination directory
     await ensureDir(dest);
-
-    // Read source directory
     const entries = await fs.readdir(src, { withFileTypes: true });
 
-    // Process each entry
-    const copyPromises = entries.map(async entry => {
+    const copyPromises = entries.map(async (entry: fsSync.Dirent) => {
       const srcPath = path.join(src, entry.name);
       const destPath = path.join(dest, entry.name);
 
-      // If we are currently copying the root 'assets' directory, and the entry is 'js', we need to
-      // ensure we still copy over JavaScript files that might not be compiled from TypeScript
       if (src === 'assets' && entry.name === 'js' && entry.isDirectory()) {
-        // Instead of skipping, we'll copy .js files that aren't compiled from .ts
-        await ensureDir(destPath); // Ensure the js directory exists
+        await ensureDir(destPath);
         await copyJSFiles(srcPath, destPath);
         return;
       }
@@ -90,12 +90,10 @@ async function copyDir(src, dest) {
   }
 }
 
-// Copy JS files that aren't compiled from TS
-async function copyJSFiles(srcDir, destDir) {
+async function copyJSFiles(srcDir: string, destDir: string): Promise<void> {
   console.log(`Copying JS files from ${srcDir} to ${destDir}...`);
   try {
-    // Recursively find all files
-    const copyJSFilesRecursive = async (src, dest) => {
+    const copyJSFilesRecursive = async (src: string, dest: string): Promise<void> => {
       const entries = await fs.readdir(src, { withFileTypes: true });
       
       for (const entry of entries) {
@@ -106,7 +104,6 @@ async function copyJSFiles(srcDir, destDir) {
           await ensureDir(destPath);
           await copyJSFilesRecursive(srcPath, destPath);
         } else if (entry.name.endsWith('.js') && !srcPath.includes('node_modules')) {
-          // Skip if there's a corresponding .ts file (which would be compiled)
           const tsPath = srcPath.replace(/\.js$/, '.ts');
           const tsExists = await fs.access(tsPath).then(() => true).catch(() => false);
           
@@ -124,19 +121,17 @@ async function copyJSFiles(srcDir, destDir) {
   }
 }
 
-// Optimize HTML files (basic minification)
-async function optimizeHTML(filePath) {
+async function optimizeHTML(filePath: string): Promise<void> {
   if (!CONFIG.optimization.minifyHTML) return;
   
   try {
     let content = await fs.readFile(filePath, 'utf8');
     
-    // Basic HTML minification
     content = content
-      .replace(/\s+/g, ' ') // Replace multiple spaces with single space
-      .replace(/>\s+</g, '><') // Remove spaces between tags
-      .replace(/\s+>/g, '>') // Remove spaces before closing tags
-      .replace(/<!--[\s\S]*?-->/g, '') // Remove comments
+      .replace(/\s+/g, ' ')
+      .replace(/>\s+</g, '><')
+      .replace(/\s+>/g, '>')
+      .replace(/<!--[\s\S]*?-->/g, '')
       .trim();
     
     await fs.writeFile(filePath, content);
@@ -146,10 +141,19 @@ async function optimizeHTML(filePath) {
   }
 }
 
-// Generate performance report
-function generatePerformanceReport() {
-  const report = {
-    buildTime: Date.now(),
+interface PerformanceReport {
+  buildTime: number;
+  environment: string;
+  optimizations: OptimizationConfig;
+  files: {
+    copied: number;
+    optimized: number;
+  };
+}
+
+export function generatePerformanceReport(): PerformanceReport {
+  const report: PerformanceReport = {
+    buildTime: Date.now(), // This will be updated at the end of the build
     environment: process.env.NODE_ENV || 'development',
     optimizations: CONFIG.optimization,
     files: {
@@ -161,15 +165,14 @@ function generatePerformanceReport() {
   return report;
 }
 
-// Recursively delete a directory
-async function removeDir(dirPath) {
+async function removeDir(dirPath: string): Promise<void> {
   try {
     const exists = await fs.access(dirPath).then(() => true).catch(() => false);
     if (!exists) return;
 
     const entries = await fs.readdir(dirPath, { withFileTypes: true });
     
-    await Promise.all(entries.map(async entry => {
+    await Promise.all(entries.map(async (entry: fsSync.Dirent) => {
       const fullPath = path.join(dirPath, entry.name);
       return entry.isDirectory() ? removeDir(fullPath) : fs.unlink(fullPath);
     }));
@@ -181,25 +184,43 @@ async function removeDir(dirPath) {
   }
 }
 
-// Clean output directory
-async function cleanOutputDirectory() {
-  console.log(`Cleaning output directory: ${CONFIG.publicDir}/assets/js`);
-  await removeDir(path.join(CONFIG.publicDir, 'assets', 'js'));
-  console.log('Output directory cleaned');
+async function cleanOutputDirectory(): Promise<void> {
+  console.log(`Cleaning specific parts of output directory: ${CONFIG.publicDir}`);
+  const pathsToRemove = [
+    path.join(CONFIG.publicDir, 'assets', 'js'),
+    path.join(CONFIG.publicDir, 'assets', 'locales'),
+    path.join(CONFIG.publicDir, 'service-worker.js'),
+    path.join(CONFIG.publicDir, 'build.js'),
+    path.join(CONFIG.publicDir, 'verify-build.js')
+    // Add any other specific files/dirs tsc will create at the root of publicDir
+  ];
+  for (const itemPath of pathsToRemove) {
+    if (fsSync.existsSync(itemPath)) { // Check if path exists before removing
+      if ((await fs.lstat(itemPath)).isDirectory()) {
+        await removeDir(itemPath);
+      } else {
+        await fs.unlink(itemPath);
+        console.log(`Removed file ${itemPath}`);
+      }
+    }
+  }
+  console.log('Specific output paths cleaned.');
 }
 
-// Compile TypeScript files
-async function compileTypeScript() {
+async function compileTypeScript(): Promise<void> {
   console.log('Compiling TypeScript files...');
   try {
-    // Execute the TypeScript compiler
-    execSync('npx tsc', { stdio: 'inherit' }); // stdio: 'inherit' will show tsc output in the console
+    execSync('npx tsc', { stdio: 'inherit' });
     console.log('TypeScript compilation successful.');
     
-    // Verify compilation success by checking if key files exist
-    const keyFiles = [
+    const keyFiles: string[] = [
       path.join(CONFIG.publicDir, 'assets', 'js', 'app.js'),
-      path.join(CONFIG.publicDir, 'assets', 'js', 'i18n-init.js')
+      path.join(CONFIG.publicDir, 'assets', 'js', 'i18n-init.js'), // Assuming this is a key file
+      path.join(CONFIG.publicDir, 'service-worker.js'),
+      path.join(CONFIG.publicDir, 'assets', 'locales', 'en.js'), // Example locale
+      path.join(CONFIG.publicDir, 'assets', 'locales', 'es.js'), // Example locale
+      path.join(CONFIG.publicDir, 'assets', 'locales', 'fr.js'), // Example locale
+      path.join(CONFIG.publicDir, 'assets', 'locales', 'index.js') // Main locale index
     ];
     
     for (const file of keyFiles) {
@@ -209,38 +230,31 @@ async function compileTypeScript() {
     }
   } catch (error) {
     console.error('TypeScript compilation failed:', error);
-    // Propagate the error to stop the build process if compilation fails
     throw new Error('TypeScript compilation failed.');
   }
 }
 
-// Main build function
-async function build() {
+async function build(): Promise<void> {
   const startTime = Date.now();
   const performanceReport = generatePerformanceReport();
   
   try {
     console.log(`Starting build in ${performanceReport.environment} mode...`);
     
-    // Ensure public directory exists
     await ensureDir(CONFIG.publicDir);
-    await ensureDir(path.join(CONFIG.publicDir, 'assets')); // Ensure public/assets exists
+    await ensureDir(path.join(CONFIG.publicDir, 'assets'));
     
-    // Clean output directory before compiling
     await cleanOutputDirectory();
-    
-    // Recreate js directory
-    await ensureDir(path.join(CONFIG.publicDir, 'assets', 'js')); // Ensure public/assets/js exists for tsc output
+    // Ensure directories that tsc will output to are present
+    await ensureDir(path.join(CONFIG.publicDir, 'assets', 'js'));
+    await ensureDir(path.join(CONFIG.publicDir, 'assets', 'locales'));
+    // service-worker.js will be created by tsc in publicDir directly.
 
-    // Compile TypeScript (tsc will output directly to public/assets/js as per tsconfig.json)
     await compileTypeScript(); 
     
-    // Copy root files
     await copyRootFiles();
     performanceReport.files.copied += CONFIG.rootFiles.length;
     
-    // Copy directories (dirsToCopy includes 'assets')
-    // The modified copyDir above will skip 'assets/js'
     for (const dir of CONFIG.dirsToCopy) {
       if (fsSync.existsSync(dir)) {
         console.log(`Copying ${dir} directory...`);
@@ -248,7 +262,6 @@ async function build() {
       }
     }
     
-    // Optimize HTML files if in production
     if (CONFIG.optimization.minifyHTML) {
       console.log('Optimizing HTML files...');
       for (const file of CONFIG.rootFiles.filter(f => f.endsWith('.html'))) {
@@ -257,8 +270,9 @@ async function build() {
       }
     }
     
-    const buildTime = Date.now() - startTime;
-    console.log(`\nBuild completed successfully in ${buildTime}ms!`);
+    const endTime = Date.now();
+    performanceReport.buildTime = endTime - startTime; // Update build time
+    console.log(`\nBuild completed successfully in ${performanceReport.buildTime}ms!`);
     console.log(`Files copied: ${performanceReport.files.copied}`);
     console.log(`Files optimized: ${performanceReport.files.optimized}`);
     
@@ -268,5 +282,4 @@ async function build() {
   }
 }
 
-// Run the build
-build(); 
+build();

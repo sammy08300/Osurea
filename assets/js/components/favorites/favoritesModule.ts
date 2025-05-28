@@ -5,7 +5,7 @@
 
 import { FavoritesUI } from './favoritesindex.js'; // Ajouter l'extension .js explicitement
 import { logError } from './favorites-utils.js'; // Ajouter l'extension .js explicitement
-import { FavoritesUIInterface } from './types'; // Import the interface
+import { FavoritesUIInterface } from './types.js'; // Import the interface
 
 // Extend the Window interface to include FavoritesUI
 declare global {

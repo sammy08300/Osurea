@@ -1,12 +1,12 @@
 /**
  * UI Manager module for handling UI components and events
  */
-import { FormManager } from './form-manager';
-import { NumberUtils } from '../utils/number-utils';
-import { DOMUtils } from '../utils/dom-utils';
-import { FavoritesUI } from '../components/favorites/favoritesindex'; // Assuming .ts extension
-import { translateWithFallback } from '../i18n-init';
-import { FavoriteObject } from '../components/favorites/types'; // Import FavoriteObject
+import { FormManager } from './form-manager.js';
+import { NumberUtils } from '../utils/number-utils.js';
+import { DOMUtils } from '../utils/dom-utils.js';
+import { FavoritesUI } from '../components/favorites/favoritesindex.js'; // Assuming .ts extension
+import { translateWithFallback } from '../i18n-init.js';
+import { FavoriteObject } from '../components/favorites/types.js'; // Import FavoriteObject
 
 // Define types for global objects/functions if they are expected
 declare function updateDisplay(): void;

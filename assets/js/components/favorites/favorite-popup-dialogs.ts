@@ -1,5 +1,5 @@
 // favorite-popup-dialogs.ts - Module pour les dialogues de création et suppression
-import { translateWithFallback } from '../../../js/i18n-init';
+import { translateWithFallback } from '../../../js/i18n-init.js';
 
 interface CommentData {
     title: string;

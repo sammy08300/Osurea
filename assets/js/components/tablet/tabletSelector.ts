@@ -1,6 +1,6 @@
-import { translateWithFallback } from '../../i18n-init';
-import { adaptAreaToNewTablet } from '../../utils/constraintHelpers';
-import { appState } from '../../app'; // Import appState
+import { translateWithFallback } from '../../i18n-init.js';
+import { adaptAreaToNewTablet } from '../../utils/constraintHelpers.js';
+import { appState } from '../../app.js'; // Import appState
 
 // Define interfaces for the data structures
 export interface Tablet {

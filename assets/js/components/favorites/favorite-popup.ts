@@ -1,7 +1,7 @@
 // favorite-popup.ts - Unified popup and dialog management module
-import { FavoritesDialogs } from './favorite-popup-dialogs';
-import { FavoritesDetailsPopup } from './favorite-popup-details';
-import { FavoriteObject } from './types'; // Import FavoriteObject
+import { FavoritesDialogs } from './favorite-popup-dialogs.js';
+import { FavoritesDetailsPopup } from './favorite-popup-details.js';
+import { FavoriteObject } from './types.js'; // Import FavoriteObject
 
 // Define a type for the actionsHandler for better type safety, if not already defined
 // This is a simplified version, adjust based on actual FavoritesActions structure

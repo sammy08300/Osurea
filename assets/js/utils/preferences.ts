@@ -2,7 +2,7 @@
  * User preferences management module 
  * Automatically saves the application state with LocalStorage
  */
-import { parseFloatSafe, formatNumber, isValidNumber } from './number-utils';
+import { parseFloatSafe, formatNumber, isValidNumber } from './number-utils.js';
 
 // Assume StorageManager and TabletSelector will be typed eventually or handled via 'any'
 declare var StorageManager: any; // Placeholder for actual StorageManager type

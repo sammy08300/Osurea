@@ -3,28 +3,28 @@
  */
 
 // Import core modules
-import { dependencyManager } from './core/dependency-manager';
-import { displayManager } from './core/display-manager';
-import { notificationManager } from './core/notification-manager';
-import { initLegacyCompatibility } from './core/legacy-compatibility';
-import { Utils, DOM, Numbers, Performance } from './utils/index'; // Ensure Utils is imported
-import { StorageManager } from './utils/storage';
-import { PreferencesManager } from './utils/preferences';
+import { dependencyManager } from './core/dependency-manager.js';
+import { displayManager } from './core/display-manager.js';
+import { notificationManager } from './core/notification-manager.js';
+import { initLegacyCompatibility } from './core/legacy-compatibility.js';
+import { Utils, DOM, Numbers, Performance } from './utils/index.js'; // Ensure Utils is imported
+import { StorageManager } from './utils/storage.js';
+import { PreferencesManager } from './utils/preferences.js';
 
 // Import performance optimization modules
-import { LazyComponent } from './utils/lazy-component-loader';
-import { bundleOptimizer } from './core/bundle-optimizer';
-import { setupEnhancedLazyLoading } from './utils/lazyLoadImages';
+import { LazyComponent } from './utils/lazy-component-loader.js';
+import { bundleOptimizer } from './core/bundle-optimizer.js';
+import { setupEnhancedLazyLoading } from './utils/lazyLoadImages.js';
 
 // Import existing modules
-import { FavoritesUI, FavoritesInit } from './components/favorites/favoritesindex';
-import TabletSelector, { Tablet } from './components/tablet/tabletSelector';
-import { translateWithFallback } from './i18n-init'; // Keep this named import
-import initializeI18n from './i18n-init'; // Add default import
-import { UIManager } from './ui/ui-manager';
-import { FormManager } from './ui/form-manager';
-import { RecapManager } from './ui/recap-manager';
-import { FavoriteObject } from './components/favorites/types';
+import { FavoritesUI, FavoritesInit } from './components/favorites/favoritesindex.js';
+import TabletSelector, { Tablet } from './components/tablet/tabletSelector.js';
+import { translateWithFallback } from './i18n-init.js'; // Keep this named import
+import initializeI18n from './i18n-init.js'; // Add default import
+import { UIManager } from './ui/ui-manager.js';
+import { FormManager } from './ui/form-manager.js';
+import { RecapManager } from './ui/recap-manager.js';
+import { FavoriteObject } from './components/favorites/types.js';
 // import { AreaDrawer } from './components/area/area-drawer'; // Commented out as file not found
 
 // Define types for global objects if they are expected to be on the window or global scope

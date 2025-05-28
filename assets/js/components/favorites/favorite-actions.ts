@@ -1,14 +1,14 @@
 // favorite-actions.ts - Module de gestion des actions sur les favoris
-import { translateWithFallback } from '../../../js/i18n-init';
-import { getFavorites, getFavoriteById, addFavorite, updateFavorite, removeFavorite } from './favorite-storage';
-import { FavoritesPopups } from './favorite-popup';
-import { FavoritesRendering } from './favorite-rendering';
-import { FavoritesInit } from './favorite-init';
-import localeManager from '../../../locales';
-import { FavoriteObject, FavoritesState } from './types'; // Import types
+import { translateWithFallback } from '../../../js/i18n-init.js';
+import { getFavorites, getFavoriteById, addFavorite, updateFavorite, removeFavorite } from './favorite-storage.js';
+import { FavoritesPopups } from './favorite-popup.js';
+import { FavoritesRendering } from './favorite-rendering.js';
+import { FavoritesInit } from './favorite-init.js';
+import localeManager from '../../../locales/index.js';
+import { FavoriteObject, FavoritesState } from './types.js'; // Import types
 
-import { formatNumber, getElement, showNotification, logError } from './favorites-utils';
-import { FAVORITES_CONFIG } from './favorites-config';
+import { formatNumber, getElement, showNotification, logError } from './favorites-utils.js';
+import { FAVORITES_CONFIG } from './favorites-config.js';
 
 /**
  * Module of actions on favorites
@@ -431,7 +431,7 @@ export const FavoritesActions = {
                     if (window.PreferencesManager?.saveCurrentState) {
                         setTimeout(() => {
                             const allFavs = getFavorites();
-                            const favExists = allFavs.some(f => f.id === savedFavorite.id);
+                            const favExists = allFavs.some((f: FavoriteObject) => f.id === savedFavorite.id);
                             console.log(`Favorite ${savedFavorite.id} exists before saving prefs: ${favExists}`);
                             window.PreferencesManager!.saveCurrentState();
                         }, 300);

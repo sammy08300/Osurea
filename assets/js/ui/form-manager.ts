@@ -1,9 +1,9 @@
 /**
  * Form Manager module for handling form elements and their events
  */
-import { DOMUtils } from '../utils/dom-utils';
-import { NumberUtils } from '../utils/number-utils';
-import { translateWithFallback } from '../i18n-init';
+import { DOMUtils } from '../utils/dom-utils.js';
+import { NumberUtils } from '../utils/number-utils.js';
+import { translateWithFallback } from '../i18n-init.js';
 
 // Define types for global functions and variables if they exist
 declare function updateDisplay(): void;

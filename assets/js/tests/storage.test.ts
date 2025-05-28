@@ -3,8 +3,8 @@
  * Tests all major functionality including data validation, repair, and CRUD operations
  */
 
-import { StorageManager } from '../utils/storage'; // .ts will be resolved
-import { FavoriteObject } from '../components/favorites/types'; // Assuming types.d.ts is in favorites
+import { StorageManager } from '../utils/storage.js'; // .ts will be resolved
+import { FavoriteObject } from '../components/favorites/types.js'; // Assuming types.d.ts is in favorites
 
 // Define types for Jest global functions if not already available
 declare var describe: (name: string, fn: () => void) => void;

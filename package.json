@@ -1,6 +1,7 @@
 {
   "name": "areasu",
   "version": "1.0.0",
+  "type": "module",
   "description": "Un outil interactif pour les joueurs d'osu! permettant de visualiser et configurer la zone active de leur tablette graphique.",
   "author": "",
   "license": "ISC",
@@ -18,14 +19,14 @@
   "bugs": {
     "url": "https://github.com/sammy08300/Areasu/issues"
   },
-  "main": "index.js",
+  "main": "public/index.html",
   "scripts": {
-    "start": "node index.js",
+    "start": "npx http-server ./public -o",
     "dev": "npm-run-all --parallel watch:css watch:ts serve:public",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npm run build:css && node build.js",
-    "build:full": "npm run build:css && node build.js && npm run verify:build",
-    "build:prod": "cross-env NODE_ENV=production npm run build:css && node build.js",
+    "test": "jest",
+    "build": "npm run build:css && tsc build.ts --target ES2020 --module commonjs --resolveJsonModule --esModuleInterop --skipLibCheck && mv build.js build.cjs && node build.cjs && rm build.cjs",
+    "build:full": "npm run build:css && tsc build.ts --target ES2020 --module commonjs --resolveJsonModule --esModuleInterop --skipLibCheck && mv build.js build.cjs && node build.cjs && rm build.cjs && tsc verify-build.ts --target ES2020 --module commonjs --resolveJsonModule --esModuleInterop --skipLibCheck && mv verify-build.js verify.cjs && node verify.cjs && rm verify.cjs",
+    "build:prod": "cross-env NODE_ENV=production npm run build:css && tsc build.ts --target ES2020 --module commonjs --resolveJsonModule --esModuleInterop --skipLibCheck && mv build.js build.cjs && node build.cjs && rm build.cjs",
     "build:css": "postcss assets/css/main.css -o assets/css/styles.css",
     "watch:css": "postcss assets/css/main.css -o assets/css/styles.css --watch",
     "watch:ts": "npx tsc --watch",
@@ -33,7 +34,7 @@
     "analyze": "echo \"Bundle analysis would go here - consider adding webpack-bundle-analyzer\"",
     "perf:test": "echo \"Performance testing - consider adding lighthouse-ci\"",
     "optimize": "npm run build:prod && echo \"Optimization complete\"",
-    "verify:build": "node verify-build.js"
+    "verify:build": "tsc verify-build.ts --target ES2020 --module commonjs --resolveJsonModule --esModuleInterop --skipLibCheck && mv verify-build.js verify.cjs && node verify.cjs && rm verify.cjs"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
@@ -45,6 +46,7 @@
     "postcss": "^8.5.3",
     "postcss-cli": "^10.1.0",
     "tailwindcss": "^3.4.17",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   }
 }

@@ -4,7 +4,7 @@
  * Tests all utility functions across DOM, Numbers, and Performance namespaces
  */
 
-import { Utils, DOM, Numbers, Performance } from '../utils/index'; // Adjusted import path
+import { Utils, DOM, Numbers, Performance } from '../utils/index.js'; // Adjusted import path
 // import type { DoneCallback } from 'jest'; // Commenting out as /// <reference types="jest" /> should handle it
 
 // Define types for Jest global functions
@@ -241,7 +241,7 @@ describe('Utils Module', () => {
     describe('Performance Utilities', () => {
         test('memoize should cache function results', () => {
             const mockFn = jest.fn((a: number, b: number) => a + b);
-            const memoizedFn = Performance.memoize(mockFn, (...args) => JSON.stringify(args));
+            const memoizedFn = Performance.memoize(mockFn, (...args: any[]) => JSON.stringify(args));
             memoizedFn(2, 3);
             memoizedFn(2, 3);
             memoizedFn(4, 5);
@@ -349,8 +349,8 @@ export function runUtilsTests(): BrowserTestResults {
             testFn: () => {
                 console.log('Testing Performance.memoize...');
                 let memoCallCount = 0;
-                const fn = (x: number) => { memoCallCount++; return x * 2; };
-                const memoized = Performance.memoize(fn, (x) => x.toString());
+                const fn = (x: number) => { memoCallCount++; return x * 2; }; // Added type for x
+                const memoized = Performance.memoize(fn, (x: number) => x.toString()); // Added type for x
                 memoized(5); memoized(5);
                 console.assert(memoCallCount === 1, 'Memoize FAIL');
             }

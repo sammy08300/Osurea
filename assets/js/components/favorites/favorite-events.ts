@@ -3,9 +3,9 @@
  * Handles event listeners and event management for the favorites component
  */
 
-import { FAVORITES_CONFIG, FAVORITES_EVENTS } from './favorites-config';
-import { getElement, logError } from './favorites-utils';
-import { FavoritesEventsInterface } from './types'; // Import the interface
+import { FAVORITES_CONFIG, FAVORITES_EVENTS } from './favorites-config.js';
+import { getElement, logError } from './favorites-utils.js';
+import { FavoritesEventsInterface } from './types.js'; // Import the interface
 
 interface EventListenerDetail {
     target: EventTarget;

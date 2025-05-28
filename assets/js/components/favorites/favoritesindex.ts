@@ -10,8 +10,8 @@ import { FavoritesActions } from './favorite-actions.js';
 import { FavoritesPopups } from './favorite-popup.js';
 import { FavoritesEvents } from './favorite-events.js';
 import { logError } from './favorites-utils.js';
-import { SortCriteria } from './types';
-import { FavoriteObject, FavoritesState } from './types';
+import { SortCriteria } from './types.js';
+import { FavoriteObject, FavoritesState } from './types.js';
 import { updateFavorite as updateFavoriteStorage } from './favorite-storage.js';
 
 export { FavoritesInit }; // Re-export FavoritesInit
@@ -341,4 +341,4 @@ export const FavoritesUI = {
             return false;
         }
     }
-}; 
+};

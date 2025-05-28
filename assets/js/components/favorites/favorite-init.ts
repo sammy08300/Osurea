@@ -1,12 +1,12 @@
 // favorite-init.ts - Favorites initialization module
-import { FavoritesEvents } from './favorite-events';
-import { translateWithFallback } from '../../../js/i18n-init';
-import { getFavorites } from './favorite-storage';
-import { sortFavorites as favoriteSortFavorites } from './favorite-sort'; // Renamed for clarity
-import { FavoritesRendering } from './favorite-rendering';
-import { FavoritesPopups } from './favorite-popup';
-import { FavoriteObject, SortCriteria } from './types'; // Import types
-import localeManager from '../../../locales'; // Assuming localeManager has its own types or is any
+import { FavoritesEvents } from './favorite-events.js';
+import { translateWithFallback } from '../../../js/i18n-init.js';
+import { getFavorites } from './favorite-storage.js';
+import { sortFavorites as favoriteSortFavorites } from './favorite-sort.js'; // Renamed for clarity
+import { FavoritesRendering } from './favorite-rendering.js';
+import { FavoritesPopups } from './favorite-popup.js';
+import { FavoriteObject, SortCriteria } from './types.js'; // Import types
+import localeManager from '../../../locales/index.js'; // Assuming localeManager has its own types or is any
 
 interface FavoritesInitModule {
     favoritesList: HTMLElement | null;
@@ -191,12 +191,12 @@ export const FavoritesInit: FavoritesInitModule = {
             });
         } else {
             if (!this.favoritesList || !this.cachedFavorites) return;
-            const favorites = this.cachedFavorites;
+            const favorites = this.cachedFavorites; // Should be FavoriteObject[]
             const existingItems = this.favoritesList.querySelectorAll<HTMLElement>('.favorite-item');
             
             existingItems.forEach(item => {
                 const id = item.dataset.id;
-                const favorite = favorites.find(f => f.id.toString() === id); // Ensure ID comparison is correct
+                const favorite = favorites.find((f: FavoriteObject) => f.id.toString() === id); 
                 
                 if (favorite) {
                     FavoritesRendering.updateFavoriteElementContent(item, favorite);
@@ -250,7 +250,7 @@ export const FavoritesInit: FavoritesInitModule = {
             
             const insertBeforeElement = this.favoritesPlaceholder || null;
             
-            sortedFavorites.forEach((favorite) => {
+            sortedFavorites.forEach((favorite) => { // favorite here is FavoriteObject
                 const element = favoriteElements[favorite.id.toString()];
                 if (element && this.favoritesList) { // Check this.favoritesList again
                     this.favoritesList.insertBefore(element, insertBeforeElement);

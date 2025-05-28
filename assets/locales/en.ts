@@ -1,4 +1,168 @@
-const en = {
+interface App {
+    title: string;
+    description: string;
+}
+
+interface Tablet {
+    settings: string;
+    model: string;
+    selectModel: string;
+    search: string;
+    searchTablet: string;
+    custom: string;
+    customDimensions: string;
+    width: string;
+    height: string;
+    units: string;
+    rotation: string;
+    degrees: string;
+}
+
+interface Area {
+    settings: string;
+    width: string;
+    height: string;
+    radius: string;
+    ratio: string;
+    lockRatio: string;
+    position: string;
+    positionX: string;
+    positionY: string;
+    center: string;
+    swap: string;
+    drag: string;
+    rightClick: string;
+}
+
+interface Visual {
+    options: string;
+    showGrid: string;
+    snapGrid: string;
+    visualization: string;
+}
+
+interface Favorites {
+    title: string;
+    noFavorites: string;
+    save: string;
+    name: string;
+    namePlaceholder: string;
+    description: string;
+    descriptionPlaceholder: string;
+    defaultName: string;
+    saveButton: string;
+    cancelButton: string;
+    deleteButton: string;
+    editButton: string;
+    sortBy: string;
+    sortDate: string;
+    sortName: string;
+    sortSize: string;
+    sortModified: string;
+    creationDate: string;
+    lastModified: string;
+    dates: string;
+    dimensions: string;
+    surfaceArea: string;
+    load: string;
+    deleteConfirm: string;
+    warning: string;
+    confirmModification: string;
+    deleteWarning: string;
+    itemTitle: string;
+}
+
+interface Summary {
+    title: string;
+    currentConfig: string;
+    copyInfo: string;
+    copied: string;
+}
+
+interface Alignment {
+    title: string;
+    center: string;
+    left: string;
+    right: string;
+    top: string;
+    bottom: string;
+    topLeft: string;
+    topRight: string;
+    bottomLeft: string;
+    bottomRight: string;
+}
+
+interface Messages {
+    confirmDelete: string;
+    yes: string;
+    no: string;
+    somethingWrong: string;
+    noConnection: string;
+    offlineFeature: string;
+}
+
+interface Language {
+    title: string;
+    fr: string;
+    en: string;
+    es: string;
+    autoDetect: string;
+}
+
+interface Footer {
+    credit: string;
+    description: string;
+    tabletSettings: string;
+    spreadsheets: string;
+    otherProjects: string;
+}
+
+interface Notifications {
+    favoriteNotFound: string;
+    configurationLoaded: string;
+    errorLoadingConfig: string;
+    editModeActivated: string;
+    editModeCanceled: string;
+    favoriteDeleted: string;
+    errorDeletingFavorite: string;
+    configurationUpdated: string;
+    errorUpdatingConfig: string;
+    titleTruncated: string;
+    descriptionTruncated: string;
+    configurationSaved: string;
+    errorSavingConfig: string;
+    areaPositionCenter: string;
+    areaPositionLeft: string;
+    areaPositionRight: string;
+    areaPositionTop: string;
+    areaPositionBottom: string;
+    areaPositionTopLeft: string;
+    areaPositionTopRight: string;
+    areaPositionBottomLeft: string;
+    areaPositionBottomRight: string;
+    copiedInfo: string;
+    copyError: string;
+    invalidDimensions: string;
+    tabletDataError: string;
+    errorSavingPreferences: string;
+    preferencesReset: string;
+}
+
+interface Locale {
+    app: App;
+    tablet: Tablet;
+    area: Area;
+    visual: Visual;
+    favorites: Favorites;
+    summary: Summary;
+    alignment: Alignment;
+    messages: Messages;
+    language: Language;
+    footer: Footer;
+    notifications: Notifications;
+}
+
+const en: Locale = {
     // General application information
     app: {
         title: "Area Visualizer",

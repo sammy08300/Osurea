@@ -3,13 +3,12 @@
  * Specifically tests the "Save" button and other critical elements
  */
 
-import { TEST_CONFIG, TestLogger, TestUtils } from './test-config';
-import { LocaleManager } from '../../locales/index.d'; // Added import
+import { TEST_CONFIG, TestLogger, TestUtils } from './test-config.js';
+// Import the default export (the instance) and type it if needed,
+// or rely on the global window.localeManager which is already typed in i18n-init.ts
+import actualLocaleManagerInstance from '../../locales/index.js'; 
 
 const logger = new TestLogger(); // Instantiate logger
-
-// Remove local LocaleManager interface, rely on global one from i18n-init.ts
-// interface LocaleManager { ... }
 
 // Removed Window interface declaration to avoid conflicts
 
@@ -29,7 +28,8 @@ export function testTranslations(): TestResults {
     
     const resultsArray: { name: string, test: () => boolean, passed: boolean, error?: string }[] = [];
 
-    const currentLocaleManager = window.localeManager as any; // Explicit cast to any
+    // Tests primarily use window.localeManager, which should be populated by i18n-init.ts
+    const currentLocaleManager = window.localeManager as any; 
 
     const addTest = (name: string, testFn: () => boolean) => {
         try {
@@ -40,13 +40,13 @@ export function testTranslations(): TestResults {
         }
     };
 
-    addTest('LocaleManager exists', () => typeof currentLocaleManager !== 'undefined');
-    addTest('TranslateWithFallback function exists', () => typeof window.translateWithFallback === 'function');
+    addTest('LocaleManager exists on window', () => typeof currentLocaleManager !== 'undefined');
+    addTest('TranslateWithFallback function exists on window', () => typeof window.translateWithFallback === 'function');
 
     if (currentLocaleManager && typeof currentLocaleManager.translate === 'function') {
         addTest('Save button translation (FR)', () => {
             const frTranslation = currentLocaleManager.translate('favorites.saveButton');
-            return frTranslation === 'Sauvegarder' || (typeof frTranslation === 'string' && frTranslation.includes('Sauvegarder')); // More flexible check
+            return frTranslation === 'Sauvegarder' || (typeof frTranslation === 'string' && frTranslation.includes('Sauvegarder'));
         });
         addTest('Save button translation (ES)', () => {
             const esTranslation = currentLocaleManager.translate('favorites.saveButton');
