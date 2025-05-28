@@ -27,7 +27,7 @@ interface AreaState {
 /**
  * Constrains the area offset to keep the area within tablet boundaries
  */
-function constrainAreaOffset(
+export function constrainAreaOffset(
     offsetX: number, 
     offsetY: number, 
     areaWidth: number, 
@@ -62,7 +62,7 @@ function constrainAreaOffset(
 /**
  * Adapts the current area dimensions and position to a new tablet
  */
-function adaptAreaToNewTablet(
+export function adaptAreaToNewTablet(
     currentState: AreaState, 
     oldTablet: TabletDimensions, 
     newTablet: TabletDimensions

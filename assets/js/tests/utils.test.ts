@@ -1,9 +1,11 @@
+/// <reference types="jest" />
 /**
  * Unit tests for consolidated Utils module
  * Tests all utility functions across DOM, Numbers, and Performance namespaces
  */
 
 import { Utils, DOM, Numbers, Performance } from '../utils/index'; // Adjusted import path
+// import type { DoneCallback } from 'jest'; // Commenting out as /// <reference types="jest" /> should handle it
 
 // Define types for Jest global functions
 declare var describe: (name: string, fn: () => void) => void;
@@ -22,7 +24,7 @@ declare var expect: (value: any) => ({
     toBeCloseTo: (expected: number, precision?: number) => void;
 });
 declare var jest: {
-    fn: <T extends (...args: any[]) => any>() => jest.Mock<ReturnType<T>, Parameters<T>>;
+    fn: <T extends (...args: any[]) => any>(implementation?: T) => jest.Mock<ReturnType<T>, jest.ArgsType<T>>;
     spyOn: <T extends object, M extends keyof T>(object: T, method: M) => jest.SpyInstance<ReturnType<T[M] extends (...args: any[]) => any ? T[M] : never>, jest.ArgsType<T[M] extends (...args: any[]) => any ? T[M] : never>>;
 };
 
@@ -33,7 +35,7 @@ const mockDOM = (): void => {
         setAttribute: jest.fn(),
         appendChild: jest.fn(),
         removeChild: jest.fn(),
-        contains: jest.fn(() => true),
+        contains: jest.fn(),
         style: {} as CSSStyleDeclaration,
         dataset: {} as DOMStringMap,
         className: '',
@@ -43,19 +45,19 @@ const mockDOM = (): void => {
 
     global.document = {
         getElementById: jest.fn().mockReturnValue(mockElementInstance),
-        createElement: jest.fn(() => mockElementInstance),
+        createElement: jest.fn().mockReturnValue(mockElementInstance),
         // Add other document properties/methods if used by Utils.DOM
     } as any;
     
     global.window = {
-        requestIdleCallback: jest.fn((cb) => setTimeout(cb, 0)),
+        requestIdleCallback: jest.fn((cb: IdleRequestCallback) => setTimeout(cb, 0)),
         cancelIdleCallback: jest.fn(),
         // Add other window properties/methods if used
     } as any;
     
     global.navigator = {
         clipboard: {
-            writeText: jest.fn(() => Promise.resolve())
+            writeText: jest.fn().mockResolvedValue(undefined)
         }
     } as any;
 };
@@ -117,7 +119,7 @@ describe('Utils Module', () => {
             expect(mockElement.textContent).toBe('Test content');
         });
 
-        test('debounce should delay function execution', (done: jest.DoneCallback) => {
+        test('debounce should delay function execution', (done?: jest.DoneCallback) => {
             const mockFn = jest.fn();
             const debouncedFn = DOM.debounce(mockFn, 100);
             debouncedFn();
@@ -126,11 +128,11 @@ describe('Utils Module', () => {
             expect(mockFn).not.toHaveBeenCalled();
             setTimeout(() => {
                 expect(mockFn).toHaveBeenCalledTimes(1);
-                done();
+                if (done) done();
             }, 150);
         });
 
-        test('throttle should limit function calls', (done: jest.DoneCallback) => {
+        test('throttle should limit function calls', (done?: jest.DoneCallback) => {
             const mockFn = jest.fn();
             const throttledFn = DOM.throttle(mockFn, 100);
             throttledFn();
@@ -140,7 +142,7 @@ describe('Utils Module', () => {
             setTimeout(() => {
                 throttledFn();
                 expect(mockFn).toHaveBeenCalledTimes(2);
-                done();
+                if (done) done();
             }, 150);
         });
 
@@ -239,7 +241,7 @@ describe('Utils Module', () => {
     describe('Performance Utilities', () => {
         test('memoize should cache function results', () => {
             const mockFn = jest.fn((a: number, b: number) => a + b);
-            const memoizedFn = Performance.memoize(mockFn);
+            const memoizedFn = Performance.memoize(mockFn, (...args) => JSON.stringify(args));
             memoizedFn(2, 3);
             memoizedFn(2, 3);
             memoizedFn(4, 5);
@@ -247,8 +249,8 @@ describe('Utils Module', () => {
         });
 
         test('memoize should use custom key generator', () => {
-            const mockFn = jest.fn((obj: {value: number}) => obj.value * 2);
-            const memoizedFn = Performance.memoize(mockFn, (obj: {id: number}) => obj.id.toString());
+            const mockFn = jest.fn((obj: { id: number; value: number }) => obj.value * 2);
+            const memoizedFn = Performance.memoize(mockFn, (obj: { id: number; value: number }) => obj.id.toString());
             const obj1 = { id: 1, value: 5 };
             const obj2 = { id: 1, value: 10 };
             memoizedFn(obj1);
@@ -295,71 +297,85 @@ describe('Utils Module', () => {
         test('should export Performance namespace', () => expect(Performance).toBeDefined());
     });
 });
-}
-
 
 interface BrowserTest {
     name: string;
-    test: () => void; // Browser tests might not return specific boolean, rely on console.assert
+    testFn: () => void;
 }
 
 interface BrowserTestResults {
     passed: number;
-    failed: number; // Not easily trackable without custom logic or framework
+    failed: number;
     total: number;
 }
 
-// Browser-compatible test runner
-export function runUtilsTests(): BrowserTestResults { // Return type adjusted
+export function runUtilsTests(): BrowserTestResults {
     console.log('Running Utils module tests...');
     
     const tests: BrowserTest[] = [
-        () => {
-            console.log('Testing DOM.debounce...');
-            let callCount = 0;
-            const debouncedFn = DOM.debounce(() => callCount++, 50);
-            debouncedFn(); debouncedFn(); debouncedFn();
-            setTimeout(() => console.assert(callCount === 1, 'Debounce FAIL'), 100);
+        {
+            name: 'DOM.debounce',
+            testFn: () => {
+                console.log('Testing DOM.debounce...');
+                let callCount = 0;
+                const debouncedFn = DOM.debounce(() => callCount++, 50);
+                debouncedFn(); debouncedFn(); debouncedFn();
+                setTimeout(() => console.assert(callCount === 1, 'Debounce FAIL'), 100);
+            }
         },
-        () => {
-            console.log('Testing Numbers.formatNumber...');
-            console.assert(Numbers.formatNumber(3.14159, 2) === '3.14', 'Format FAIL');
+        {
+            name: 'Numbers.formatNumber',
+            testFn: () => {
+                console.log('Testing Numbers.formatNumber...');
+                console.assert(Numbers.formatNumber(3.14159, 2) === '3.14', 'Format FAIL');
+            }
         },
-        () => {
-            console.log('Testing Numbers.clamp...');
-            console.assert(Numbers.clamp(5, 0, 10) === 5, 'Clamp in range FAIL');
+        {
+            name: 'Numbers.clamp',
+            testFn: () => {
+                console.log('Testing Numbers.clamp...');
+                console.assert(Numbers.clamp(5, 0, 10) === 5, 'Clamp in range FAIL');
+            }
         },
-        () => {
-            console.log('Testing Numbers.parseFloatSafe...');
-            console.assert(Numbers.parseFloatSafe('3.14') === 3.14, 'ParseFloatSafe FAIL');
+        {
+            name: 'Numbers.parseFloatSafe',
+            testFn: () => {
+                console.log('Testing Numbers.parseFloatSafe...');
+                console.assert(Numbers.parseFloatSafe('3.14') === 3.14, 'ParseFloatSafe FAIL');
+            }
         },
-        () => {
-            console.log('Testing Performance.memoize...');
-            let memoCallCount = 0;
-            const fn = (x: number) => { memoCallCount++; return x * 2; };
-            const memoized = Performance.memoize(fn);
-            memoized(5); memoized(5);
-            console.assert(memoCallCount === 1, 'Memoize FAIL');
+        {
+            name: 'Performance.memoize',
+            testFn: () => {
+                console.log('Testing Performance.memoize...');
+                let memoCallCount = 0;
+                const fn = (x: number) => { memoCallCount++; return x * 2; };
+                const memoized = Performance.memoize(fn, (x) => x.toString());
+                memoized(5); memoized(5);
+                console.assert(memoCallCount === 1, 'Memoize FAIL');
+            }
         },
-        () => {
-            console.log('Testing legacy compatibility...');
-            console.assert(Utils.debounce === DOM.debounce, 'Legacy debounce FAIL');
+        {
+            name: 'Legacy compatibility',
+            testFn: () => {
+                console.log('Testing legacy compatibility...');
+                console.assert(Utils.debounce === DOM.debounce, 'Legacy debounce FAIL');
+            }
         }
     ];
     
-    let passed = 0; // Simple tracking, real pass/fail needs assert checks
-    tests.forEach((test, index) => {
+    let passed = 0;
+    tests.forEach((testItem, index) => {
         try {
-            test(); // Execute the test
-            console.log(`✓ Test ${index + 1} executed (check console for asserts)`);
-            passed++; // Assume pass if no error, actual pass/fail depends on console.assert
+            console.log(`Running test ${index + 1}: ${testItem.name}`);
+            testItem.testFn();
+            console.log(`✓ Test ${index + 1} (${testItem.name}) executed (check console for asserts)`);
+            passed++;
         } catch (error: any) {
-            console.error(`✗ Test ${index + 1} failed:`, error.message);
+            console.error(`✗ Test ${index + 1} (${testItem.name}) failed:`, error.message);
         }
     });
     
     console.log('Utils tests completed');
-    // Note: In browser, 'failed' count isn't automatically tracked without a test framework.
-    // We're assuming all executed tests are 'passed' for simplicity here unless an error is thrown.
     return { passed, failed: tests.length - passed, total: tests.length };
 }

@@ -10,27 +10,6 @@ import { FavoriteObject, FavoritesState } from './types'; // Import types
 import { formatNumber, getElement, showNotification, logError } from './favorites-utils';
 import { FAVORITES_CONFIG } from './favorites-config';
 
-// Define types for global objects if not already typed elsewhere
-declare global {
-    interface Window {
-        Notifications?: {
-            error: (message: string) => void;
-            success: (message: string) => void;
-            info: (message: string) => void;
-            warning: (message: string) => void;
-        };
-        updateDisplay?: () => void;
-        PreferencesManager?: {
-            saveCurrentState: () => void;
-        };
-        appState?: Partial<FavoritesState>; // Use Partial if appState might not have all properties
-        StorageManager?: {
-            clearCache: () => void;
-        };
-    }
-}
-
-
 /**
  * Module of actions on favorites
  */
@@ -161,8 +140,8 @@ export const FavoritesActions = {
                 </svg>
                 <span data-i18n="favorites.confirmModification">Confirmer la modification</span>`;
             
-            if (localeManager.applyTranslations) {
-                 localeManager.applyTranslations(saveBtn);
+            if (localeManager.updatePageTranslations) {
+                 localeManager.updatePageTranslations();
             } else {
                 const span = saveBtn.querySelector('span[data-i18n]') as HTMLSpanElement;
                 if (span) {
@@ -250,8 +229,8 @@ export const FavoritesActions = {
                 </svg>
                 <span data-i18n="save">Sauvegarder</span>`;
             
-            if (localeManager.applyTranslations) {
-                localeManager.applyTranslations(saveBtn);
+            if (localeManager.updatePageTranslations) {
+                localeManager.updatePageTranslations();
             } else {
                 const span = saveBtn.querySelector('span[data-i18n]') as HTMLSpanElement;
                 if (span) {

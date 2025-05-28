@@ -8,18 +8,6 @@ import { FavoritesPopups } from './favorite-popup';
 import { FavoriteObject, SortCriteria } from './types'; // Import types
 import localeManager from '../../../locales'; // Assuming localeManager has its own types or is any
 
-// Define types for global objects if not already typed elsewhere
-declare global {
-    interface Window {
-        StorageManager?: { // Assuming StorageManager might exist on window
-            forceReset: () => FavoriteObject[];
-            clearCache: () => void;
-        };
-        localeManager?: typeof localeManager; // If localeManager is also global
-    }
-}
-
-
 interface FavoritesInitModule {
     favoritesList: HTMLElement | null;
     favoritesPlaceholder: Element | null;
@@ -36,7 +24,6 @@ interface FavoritesInitModule {
     setupSortButtons(): void;
     handleSortButtonClick(button: HTMLElement): void;
 }
-
 
 /**
  * Favorites initialization and configuration management module

@@ -1,7 +1,9 @@
 import { translateWithFallback } from '../../i18n-init';
+import { adaptAreaToNewTablet } from '../../utils/constraintHelpers';
+import { appState } from '../../app'; // Import appState
 
 // Define interfaces for the data structures
-interface Tablet {
+export interface Tablet {
     brand: string;
     model: string;
     width: number;
@@ -32,12 +34,8 @@ declare function isValidNumber(value: any): value is number; // Type guard
 declare function formatNumber(value: number, precision?: number): string;
 
 // Global state/functions (assuming these exist and might be typed elsewhere)
-declare const appState: { cancelEditMode?: () => void } | undefined;
+// declare const appState: { cancelEditMode?: () => void } | undefined;
 declare function updateDisplay(): void;
-declare const ConstraintUtils: { // Assuming ConstraintUtils exists
-    adaptAreaToNewTablet: (currentState: any, oldTablet: any, newTablet: any) => any;
-};
-
 
 const TabletSelector = {
     elements: {} as DOMElements,
@@ -69,6 +67,7 @@ const TabletSelector = {
     } as TabletSelectorConstants,
     
     init(tabletData: Tablet[]): void {
+        console.log('TabletSelector init received tabletData:', tabletData);
         this.initElements();
         if (!this.validateElements()) {
             console.error('Tablet selector: essential elements not found');
@@ -488,7 +487,7 @@ const TabletSelector = {
         const newTablet = { width: tablet.width, height: tablet.height };
         const currentState = { areaWidth: currentAreaWidth, areaHeight: currentAreaHeight, offsetX: currentOffsetX, offsetY: currentOffsetY };
         
-        const adaptedState = ConstraintUtils.adaptAreaToNewTablet(currentState, oldTablet, newTablet);
+        const adaptedState = adaptAreaToNewTablet(currentState, oldTablet, newTablet);
         
         (document.getElementById('areaWidth') as HTMLInputElement).value = formatNumber(adaptedState.areaWidth);
         (document.getElementById('areaHeight') as HTMLInputElement).value = formatNumber(adaptedState.areaHeight);
@@ -546,13 +545,8 @@ const TabletSelector = {
     },
     
     hidePopup(): void {
-        const { selectorPopup } = this.elements;
-        if (selectorPopup) selectorPopup.classList.add('hidden');
+        this.elements.selectorPopup?.classList.add('hidden');
     }
 };
 
 export default TabletSelector;
-
-if (typeof window !== 'undefined') {
-    (window as any).TabletSelector = TabletSelector;
-}

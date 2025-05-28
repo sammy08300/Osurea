@@ -82,16 +82,20 @@ export function showNotification(type: NotificationType, messageKey: string, fal
 export function applyTranslation(element: HTMLElement | null, translationKey: string, fallback: string = ''): void {
     if (!element) return;
     
-    element.setAttribute('data-i18n', translationKey);
-    
-    if (localeManager) { // Check if localeManager is defined
-        if (typeof localeManager.applyTranslations === 'function') {
-            localeManager.applyTranslations(element);
-        } else if (typeof localeManager.translate === 'function') {
-            element.textContent = localeManager.translate(translationKey) || fallback;
+    const translatedText = translateWithFallback(translationKey, fallback);
+    if (element.textContent !== translatedText) {
+        element.textContent = translatedText;
+    }
+
+    // Fallback to direct translation if localeManager or applyTranslations not available
+    // Check if localeManager and specific method exist
+    if (typeof localeManager !== 'undefined' && localeManager !== null) {
+        if (typeof localeManager.updatePageTranslations === 'function') { // Changed from applyTranslations
+            localeManager.updatePageTranslations(); // Changed from applyTranslations
+        } else if (typeof (localeManager as any).translate === 'function' && typeof (localeManager as any).updatePageTranslations === 'function') {
+            // Attempt to call updatePageTranslations if translate exists as a fallback logic
+            (localeManager as any).updatePageTranslations();
         }
-    } else {
-        element.textContent = translateWithFallback(translationKey, fallback);
     }
 }
 

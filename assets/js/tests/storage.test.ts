@@ -332,7 +332,7 @@ export function runStorageTests(): BrowserTestResults {
                 try {
                     const testFavorite: Partial<FavoriteObject> = {
                         title: 'Test Favorite', description: 'Test Description',
-                        width: 100, areaHeight: 100 // Corrected typo
+                        width: 100, height: 100 // Corrected typo from areaHeight to height
                     };
                     const result = (window as any).StorageManager.addFavorite(testFavorite as FavoriteObject);
                     return result && result.id;

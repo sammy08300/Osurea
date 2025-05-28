@@ -5,7 +5,7 @@
  * and applies the corresponding language to the site (French, Spanish, or English by default)
  */
 
-import localeManager from '../locales/index'; // .ts extension will be resolved
+import localeManager from '../locales/index'; // Remove the .js extension
 
 // Define types for better code clarity and safety
 type SupportedLanguageCode = 'fr' | 'es' | 'en';

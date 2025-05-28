@@ -65,6 +65,14 @@ export const FAVORITES_CONFIG: FavoritesConfig = {
         DELETE_SUCCESS: 'notifications.deleteSuccess',
         EDIT_CANCELLED: 'notifications.editCancelled'
         // Add other keys as needed, or define a more generic type like: [key: string]: string;
+    },
+
+    // Storage Key
+    STORAGE_KEY: 'Osu!reaFavorites_v2',
+
+    // ID Generator
+    generateId: (): string => {
+        return `fav_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
     }
 };
 

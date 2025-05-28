@@ -17,6 +17,7 @@ interface NotificationsModule {
     init(): boolean;
     _translateMessage(message: string): string;
     _createNotificationElement(message: string, type: NotificationType): HTMLElement;
+    _escapeHtml(text: string): string;
     _scheduleRemoval(notification: HTMLElement, duration: number): void;
     show(message: string, type?: NotificationType, duration?: number): HTMLElement | null;
     success(message: string, duration?: number): HTMLElement | null;
@@ -25,32 +26,32 @@ interface NotificationsModule {
     warning(message: string, duration?: number): HTMLElement | null;
 }
 
-// Assuming window.__ is a global translation function
-declare global {
-    interface Window {
-        __(message: string, fallback?: string): string;
-    }
-}
+// Remove duplicate global declaration if __ is already globally declared elsewhere
+// declare global {
+//     interface Window {
+//         __(message: string, fallback?: string): string;
+//     }
+// }
 
 const Notifications: NotificationsModule = {
     container: null,
-    defaultDuration: 1500,
+    defaultDuration: 5000,
     notificationTypes: {
         success: {
-            bgColor: 'bg-green-600',
-            iconPath: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />'
+            bgColor: 'bg-green-500',
+            iconPath: 'M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z'
         },
         error: {
-            bgColor: 'bg-red-600',
-            iconPath: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />'
+            bgColor: 'bg-red-500',
+            iconPath: 'M10 18a8 8 0 100-16 8 8 0 000 16zm1-13H9v6h2V5zm0 8H9v2h2v-2z'
         },
         warning: {
             bgColor: 'bg-yellow-500',
-            iconPath: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />'
+            iconPath: 'M10 18a8 8 0 100-16 8 8 0 000 16zm-1-5v2h2v-2H9zm0-8v5h2V5H9z'
         },
         info: {
             bgColor: 'bg-blue-500',
-            iconPath: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />'
+            iconPath: 'M10 18a8 8 0 100-16 8 8 0 000 16zm1-7h-2v4h2v-4zm0-4h-2v2h2V7z'
         }
     },
     
@@ -59,10 +60,13 @@ const Notifications: NotificationsModule = {
      * @returns {boolean} Whether initialization was successful
      */
     init(): boolean {
+        if (typeof document === 'undefined') return false;
         this.container = document.getElementById('notification-container');
         if (!this.container) {
-            console.error('Notification container not found');
-            return false;
+            this.container = document.createElement('div');
+            this.container.id = 'notification-container';
+            this.container.className = 'fixed top-5 right-5 z-[99999] flex flex-col items-end space-y-2';
+            document.body.appendChild(this.container);
         }
         return true;
     },
@@ -74,10 +78,13 @@ const Notifications: NotificationsModule = {
      * @private
      */
     _translateMessage(message: string): string {
-        if (typeof window.__ === 'function') {
-            return window.__(message, message); // Provide fallback for safety
+        if (typeof window !== 'undefined' && typeof (window as any).__ === 'function') {
+            // Check if it looks like a translation key (e.g., contains a dot)
+            if (message.includes('.')) {
+                return (window as any).__(message, message); // Pass message as fallback
+            }
         }
-        return message;
+        return message; // Return original if not a key or no translator
     },
     
     /**
@@ -89,20 +96,24 @@ const Notifications: NotificationsModule = {
      * @private
      */
     _createNotificationElement(message: string, type: NotificationType): HTMLElement {
-        const typeConfig = this.notificationTypes[type] || this.notificationTypes.success;
-        const translatedMessage = this._translateMessage(message);
-        
         const notification = document.createElement('div');
-        notification.className = `notification rounded-lg p-3 flex items-center shadow-lg ${typeConfig.bgColor}`;
-        
+        const translatedMessage = this._translateMessage(message);
+        const typeConfig = this.notificationTypes[type] || this.notificationTypes.info;
+
+        notification.className = `notification flex items-center p-4 rounded-lg shadow-lg text-white ${typeConfig.bgColor} max-w-sm animate-slide-in`;
         notification.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                ${typeConfig.iconPath}
+            <svg class="w-6 h-6 mr-3 fill-current" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="${typeConfig.iconPath}" clip-rule="evenodd"></path>
             </svg>
-            <p class="text-white text-sm font-medium">${translatedMessage}</p>
+            <span>${this._escapeHtml(translatedMessage)}</span>
         `;
-        
         return notification;
+    },
+    
+    _escapeHtml(text: string): string {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     },
     
     /**
@@ -114,12 +125,11 @@ const Notifications: NotificationsModule = {
      */
     _scheduleRemoval(notification: HTMLElement, duration: number): void {
         setTimeout(() => {
-            notification.style.animationDuration = '0.3s';
-            notification.style.animationName = 'fade-out';
-            
+            notification.classList.remove('animate-slide-in');
+            notification.classList.add('animate-fade-out');
             setTimeout(() => {
                 notification.remove();
-            }, 300); // Corresponds to animation duration
+            }, 300); // Match fade-out animation duration
         }, duration);
     },
     
@@ -131,17 +141,16 @@ const Notifications: NotificationsModule = {
      * @param {number} duration - Duration in ms to show the notification
      * @returns {HTMLElement | null} The notification element or null if container not found
      */
-    show(message: string, type: NotificationType = 'success', duration: number = this.defaultDuration): HTMLElement | null {
+    show(message: string, type: NotificationType = 'success', duration: number = Notifications.defaultDuration): HTMLElement | null {
         if (!this.container && !this.init()) {
+            console.error('Notification container not initialized.');
             return null;
         }
-        
+        if (!this.container) return null; // Should be initialized by now
+
         const notification = this._createNotificationElement(message, type);
-        if (this.container) { // Ensure container is not null after init
-            this.container.appendChild(notification);
-        }
+        this.container.appendChild(notification);
         this._scheduleRemoval(notification, duration);
-        
         return notification;
     },
     
@@ -151,8 +160,8 @@ const Notifications: NotificationsModule = {
      * @param {number} duration - Duration in ms
      * @returns {HTMLElement | null} The notification element or null if container not found
      */
-    success(message: string, duration: number = this.defaultDuration): HTMLElement | null {
-        return this.show(message, 'success', duration);
+    success(message: string, duration: number = Notifications.defaultDuration): HTMLElement | null {
+        return Notifications.show(message, 'success', duration);
     },
     
     /**
@@ -161,8 +170,8 @@ const Notifications: NotificationsModule = {
      * @param {number} duration - Duration in ms
      * @returns {HTMLElement | null} The notification element or null if container not found
      */
-    error(message: string, duration: number = this.defaultDuration): HTMLElement | null {
-        return this.show(message, 'error', duration);
+    error(message: string, duration: number = Notifications.defaultDuration): HTMLElement | null {
+        return Notifications.show(message, 'error', duration);
     },
     
     /**
@@ -171,8 +180,8 @@ const Notifications: NotificationsModule = {
      * @param {number} duration - Duration in ms
      * @returns {HTMLElement | null} The notification element or null if container not found
      */
-    info(message: string, duration: number = this.defaultDuration): HTMLElement | null {
-        return this.show(message, 'info', duration);
+    info(message: string, duration: number = Notifications.defaultDuration): HTMLElement | null {
+        return Notifications.show(message, 'info', duration);
     },
     
     /**
@@ -181,12 +190,35 @@ const Notifications: NotificationsModule = {
      * @param {number} duration - Duration in ms
      * @returns {HTMLElement | null} The notification element or null if container not found
      */
-    warning(message: string, duration: number = this.defaultDuration): HTMLElement | null {
-        return this.show(message, 'warning', duration);
+    warning(message: string, duration: number = Notifications.defaultDuration): HTMLElement | null {
+        return Notifications.show(message, 'warning', duration);
     }
 };
+
+// Methods that use 'this' need to refer to Notifications directly
+Notifications.success = function(message: string, duration: number = Notifications.defaultDuration): HTMLElement | null {
+    return Notifications.show(message, 'success', duration);
+};
+
+Notifications.error = function(message: string, duration: number = Notifications.defaultDuration): HTMLElement | null {
+    return Notifications.show(message, 'error', duration);
+};
+
+Notifications.info = function(message: string, duration: number = Notifications.defaultDuration): HTMLElement | null {
+    return Notifications.show(message, 'info', duration);
+};
+
+Notifications.warning = function(message: string, duration: number = Notifications.defaultDuration): HTMLElement | null {
+    return Notifications.show(message, 'warning', duration);
+};
+
+// Initialize notifications automatically or provide an init function
+// ... existing code ...
 
 // Make Notifications available globally if it's used that way
 if (typeof window !== 'undefined') {
     (window as any).Notifications = Notifications;
 }
+
+export default Notifications;
+export {};

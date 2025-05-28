@@ -1,6 +1,6 @@
-import fr from './fr.js';
-import en from './en.js';
-import es from './es.js';
+import fr from './fr';
+import en from './en';
+import es from './es';
 
 /**
  * Finds a translation value by its path key

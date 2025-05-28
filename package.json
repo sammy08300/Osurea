@@ -24,6 +24,7 @@
     "dev": "npm-run-all --parallel watch:css watch:ts serve:public",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npm run build:css && node build.js",
+    "build:full": "npm run build:css && node build.js && npm run verify:build",
     "build:prod": "cross-env NODE_ENV=production npm run build:css && node build.js",
     "build:css": "postcss assets/css/main.css -o assets/css/styles.css",
     "watch:css": "postcss assets/css/main.css -o assets/css/styles.css --watch",
@@ -31,9 +32,11 @@
     "serve:public": "npx http-server ./public -o",
     "analyze": "echo \"Bundle analysis would go here - consider adding webpack-bundle-analyzer\"",
     "perf:test": "echo \"Performance testing - consider adding lighthouse-ci\"",
-    "optimize": "npm run build:prod && echo \"Optimization complete\""
+    "optimize": "npm run build:prod && echo \"Optimization complete\"",
+    "verify:build": "node verify-build.js"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.14",
     "@types/node": "^22.15.23",
     "autoprefixer": "^10.4.14",
     "cross-env": "^7.0.3",

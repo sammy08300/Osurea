@@ -10,6 +10,11 @@ import { FavoritesActions } from './favorite-actions.js';
 import { FavoritesPopups } from './favorite-popup.js';
 import { FavoritesEvents } from './favorite-events.js';
 import { logError } from './favorites-utils.js';
+import { SortCriteria } from './types';
+import { FavoriteObject, FavoritesState } from './types';
+import { updateFavorite as updateFavoriteStorage } from './favorite-storage.js';
+
+export { FavoritesInit }; // Re-export FavoritesInit
 
 /**
  * Unified Favorites Interface
@@ -26,8 +31,8 @@ export const FavoritesUI = {
         isInitialized: false,
         autoSaveTimer: null,
         originalValues: null,
-        currentSortCriteria: FAVORITES_CONFIG.SORT_CRITERIA.DATE
-    },
+        currentSortCriteria: 'date' as SortCriteria,
+    } as FavoritesState,
 
     /**
      * Initialize the favorites component
@@ -46,13 +51,17 @@ export const FavoritesUI = {
             // Initialize events
             FavoritesEvents.init();
             
+            FavoritesPopups.createDialogs();
+            FavoritesPopups.createDetailsPopup();
+            
             this.state.isInitialized = true;
             console.log('FavoritesUI initialized successfully');
             return true;
         } catch (error) {
-            logError('FavoritesUI.init', error);
-            return false;
+            logError('FavoritesUI.init', error as Error);
+            this.state.isInitialized = false;
         }
+        return this.state.isInitialized;
     },
 
     /**
@@ -65,7 +74,7 @@ export const FavoritesUI = {
             this.resetState();
             console.log('FavoritesUI destroyed successfully');
         } catch (error) {
-            logError('FavoritesUI.destroy', error);
+            logError('FavoritesUI.destroy', error as Error);
         }
     },
 
@@ -74,27 +83,23 @@ export const FavoritesUI = {
      */
     syncStateWithInit() {
         this.state.favoritesList = FavoritesInit.favoritesList;
-        this.state.favoritesPlaceholder = FavoritesInit.favoritesPlaceholder;
+        this.state.favoritesPlaceholder = FavoritesInit.favoritesPlaceholder as HTMLElement | null;
         this.state.cachedFavorites = FavoritesInit.cachedFavorites;
-        this.state.isInitialized = FavoritesInit.isInitialized;
-        this.state.currentSortCriteria = FavoritesInit.currentSortCriteria;
+        this.state.currentSortCriteria = FavoritesInit.currentSortCriteria as SortCriteria;
     },
 
     /**
      * Reset the component state
      */
     resetState() {
-        this.state = {
-            editingFavoriteId: null,
-            currentDetailedFavoriteId: null,
-            favoritesList: null,
-            favoritesPlaceholder: null,
-            cachedFavorites: null,
-            isInitialized: false,
-            autoSaveTimer: null,
-            originalValues: null,
-            currentSortCriteria: FAVORITES_CONFIG.SORT_CRITERIA.DATE
-        };
+        this.state.editingFavoriteId = null;
+        this.state.currentDetailedFavoriteId = null;
+        this.state.cachedFavorites = [];
+        this.state.originalValues = null;
+        this.clearAutoSaveTimer();
+        if (this.state.favoritesList) {
+            this.state.favoritesList.innerHTML = '';
+        }
     },
 
     /**
@@ -114,12 +119,12 @@ export const FavoritesUI = {
      * @param {string|number} id - Favorite ID
      * @returns {boolean} True if loaded successfully
      */
-    loadFavorite(id) {
+    loadFavorite(id: string | number): boolean {
         try {
-            const result = FavoritesActions.loadFavorite(id);
-            return result !== false;
+            FavoritesActions.loadFavorite(id);
+            return true;
         } catch (error) {
-            logError('FavoritesUI.loadFavorite', error, { id });
+            logError('FavoritesUI.loadFavorite', error as Error, { id });
             return false;
         }
     },
@@ -128,15 +133,15 @@ export const FavoritesUI = {
      * Save current configuration as favorite
      * @returns {boolean} True if saved successfully
      */
-    saveFavorite() {
+    saveFavorite(): boolean {
         try {
-            const result = FavoritesActions.saveFavorite();
-            if (result) {
-                this.refreshAllFavorites();
-            }
-            return result !== false;
+            FavoritesActions.saveFavorite();
+            this.state.editingFavoriteId = FavoritesActions.editingFavoriteId;
+            this.state.originalValues = FavoritesActions.originalValues;
+            this.refreshAllFavorites();
+            return true;
         } catch (error) {
-            logError('FavoritesUI.saveFavorite', error);
+            logError('FavoritesUI.saveFavorite', error as Error);
             return false;
         }
     },
@@ -146,14 +151,14 @@ export const FavoritesUI = {
      * @param {string|number} id - Favorite ID
      * @returns {boolean} True if edit mode started successfully
      */
-    editFavorite(id) {
+    editFavorite(id: string | number): boolean {
         try {
             FavoritesActions.editFavorite(id);
             this.state.editingFavoriteId = FavoritesActions.editingFavoriteId;
             this.state.originalValues = FavoritesActions.originalValues;
             return true;
         } catch (error) {
-            logError('FavoritesUI.editFavorite', error, { id });
+            logError('FavoritesUI.editFavorite', error as Error, { id });
             return false;
         }
     },
@@ -163,15 +168,13 @@ export const FavoritesUI = {
      * @param {string|number} id - Favorite ID
      * @returns {boolean} True if deleted successfully
      */
-    deleteFavorite(id) {
+    deleteFavorite(id: string | number): boolean {
         try {
-            const result = FavoritesActions.deleteFavorite(id);
-            if (result) {
-                this.refreshAllFavorites();
-            }
-            return result !== false;
+            FavoritesActions.deleteFavorite(id);
+            this.refreshAllFavorites();
+            return true;
         } catch (error) {
-            logError('FavoritesUI.deleteFavorite', error, { id });
+            logError('FavoritesUI.deleteFavorite', error as Error, { id });
             return false;
         }
     },
@@ -181,14 +184,14 @@ export const FavoritesUI = {
      * @param {boolean} skipNotification - Skip showing notification
      * @returns {boolean} True if cancelled successfully
      */
-    cancelEditMode(skipNotification = false) {
+    cancelEditMode(skipNotification = false): boolean {
         try {
             FavoritesActions.cancelEditMode(skipNotification);
             this.state.editingFavoriteId = FavoritesActions.editingFavoriteId;
             this.state.originalValues = FavoritesActions.originalValues;
             return true;
         } catch (error) {
-            logError('FavoritesUI.cancelEditMode', error);
+            logError('FavoritesUI.cancelEditMode', error as Error);
             return false;
         }
     },
@@ -200,10 +203,10 @@ export const FavoritesUI = {
      */
     refreshAllFavorites() {
         try {
-            FavoritesInit.refreshAllFavorites();
+            FavoritesRendering.loadFavoritesWithAnimation();
             this.state.cachedFavorites = FavoritesInit.cachedFavorites;
         } catch (error) {
-            logError('FavoritesUI.refreshAllFavorites', error);
+            logError('FavoritesUI.refreshAllFavorites', error as Error);
         }
     },
 
@@ -215,7 +218,7 @@ export const FavoritesUI = {
             FavoritesInit.forceRefreshFavorites();
             this.state.cachedFavorites = FavoritesInit.cachedFavorites;
         } catch (error) {
-            logError('FavoritesUI.forceRefreshFavorites', error);
+            logError('FavoritesUI.forceRefreshFavorites', error as Error);
         }
     },
 
@@ -224,11 +227,11 @@ export const FavoritesUI = {
      * @param {string|number} id - Favorite ID
      * @param {boolean} withScroll - Whether to scroll to the favorite
      */
-    highlightFavorite(id, withScroll = true) {
+    highlightFavorite(id: string | number, withScroll = true) {
         try {
             FavoritesRendering.highlightFavorite(id, withScroll);
         } catch (error) {
-            logError('FavoritesUI.highlightFavorite', error, { id, withScroll });
+            logError('FavoritesUI.highlightFavorite', error as Error, { id, withScroll });
         }
     },
 
@@ -238,12 +241,12 @@ export const FavoritesUI = {
      * Show favorite details popup
      * @param {Object} favorite - Favorite object
      */
-    showFavoriteDetails(favorite) {
+    showFavoriteDetails(favorite: FavoriteObject) {
         try {
-            FavoritesPopups.showFavoriteDetails(favorite, FavoritesActions);
+            FavoritesPopups.showFavoriteDetails(favorite, FavoritesActions as any);
             this.state.currentDetailedFavoriteId = FavoritesActions.currentDetailedFavoriteId;
         } catch (error) {
-            logError('FavoritesUI.showFavoriteDetails', error, { favorite });
+            logError('FavoritesUI.showFavoriteDetails', error as Error, { favorite });
         }
     },
 
@@ -251,11 +254,11 @@ export const FavoritesUI = {
      * Show comment dialog
      * @param {Function} callback - Callback function
      */
-    showCommentDialog(callback) {
+    showCommentDialog(callback: (data: { title: string, description: string }) => void) {
         try {
             FavoritesPopups.showCommentDialog(callback);
         } catch (error) {
-            logError('FavoritesUI.showCommentDialog', error);
+            logError('FavoritesUI.showCommentDialog', error as Error);
         }
     },
 
@@ -263,11 +266,11 @@ export const FavoritesUI = {
      * Show delete confirmation dialog
      * @param {Function} callback - Callback function
      */
-    showDeleteDialog(callback) {
+    showDeleteDialog(callback: (confirmed: boolean) => void) {
         try {
             FavoritesPopups.showDeleteDialog(callback);
         } catch (error) {
-            logError('FavoritesUI.showDeleteDialog', error);
+            logError('FavoritesUI.showDeleteDialog', error as Error);
         }
     },
 
@@ -277,12 +280,12 @@ export const FavoritesUI = {
      * Handle locale change event
      * @param {Event} event - Locale change event
      */
-    handleLocaleChange(event) {
+    handleLocaleChange(event: CustomEvent) {
         try {
             FavoritesInit.handleLocaleChange(event);
             this.state.cachedFavorites = FavoritesInit.cachedFavorites;
         } catch (error) {
-            logError('FavoritesUI.handleLocaleChange', error, { event });
+            logError('FavoritesUI.handleLocaleChange', error as Error, { event });
         }
     },
 
@@ -290,12 +293,12 @@ export const FavoritesUI = {
      * Handle manual language update
      * @param {string} language - New language code
      */
-    manualLanguageUpdate(language) {
+    manualLanguageUpdate(language: string) {
         try {
             FavoritesInit.manualLanguageUpdate(language);
             this.state.cachedFavorites = FavoritesInit.cachedFavorites;
         } catch (error) {
-            logError('FavoritesUI.manualLanguageUpdate', error, { language });
+            logError('FavoritesUI.manualLanguageUpdate', error as Error, { language });
         }
     },
 
@@ -323,5 +326,19 @@ export const FavoritesUI = {
      */
     getFavoritesCount() {
         return this.state.cachedFavorites ? this.state.cachedFavorites.length : 0;
+    },
+
+    updateFavorite(id: string | number, data: Partial<FavoriteObject>): boolean {
+        if (!this.isReady()) return false;
+        try {
+            const success = updateFavoriteStorage(id, data);
+            if (success) {
+                this.forceRefreshFavorites();
+            }
+            return success;
+        } catch (error) {
+            logError('FavoritesUI.updateFavorite', error as Error, { id, data });
+            return false;
+        }
     }
 }; 

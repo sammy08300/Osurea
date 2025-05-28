@@ -14,11 +14,12 @@ export interface FavoriteObject {
     radius?: number;
     tabletW?: number;
     tabletH?: number;
-    presetInfo?: string;
+    presetInfo?: string | null | undefined;
     title?: string;
     description?: string;
     comment?: string;
     lastModified?: number;
+    createdAt?: number;
 }
 
 export interface FavoritesState {
@@ -57,6 +58,13 @@ export interface FavoritesConfig {
     I18N_KEYS: {
         [key: string]: string;
     };
+    STORAGE_KEY: string;
+    generateId: () => string;
+}
+
+export interface CommentData {
+    title: string;
+    description: string;
 }
 
 export interface FavoritesUIInterface {
@@ -73,6 +81,7 @@ export interface FavoritesUIInterface {
     loadFavorite(id: string | number): boolean;
     saveFavorite(): boolean;
     editFavorite(id: string | number): boolean;
+    updateFavorite(id: string | number, data: Partial<FavoriteObject>): boolean;
     deleteFavorite(id: string | number): boolean;
     cancelEditMode(skipNotification?: boolean): boolean;
     
@@ -83,8 +92,8 @@ export interface FavoritesUIInterface {
     
     // Popup methods
     showFavoriteDetails(favorite: FavoriteObject): void;
-    showCommentDialog(callback: (comment: string) => void): void;
-    showDeleteDialog(callback: () => void): void;
+    showCommentDialog(callback: (data: CommentData) => void): void;
+    showDeleteDialog(callback: (confirmed: boolean) => void): void;
     
     // Localization methods
     handleLocaleChange(event: Event): void;
@@ -96,12 +105,18 @@ export interface FavoritesEventsInterface {
     isInitialized: boolean;
     
     init(): void;
+    setupDOMEventListeners(): void;
+    setupCustomEventListeners(): void;
     cleanup(): void;
-    addEventListener(target: EventTarget, event: string, handler: Function, options?: any): void;
-    removeEventListener(target: EventTarget, event: string, handler: Function): void;
+    addEventListener(target: EventTarget, event: string, handler: EventListenerOrEventListenerObject, options?: AddEventListenerOptions | boolean): void;
+    removeEventListener(target: EventTarget, event: string, handler: EventListenerOrEventListenerObject): void;
     dispatchEvent(eventName: string, detail?: any, target?: EventTarget): void;
     getActiveListenersCount(): number;
     isReady(): boolean;
+
+    handleFavoritesListClick(event: Event): void;
+    handleLocaleChange(event: CustomEvent): void;
+    handleLanguageChange(event: CustomEvent): void;
 }
 
 // Storage functions

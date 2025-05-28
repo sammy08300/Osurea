@@ -4,10 +4,10 @@
  * while transitioning to the new modular system
  */
 
-import { Utils as ImportedUtils } from '../utils/index.js';
-import { displayManager } from './display-manager.js'; // Assuming DisplayManager has isInitialized property
-import { notificationManager } from './notification-manager.js';
-import { dependencyManager } from './dependency-manager.js';
+import { Utils as ImportedUtils } from '../utils/index';
+import { displayManager } from './display-manager'; // Assuming DisplayManager has isInitialized property
+import { notificationManager } from './notification-manager';
+import { dependencyManager } from './dependency-manager';
 
 // Assume Utils is an external library for now, or has a .d.ts file elsewhere.
 const Utils: any = ImportedUtils;

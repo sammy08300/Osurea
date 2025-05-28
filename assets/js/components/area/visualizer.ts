@@ -4,9 +4,13 @@
 
 // Import ContextMenu if it's in a separate module (assuming it will be after conversion)
 import ContextMenu from './contextMenu'; 
+import { Utils } from '../../utils'; // Import Utils
+import { appState } from '../../app'; // Import appState
+import { PreferencesManager } from '../../utils/preferences'; // Import PreferencesManager
 
 // Define types for global functions and variables if they exist, or ensure they are imported/defined.
 // These are placeholders and should be adjusted based on actual definitions.
+/*
 declare function parseFloatSafe(value: string | undefined): number;
 declare function isValidNumber(value: number, minValue?: number): boolean;
 declare function formatNumber(value: number, precision: number): string;
@@ -26,11 +30,11 @@ interface AppState {
 declare const appState: AppState | undefined;
 
 // Define type for PreferencesManager if it exists globally
-interface PreferencesManager {
+interface PreferencesManagerType { // Renamed to avoid conflict with imported const
     saveCurrentState: () => void;
 }
-declare const PreferencesManager: PreferencesManager | undefined;
-
+declare const PreferencesManager: PreferencesManagerType | undefined;
+*/
 
 // DOM Elements
 const visualContainer = document.getElementById('visual-container') as HTMLElement | null;
@@ -114,12 +118,12 @@ interface Dimensions {
  */
 function getCurrentDimensions(): Dimensions {
     return {
-        tabletWidth: parseFloatSafe(cachedElements.tabletWidthInput?.value),
-        tabletHeight: parseFloatSafe(cachedElements.tabletHeightInput?.value),
-        areaWidth: parseFloatSafe(cachedElements.areaWidthInput?.value),
-        areaHeight: parseFloatSafe(cachedElements.areaHeightInput?.value),
-        areaOffsetX: parseFloatSafe(cachedElements.areaOffsetXInput?.value),
-        areaOffsetY: parseFloatSafe(cachedElements.areaOffsetYInput?.value)
+        tabletWidth: Utils.parseFloatSafe(cachedElements.tabletWidthInput?.value),
+        tabletHeight: Utils.parseFloatSafe(cachedElements.tabletHeightInput?.value),
+        areaWidth: Utils.parseFloatSafe(cachedElements.areaWidthInput?.value),
+        areaHeight: Utils.parseFloatSafe(cachedElements.areaHeightInput?.value),
+        areaOffsetX: Utils.parseFloatSafe(cachedElements.areaOffsetXInput?.value),
+        areaOffsetY: Utils.parseFloatSafe(cachedElements.areaOffsetYInput?.value)
     };
 }
 
@@ -162,11 +166,11 @@ function updateRectangleDisplay(areaWidth: number, areaHeight: number, areaOffse
     const currentAreaRadiusForDebug = document.getElementById('areaRadius') as HTMLInputElement | null; // DEBUG STEP 3
     console.log('updateRectangleDisplay called. Radius value from #areaRadius:', currentAreaRadiusForDebug?.value); // DEBUG STEP 3
 
-    const rectWidth = mmToPx(areaWidth, currentScale);
-    const rectHeight = mmToPx(areaHeight, currentScale);
+    const rectWidth = Utils.mmToPx(areaWidth, currentScale);
+    const rectHeight = Utils.mmToPx(areaHeight, currentScale);
     
-    const rectLeft = mmToPx(areaOffsetX, currentScale) - rectWidth / 2;
-    const rectTop = mmToPx(areaOffsetY, currentScale) - rectHeight / 2;
+    const rectLeft = Utils.mmToPx(areaOffsetX, currentScale) - rectWidth / 2;
+    const rectTop = Utils.mmToPx(areaOffsetY, currentScale) - rectHeight / 2;
     
     rectangle.style.width = `${rectWidth}px`;
     rectangle.style.height = `${rectHeight}px`;
@@ -227,9 +231,9 @@ let debouncedSaveState: (() => void) | undefined;
  * Save current state with debounce
  */
 function saveCurrentState(): void {
-    if (typeof PreferencesManager !== 'undefined' && typeof debounce === 'function') {
+    if (typeof PreferencesManager !== 'undefined' && typeof Utils.DOM.debounce === 'function') {
         if (!debouncedSaveState) {
-            debouncedSaveState = debounce(() => {
+            debouncedSaveState = Utils.DOM.debounce(() => {
                 PreferencesManager.saveCurrentState();
             }, 1000);
         }
@@ -256,7 +260,7 @@ function getConstrainedOffsets(
     }
     
     if (!isOffsetXFocused && !isOffsetYFocused) {
-        return constrainAreaOffset(
+        return Utils.constrainAreaOffset(
             areaOffsetX, 
             areaOffsetY, 
             dims.areaWidth, 
@@ -280,7 +284,7 @@ function updateDisplay(): void {
     const isOffsetXFocused = document.activeElement === cachedElements.areaOffsetXInput;
     const isOffsetYFocused = document.activeElement === cachedElements.areaOffsetYInput;
     
-    if (!isValidNumber(dims.tabletWidth, 10) || !isValidNumber(dims.tabletHeight, 10)) {
+    if (!Utils.isValidNumber(dims.tabletWidth, 10) || !Utils.isValidNumber(dims.tabletHeight, 10)) {
         console.warn('Invalid tablet dimensions');
         return;
     }
@@ -294,11 +298,11 @@ function updateDisplay(): void {
     );
     
     if (!isOffsetXFocused && constrainedOffsets.x !== dims.areaOffsetX) {
-        cachedElements.areaOffsetXInput.value = formatNumber(constrainedOffsets.x, DECIMAL_PRECISION_POSITION);
+        cachedElements.areaOffsetXInput.value = Utils.formatNumber(constrainedOffsets.x, Utils.DECIMAL_PRECISION_POSITION);
     }
     
     if (!isOffsetYFocused && constrainedOffsets.y !== dims.areaOffsetY) {
-        cachedElements.areaOffsetYInput.value = formatNumber(constrainedOffsets.y, DECIMAL_PRECISION_POSITION);
+        cachedElements.areaOffsetYInput.value = Utils.formatNumber(constrainedOffsets.y, Utils.DECIMAL_PRECISION_POSITION);
     }
     
     dims.areaOffsetX = constrainedOffsets.x;
@@ -327,8 +331,8 @@ function updateDisplay(): void {
     }
 }
 
-if (typeof throttle === 'function') {
-    throttledUpdateDisplay = throttle(updateDisplay, 16); // ~60fps
+if (typeof Utils.DOM.throttle === 'function') {
+    throttledUpdateDisplay = Utils.DOM.throttle(updateDisplay, 16); // ~60fps
 }
 
 /**
@@ -343,7 +347,7 @@ function updateInfoDisplays(dims: Dimensions): void {
     
     if (isLocked) {
         if (!customRatioInput.matches(':focus') && !(customRatioInput as any).dataset?.editing) {
-            const newRatio = formatNumber(dims.areaWidth / dims.areaHeight, 3);
+            const newRatio = Utils.formatNumber(dims.areaWidth / dims.areaHeight, 3);
             if (customRatioInput.value !== newRatio) {
                 customRatioInput.value = newRatio;
                 if (appState) {
@@ -364,7 +368,7 @@ let debouncedSaveStateWithoutRatio: (() => void) | undefined;
 function updateDisplayWithoutRatio(): void {
     const dims = getCurrentDimensions();
     
-    if (!isValidNumber(dims.tabletWidth, 10) || !isValidNumber(dims.tabletHeight, 10)) {
+    if (!Utils.isValidNumber(dims.tabletWidth, 10) || !Utils.isValidNumber(dims.tabletHeight, 10)) {
         console.warn('Invalid tablet dimensions');
         return;
     }
@@ -383,9 +387,9 @@ function updateDisplayWithoutRatio(): void {
     if (isFirstRender) {
         handleFirstRender();
     } else {
-        if (typeof PreferencesManager !== 'undefined' && typeof debounce === 'function') {
+        if (typeof PreferencesManager !== 'undefined' && typeof Utils.DOM.debounce === 'function') {
             if (!debouncedSaveStateWithoutRatio) {
-                debouncedSaveStateWithoutRatio = debounce(() => {
+                debouncedSaveStateWithoutRatio = Utils.DOM.debounce(() => {
                     PreferencesManager.saveCurrentState();
                 }, 1000);
             }
@@ -439,8 +443,8 @@ function handleDragStart(e: MouseEvent): void {
     isDragging = true;
     dragStartX = e.clientX;
     dragStartY = e.clientY;
-    dragStartOffsetX = parseFloatSafe(cachedElements.areaOffsetXInput.value);
-    dragStartOffsetY = parseFloatSafe(cachedElements.areaOffsetYInput.value);
+    dragStartOffsetX = Utils.parseFloatSafe(cachedElements.areaOffsetXInput.value);
+    dragStartOffsetY = Utils.parseFloatSafe(cachedElements.areaOffsetYInput.value);
     rectangle.style.cursor = 'grabbing';
 }
 
@@ -455,8 +459,8 @@ function handleTouchStart(e: TouchEvent): void {
         const touch = e.touches[0];
         dragStartX = touch.clientX;
         dragStartY = touch.clientY;
-        dragStartOffsetX = parseFloatSafe(cachedElements.areaOffsetXInput.value);
-        dragStartOffsetY = parseFloatSafe(cachedElements.areaOffsetYInput.value);
+        dragStartOffsetX = Utils.parseFloatSafe(cachedElements.areaOffsetXInput.value);
+        dragStartOffsetY = Utils.parseFloatSafe(cachedElements.areaOffsetYInput.value);
     }
 }
 
@@ -473,13 +477,13 @@ function handleMovement(clientX: number, clientY: number): void {
     const deltaXPx = clientX - dragStartX;
     const deltaYPx = clientY - dragStartY;
     
-    const deltaXMm = pxToMm(deltaXPx, currentScale);
-    const deltaYMm = pxToMm(deltaYPx, currentScale);
+    const deltaXMm = Utils.pxToMm(deltaXPx, currentScale);
+    const deltaYMm = Utils.pxToMm(deltaYPx, currentScale);
     
     let newOffsetX = dragStartOffsetX + deltaXMm;
     let newOffsetY = dragStartOffsetY + deltaYMm;
     
-    const constrainedOffsets = constrainAreaOffset(
+    const constrainedOffsets = Utils.constrainAreaOffset(
         newOffsetX, 
         newOffsetY, 
         dims.areaWidth, 
@@ -489,11 +493,11 @@ function handleMovement(clientX: number, clientY: number): void {
     );
     
     if (!isOffsetXFocused) {
-        cachedElements.areaOffsetXInput.value = formatNumber(constrainedOffsets.x, DECIMAL_PRECISION_POSITION);
+        cachedElements.areaOffsetXInput.value = Utils.formatNumber(constrainedOffsets.x, Utils.DECIMAL_PRECISION_POSITION);
     }
     
     if (!isOffsetYFocused) {
-        cachedElements.areaOffsetYInput.value = formatNumber(constrainedOffsets.y, DECIMAL_PRECISION_POSITION);
+        cachedElements.areaOffsetYInput.value = Utils.formatNumber(constrainedOffsets.y, Utils.DECIMAL_PRECISION_POSITION);
     }
     
     if (throttledUpdateDisplay) {
@@ -564,11 +568,11 @@ function centerArea(): void {
     const isOffsetYFocused = document.activeElement === cachedElements.areaOffsetYInput;
     
     if (!isOffsetXFocused) {
-        cachedElements.areaOffsetXInput.value = formatNumber(dims.tabletWidth / 2, DECIMAL_PRECISION_POSITION);
+        cachedElements.areaOffsetXInput.value = Utils.formatNumber(dims.tabletWidth / 2, Utils.DECIMAL_PRECISION_POSITION);
     }
     
     if (!isOffsetYFocused) {
-        cachedElements.areaOffsetYInput.value = formatNumber(dims.tabletHeight / 2, DECIMAL_PRECISION_POSITION);
+        cachedElements.areaOffsetYInput.value = Utils.formatNumber(dims.tabletHeight / 2, Utils.DECIMAL_PRECISION_POSITION);
     }
     
     updateDisplay();
@@ -592,7 +596,7 @@ function centerArea(): void {
  */
 function setupResizeObserver(): void {
     if (!visualContainer) return;
-    const resizeObserver = new ResizeObserver(throttle(() => {
+    const resizeObserver = new ResizeObserver(Utils.DOM.throttle(() => {
         updateContainerSize();
         if (visualContainer) {
             visualContainer.style.display = 'flex';
@@ -609,8 +613,8 @@ function setupResizeObserver(): void {
  * Initialize throttled functions and ensure proper order
  */
 function initThrottledFunctions(): void {
-    if (!throttledUpdateDisplay && typeof throttle === 'function') {
-        throttledUpdateDisplay = throttle(updateDisplay, 16);
+    if (!throttledUpdateDisplay && typeof Utils.DOM.throttle === 'function') {
+        throttledUpdateDisplay = Utils.DOM.throttle(updateDisplay, 16);
     }
 }
 
@@ -695,7 +699,7 @@ function initVisualizer(): void {
         }
         
         if (toggleGridCheckbox && backgroundGrid) {
-            toggleGridCheckbox.addEventListener('change', throttle(() => {
+            toggleGridCheckbox.addEventListener('change', Utils.DOM.throttle(() => {
                 backgroundGrid.classList.toggle('hidden', !toggleGridCheckbox.checked);
             }, 50));
         }

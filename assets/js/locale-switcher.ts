@@ -13,7 +13,6 @@ interface EventListenersMap {
     buttonKeydown?: (e: KeyboardEvent) => void;
     dropdownClick?: (e: MouseEvent) => void;
     documentClick?: () => void;
-    [key: string]: EventListenerOrEventListenerObject | undefined;
 }
 
 // Assuming localeManager has a more specific type if available, else use 'any' for now

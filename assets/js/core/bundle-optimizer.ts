@@ -212,12 +212,12 @@ class BundleOptimizer {
      */
     initializeCommonChunks() {
         // Register common chunks
-        this.registerChunk('favorites', './components/favorites/favoritesindex.js', ['utils'], false);
-        this.registerChunk('tablet-selector', './components/tablet/tabletSelector.js', ['utils'], false);
-        this.registerChunk('ui-manager', './ui/ui-manager.js', ['utils'], true);
-        this.registerChunk('form-manager', './ui/form-manager.js', ['utils'], true);
-        this.registerChunk('display-manager', './core/display-manager.js', ['utils'], true);
-        this.registerChunk('notification-manager', './core/notification-manager.js', [], true);
+        this.registerChunk('favorites', './components/favorites/favoritesindex', ['utils'], false);
+        this.registerChunk('tablet-selector', './components/tablet/tabletSelector', ['utils'], false);
+        this.registerChunk('ui-manager', './ui/ui-manager', ['utils'], true);
+        this.registerChunk('form-manager', './ui/form-manager', ['utils'], true);
+        this.registerChunk('display-manager', './core/display-manager', ['utils'], true);
+        this.registerChunk('notification-manager', './core/notification-manager', [], true);
     }
 
     /**

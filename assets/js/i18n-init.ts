@@ -1,5 +1,5 @@
-import localeManager from '../locales/index'; // .ts extension will be resolved
-import { detectAndApplyBrowserLanguage } from './browser-language-detector'; // .ts
+import localeManager from '../locales/index'; // Remove extension - will be resolved by TS
+import { detectAndApplyBrowserLanguage } from './browser-language-detector';
 
 // Define types for global objects if they are expected
 interface LocaleManager {
@@ -211,11 +211,18 @@ function setupEventListeners(): void {
 
 function initializeI18n(): void {
     try {
+        console.log('Initializing i18n system...');
         setupGlobalFunctions();
-        detectAndApplyBrowserLanguage(); // Assumes this function is available
+        console.log('Global i18n functions set up');
+        detectAndApplyBrowserLanguage();
+        console.log('Browser language detection applied');
         window.localeManager?.updatePageTranslations();
+        console.log('Page translations updated');
         observeDOMChanges();
+        console.log('DOM change observer for translations set up');
         setupEventListeners();
+        console.log('i18n event listeners set up');
+        console.log('i18n system fully initialized');
     } catch (e) {
         console.error('Error during translations initialization:', e);
     }

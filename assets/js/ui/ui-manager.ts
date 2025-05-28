@@ -32,6 +32,7 @@ declare const Notifications: NotificationsGlobal | undefined; // Or window.Notif
 interface PreferencesManagerGlobal {
     showResetConfirmation: (callback: (confirmed: boolean) => void) => void;
     resetPreferences: () => void;
+    saveCurrentState: () => void;
 }
 declare const PreferencesManager: PreferencesManagerGlobal | undefined; // Or window.PreferencesManager
 
@@ -95,37 +96,45 @@ export const UIManager = {
     },
     
     handleUpdateFavorite(): void {
-        if (!this.appState || !this.appState.originalValues || typeof this.appState.editingFavoriteId === 'undefined' || this.appState.editingFavoriteId === null) return;
+        if (!this.appState || this.appState.editingFavoriteId === null) {
+            console.warn('No favorite is being edited.');
+            return;
+        }
 
-        const formValues = FormManager.getFormValues();
-        
-        const updatedData: Partial<FavoriteObject> = { // Ensure all fields are optional or provide defaults
-            width: !isNaN(formValues.areaWidth!) ? formValues.areaWidth : this.appState.originalValues.width,
-            height: !isNaN(formValues.areaHeight!) ? formValues.areaHeight : this.appState.originalValues.height,
-            x: !isNaN(formValues.areaOffsetX!) ? formValues.areaOffsetX : this.appState.originalValues.x,
-            y: !isNaN(formValues.areaOffsetY!) ? formValues.areaOffsetY : this.appState.originalValues.y,
-            ratio: !isNaN(formValues.customRatio!) ? formValues.customRatio : this.appState.originalValues.ratio,
-            tabletW: !isNaN(formValues.tabletWidth!) ? formValues.tabletWidth : this.appState.originalValues.tabletW,
-            tabletH: !isNaN(formValues.tabletHeight!) ? formValues.tabletHeight : this.appState.originalValues.tabletH,
-            presetInfo: formValues.presetInfo || this.appState.originalValues.presetInfo,
-            title: this.appState.originalValues.title,
-            description: this.appState.originalValues.description,
-            radius: !isNaN(formValues.areaRadius) ? formValues.areaRadius : (this.appState.originalValues.radius || 0),
-            lastModified: new Date().getTime()
-        };
-        
-        if (typeof FavoritesUI !== 'undefined' && FavoritesUI.updateFavorite) {
-            const success = FavoritesUI.updateFavorite(this.appState.editingFavoriteId, updatedData);
+        const updatedData = FormManager.getFormValues();
+        const favoriteId = this.appState.editingFavoriteId;
+
+        if (favoriteId === undefined) {
+            console.warn('Favorite ID is undefined.');
+            return;
+        }
+
+        if (typeof window.FavoritesUI?.updateFavorite === 'function') {
+            const success = window.FavoritesUI.updateFavorite(favoriteId, updatedData);
             if (success) {
-                FavoritesUI.cachedFavorites = null; // Assuming FavoritesUI has this structure
-                if (FavoritesUI.loadFavoritesWithAnimation) FavoritesUI.loadFavoritesWithAnimation();
-                
-                if (FavoritesUI.cancelEditMode) FavoritesUI.cancelEditMode();
-                this.appState.cancelEditMode();
-                
-                if (Notifications) Notifications.success(translateWithFallback('notifications.configurationUpdated', 'Configuration mise à jour'));
-            } else if (Notifications) {
-                Notifications.error(translateWithFallback('notifications.errorUpdatingConfig', 'Erreur lors de la mise à jour'));
+                if (Notifications && typeof Notifications.success === 'function') {
+                    Notifications.success(
+                        window.translateWithFallback ?
+                        window.translateWithFallback('notifications.favoriteUpdated', 'Favorite updated successfully!') :
+                        'Favorite updated successfully!'
+                    );
+                }
+                this.updateEditModeUI(false);
+                if (typeof updateDisplay === 'function') {
+                    updateDisplay();
+                }
+            } else {
+                if (Notifications && typeof Notifications.error === 'function') {
+                    Notifications.error(
+                        window.translateWithFallback ?
+                        window.translateWithFallback('notifications.favoriteUpdateError', 'Failed to update favorite.') :
+                        'Failed to update favorite.'
+                    );
+                }
+            }
+        } else {
+            if (Notifications && typeof Notifications.error === 'function') {
+                Notifications.error('Update function not available.');
             }
         }
     },
@@ -139,25 +148,28 @@ export const UIManager = {
     },
     
     setupActionButtons(): void {
-        const swapButton = document.getElementById('swap-btn') as HTMLButtonElement | null;
-        const centerButton = document.getElementById('center-btn') as HTMLButtonElement | null;
-        const copyButton = document.getElementById('copy-btn') as HTMLButtonElement | null;
-        const cancelEditBtn = document.getElementById('cancel-edit-btn') as HTMLButtonElement | null;
-        
-        swapButton?.addEventListener('click', () => {
-            this.appState?.cancelEditMode();
-            this.handleSwapDimensions();
-        });
-        
-        centerButton?.addEventListener('click', () => {
-            if (this.appState && !this.appState.editingFavoriteId) {
-                this.appState.cancelEditMode();
-            }
-            if (typeof centerArea === 'function') centerArea();
-        });
-        
-        copyButton?.addEventListener('click', () => this.handleCopyInfo());
-        cancelEditBtn?.addEventListener('click', () => this.appState?.cancelEditMode());
+        const swapButton = document.getElementById('swap-dimensions-btn');
+        const copyInfoButton = document.getElementById('copy-info-btn');
+        const centerAreaButton = document.getElementById('center-area-btn');
+
+        if (swapButton) {
+            swapButton.addEventListener('click', () => this.handleSwapDimensions());
+        }
+        if (copyInfoButton) {
+            copyInfoButton.addEventListener('click', () => this.handleCopyInfo());
+        }
+
+        if (centerAreaButton && typeof centerArea === 'function') {
+            centerAreaButton.addEventListener('click', centerArea);
+        } else if (centerAreaButton) {
+            centerAreaButton.addEventListener('click', () => {
+                if (typeof window.centerArea === 'function') {
+                    window.centerArea();
+                } else {
+                    console.warn('centerArea function not found on window.');
+                }
+            });
+        }
     },
     
     handleSwapDimensions(): void {
@@ -183,30 +195,42 @@ export const UIManager = {
     },
     
     handleCopyInfo(): void {
-        const elements = FormManager.getFormElements();
-        if (!elements.areaWidth || !elements.areaHeight || !elements.areaOffsetX || !elements.areaOffsetY || !elements.areaRadius) return;
+        const formValues = FormManager.getFormValues();
+        const recapText = `
+            Tablet: ${formValues.presetInfo || 'Custom'}
+            Area: ${formValues.areaWidth}x${formValues.areaHeight} mm
+            Offset: X=${formValues.areaOffsetX}, Y=${formValues.areaOffsetY} mm
+            Ratio: ${formValues.customRatio ? formValues.customRatio.toFixed(3) : 'N/A'}
+            Radius: ${formValues.areaRadius}%
+        `.trim().replace(/^ +/gm, '');
 
-        const width = NumberUtils.parseFloatSafe(elements.areaWidth.value);
-        const height = NumberUtils.parseFloatSafe(elements.areaHeight.value);
-        const offsetX = NumberUtils.parseFloatSafe(elements.areaOffsetX.value);
-        const offsetY = NumberUtils.parseFloatSafe(elements.areaOffsetY.value);
-        const ratio = (height > 0) ? (width / height).toFixed(3) : 'N/A';
-        const areaRadius = parseInt(elements.areaRadius.value) || 0;
-        
-        const titleLabel = translateWithFallback('summary.currentConfig', '-- Zone Active Réelle --');
-        const widthLabel = translateWithFallback('area.width', 'Largeur');
-        const heightLabel = translateWithFallback('area.height', 'Hauteur');
-        const ratioLabel = translateWithFallback('area.ratio', 'Ratio');
-        const centerXLabel = translateWithFallback('area.positionX', 'Centre X');
-        const centerYLabel = translateWithFallback('area.positionY', 'Centre Y');
-        const borderRadiusLabel = translateWithFallback('area.radius', 'Rayon de la bordure');
-
-        const info = `${titleLabel}\n${widthLabel}: ${NumberUtils.formatNumber(width)} mm\n${heightLabel}: ${NumberUtils.formatNumber(height)} mm\n${ratioLabel}: ${ratio}\n${centerXLabel}: ${NumberUtils.formatNumber(offsetX, 3)} mm\n${centerYLabel}: ${NumberUtils.formatNumber(offsetY, 3)} mm\n${borderRadiusLabel}: ${areaRadius}%`;
-        
-        DOMUtils.copyToClipboard(info);
-        
-        if (Notifications) {
-            Notifications.success(translateWithFallback('notifications.copiedInfo', 'Information copiée !'));
+        if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+            navigator.clipboard.writeText(recapText)
+                .then(() => {
+                    if (Notifications && typeof Notifications.success === 'function') {
+                        Notifications.success(
+                            window.translateWithFallback ?
+                            window.translateWithFallback('notifications.copiedSuccess', 'Information copied!') :
+                            'Information copied!'
+                        );
+                    }
+                })
+                .catch(err => {
+                    console.error('Failed to copy info:', err);
+                    if (Notifications && typeof Notifications.error === 'function') {
+                        Notifications.error(
+                            window.translateWithFallback ?
+                            window.translateWithFallback('notifications.copiedError', 'Could not copy information.') :
+                            'Could not copy information.'
+                        );
+                    }
+                });
+        } else if (Notifications && typeof Notifications.error === 'function') {
+             Notifications.error(
+                window.translateWithFallback ?
+                window.translateWithFallback('notifications.clipboardUnavailable', 'Clipboard API not available.') :
+                'Clipboard API not available.'
+             );
         }
     },
     

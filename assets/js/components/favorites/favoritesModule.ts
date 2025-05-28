@@ -3,8 +3,8 @@
  * Automatic initialization for browser environments
  */
 
-import { FavoritesUI } from './favoritesindex'; // Use .ts extension implicitly
-import { logError } from './favorites-utils';
+import { FavoritesUI } from './favoritesindex.js'; // Ajouter l'extension .js explicitement
+import { logError } from './favorites-utils.js'; // Ajouter l'extension .js explicitement
 import { FavoritesUIInterface } from './types'; // Import the interface
 
 // Extend the Window interface to include FavoritesUI
@@ -30,6 +30,10 @@ async function initializeFavorites(): Promise<void> {
         
         if (success) {
             console.log('Favorites module initialized successfully');
+            // Exposer globalement pour le débogage
+            if (typeof window !== 'undefined') {
+                window.FavoritesUI = FavoritesUI;
+            }
         } else {
             console.error('Failed to initialize favorites module');
         }
@@ -45,9 +49,13 @@ if (typeof window !== 'undefined') {
     
     // Auto-initialize when DOM is ready
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeFavorites as EventListener);
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("DOM Content Loaded - Initializing favorites module");
+            initializeFavorites();
+        });
     } else {
         // DOM is already ready
+        console.log("DOM already ready - Initializing favorites module immediately");
         initializeFavorites();
     }
     

@@ -20,8 +20,8 @@ interface CriticalTestResult {
 declare global {
     interface Window {
         osureaTests?: {
-            runAll: () => Promise<AllTestsResult | null>;
-            runCritical: () => Promise<CriticalTestResult | null>;
+            runAll: () => Promise<any | null>;
+            runCritical: () => Promise<any | null>;
             diagnose: () => Promise<void>;
         };
     }

@@ -52,7 +52,7 @@ interface OriginalValues {
     ratio?: number;
     tabletW?: number;
     tabletH?: number;
-    presetInfo?: string;
+    presetInfo?: string | null | undefined;
     // Add other potential original values
 }
 
@@ -60,7 +60,7 @@ interface OriginalValues {
 declare global {
     interface Window {
         updateRatioFieldState?: () => void;
-        updateSliderProgress?: (value?: string | number) => void; // From radiusSlider.ts
+        updateSliderProgress?: (value: string | number) => void; // Make parameter non-optional
     }
 }
 
@@ -139,7 +139,9 @@ export const FormManager = {
         };
         
         elements.tabletWidth?.addEventListener('input', handleTabletDimensionInput);
-        elements.tabletHeight?.addEventListener('input', handleTabletDimensionInput);
+        if (elements.tabletHeight) {
+            elements.tabletHeight.addEventListener('input', handleTabletDimensionInput);
+        }
     },
     
     setupAreaDimensionInputs(): void {
@@ -152,7 +154,7 @@ export const FormManager = {
             }
             
             const tabletWidth = NumberUtils.parseFloatSafe(elements.tabletWidth.value);
-            const tabletHeight = NumberUtils.parseFloatSafe(elements.tabletHeight.value);
+            const tabletHeight = NumberUtils.parseFloatSafe(elements.tabletHeight?.value);
             const areaWidth = NumberUtils.parseFloatSafe(elements.areaWidth.value);
             
             const constrainedWidth = Math.min(areaWidth, tabletWidth);
@@ -193,7 +195,7 @@ export const FormManager = {
             }
             
             const tabletWidth = NumberUtils.parseFloatSafe(elements.tabletWidth.value);
-            const tabletHeight = NumberUtils.parseFloatSafe(elements.tabletHeight.value);
+            const tabletHeight = NumberUtils.parseFloatSafe(elements.tabletHeight?.value);
             const areaHeight = NumberUtils.parseFloatSafe(elements.areaHeight.value);
             
             const constrainedHeight = Math.min(areaHeight, tabletHeight);

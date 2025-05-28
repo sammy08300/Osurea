@@ -6,6 +6,8 @@
 // Define expected module structures and their functions
 // These are simplified; more detailed types would come from the modules themselves if they were TS already.
 
+import { FavoriteObject } from '../components/favorites/types';
+
 interface UtilsModule {
     Utils: any; // Replace 'any' with a more specific type if Utils structure is known
     DOM: any;
@@ -18,7 +20,7 @@ interface LocaleModule {
 }
 
 interface I18nInitModule {
-    translateWithFallback?: Function;
+    translateWithFallback?: (...args: any[]) => string; // More generic function type
 }
 
 interface StorageModule {
@@ -45,19 +47,34 @@ interface DimensionsTestModule {
 // Extend Window interface for global exposure
 declare global {
     interface Window {
-        Utils?: any;
-        DOM?: any;
-        Numbers?: any;
-        Performance?: any;
-        debounce?: Function;
-        throttle?: Function;
-        clamp?: Function;
-        formatNumber?: Function;
-        parseFloatSafe?: Function;
-        constrainAreaOffset?: Function;
-        localeManager?: any;
-        translateWithFallback?: Function;
-        StorageManager?: any;
+        Utils?: {
+            DOM: {
+                debounce: Function;
+                throttle: Function;
+                getElement: Function;
+            };
+            Numbers: {
+                formatNumber: (num: number, precision?: number | undefined) => string;
+                clamp: (value: number, min: number, max: number) => number;
+                parseFloatSafe: (value: string) => number;
+                constrainAreaOffset: (offsetX: number, offsetY: number, areaWidth: number, areaHeight: number, tabletWidth: number, tabletHeight: number) => { x: number; y: number };
+            };
+            Performance: {
+                memoize: Function;
+            };
+            debounce?: Function;
+            formatNumber?: (num: number, precision?: number | undefined) => string;
+            clamp?: (value: number, min: number, max: number) => number;
+        };       
+        constrainAreaOffset?: (offsetX: number, offsetY: number, areaWidth: number, areaHeight: number, tabletWidth: number, tabletHeight: number) => { x: number; y: number };
+        localeManager?: Window['localeManager']; // Use the globally defined type
+        translateWithFallback?: (key: string, fallback?: string | undefined) => string;
+        StorageManager?: {
+            forceReset: () => FavoriteObject[];
+            diagnoseFavorites: () => void;
+            clearCache: () => void;
+            getFavorites: () => FavoriteObject[];
+        };
         OsureaTest?: {
             runAll: () => Promise<any>;
             runCritical: () => Promise<any>;
@@ -69,35 +86,49 @@ declare global {
             performanceDimensions: () => any;
             init: () => boolean;
         };
-        osureaTests?: Window['OsureaTest']; // Alias
+        osureaTests?: {
+            runAll: () => Promise<any | null>;
+            runCritical: () => Promise<any | null>;
+            diagnose: () => Promise<void>;
+        };
     }
 }
 
-
-(async function(): Promise<void> {
+async function initializeTestEnvironment(): Promise<boolean> {
     try {
-        if (!window.Utils) {
-            const utilsModule = await import('../utils/index') as UtilsModule; // Use .ts implicit extension
-            window.Utils = utilsModule.Utils;
-            window.DOM = utilsModule.DOM;
-            window.Numbers = utilsModule.Numbers;
-            window.Performance = utilsModule.Performance;
-            
-            window.debounce = window.Utils.debounce;
-            window.throttle = window.Utils.throttle;
-            window.clamp = window.Utils.clamp;
-            window.formatNumber = window.Utils.formatNumber;
-            window.parseFloatSafe = window.Utils.parseFloatSafe;
-            window.constrainAreaOffset = window.Utils.constrainAreaOffset;
+        // Load core utilities
+        const utilsModule = await import('../utils') as UtilsModule;
+        window.Utils = utilsModule.Utils;
+        window.DOM = utilsModule.DOM;
+        window.Numbers = utilsModule.Numbers;
+        window.Utils = utilsModule.Utils; // Assuming Utils is the main export object from index
+        window.DOM = utilsModule.DOM; // Assuming DOM is exported directly
+        window.Numbers = utilsModule.Numbers; // Assuming Numbers is exported directly
+        window.Performance = utilsModule.Performance; // Assuming Performance is exported directly
+
+        // Setup legacy direct access if Utils exists and has these properties
+        if (window.Utils) {
+            if (window.Utils.DOM && typeof window.Utils.DOM.debounce === 'function') {
+                window.debounce = window.Utils.DOM.debounce as any;
+            }
+            if (window.Utils.DOM && typeof window.Utils.DOM.throttle === 'function') {
+                window.throttle = window.Utils.DOM.throttle as any;
+            }
+            if (window.Utils.Numbers && typeof window.Utils.Numbers.clamp === 'function') {
+                window.clamp = window.Utils.Numbers.clamp;
+            }
+            if (window.Utils.Numbers && typeof window.Utils.Numbers.formatNumber === 'function') {
+                window.formatNumber = window.Utils.Numbers.formatNumber;
+            }
+            if (window.Utils.Numbers && typeof window.Utils.Numbers.parseFloatSafe === 'function') {
+                window.parseFloatSafe = window.Utils.Numbers.parseFloatSafe;
+            }
+            if (window.Utils.Numbers && typeof window.Utils.Numbers.constrainAreaOffset === 'function') {
+                window.constrainAreaOffset = window.Utils.Numbers.constrainAreaOffset;
+            }
         }
-        
-        if (window.Utils && (!window.Utils.DOM || !window.Utils.Numbers || !window.Utils.Performance)) {
-            const utilsModule = await import('../utils/index') as UtilsModule;
-            if (!window.Utils.DOM) window.Utils.DOM = utilsModule.DOM;
-            if (!window.Utils.Numbers) window.Utils.Numbers = utilsModule.Numbers;
-            if (!window.Utils.Performance) window.Utils.Performance = utilsModule.Performance;
-        }
-        
+
+        // Load localization
         if (!window.localeManager) {
             const localeModule = await import('../../locales/index') as LocaleModule;
             window.localeManager = localeModule.default;
@@ -167,8 +198,27 @@ declare global {
         
         window.osureaTests = window.OsureaTest;
         
+        // Final check and return true if all initializations are successful
+        if (window.Utils && window.localeManager && window.StorageManager && window.OsureaTest) {
+            window.OsureaTest.init(); // Assuming an init method for OsureaTest itself
+            console.log('[TestLoader] Test environment initialized successfully.');
+            return true; // Explicitly return true on success
+        }
+
+        console.error('[TestLoader] Failed to initialize some critical test components.');
+        return false; // Explicitly return false if something failed
     } catch (error) {
         console.error('❌ Failed to load Osurea tests:', error);
         console.log('💡 Make sure you are on the correct page and all test files exist.');
+        return false;
     }
-})();
+}
+
+// Initialize the test environment as soon as the script loads
+initializeTestEnvironment().then(initialized => {
+    if (initialized) {
+        // ... existing code ...
+    }
+});
+
+export {}; // Make this a module

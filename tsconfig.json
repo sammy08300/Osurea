@@ -2,22 +2,25 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "ESNext",
+    "moduleResolution": "node",
     "strict": true,
     "rootDir": "./assets/js",
     "outDir": "./public/assets/js",
     "sourceMap": true,
-    "allowJs": false, // Crucial: ensure we are creating valid TS
-    "moduleResolution": "node",
+    "allowJs": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "moduleDetection": "force"
   },
   "include": [
-    "assets/js/core/**/*.ts",  // Assumes core files are already .ts
-    "assets/js/utils/**/*.ts", // For the newly renamed utils files
+    "assets/js/core/**/*.ts",
+    "assets/js/utils/**/*.ts",
     "assets/js/components/area/**/*.ts",
     "assets/js/components/tablet/**/*.ts",
     "assets/js/components/ui/**/*.ts",
+    "assets/js/components/favorites/**/*.ts",
     "assets/js/init/**/*.ts",
     "assets/js/tests/**/*.ts",
     "assets/js/ui/*.ts",
@@ -26,5 +29,8 @@
   "exclude": [
     "node_modules", "./public", "./compiled_ts",
     "build.js", "service-worker.js", "assets/js/utils/README.md"
-  ]
+  ],
+  "scripts": {
+    "build": "tsc"
+  }
 }

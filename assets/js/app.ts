@@ -7,7 +7,9 @@ import { dependencyManager } from './core/dependency-manager';
 import { displayManager } from './core/display-manager';
 import { notificationManager } from './core/notification-manager';
 import { initLegacyCompatibility } from './core/legacy-compatibility';
-import { Utils, DOMUtils, NumberUtils } from './utils/index'; // Assuming DOMUtils, NumberUtils are exported from utils/index
+import { Utils, DOM, Numbers, Performance } from './utils/index'; // Ensure Utils is imported
+import { StorageManager } from './utils/storage';
+import { PreferencesManager } from './utils/preferences';
 
 // Import performance optimization modules
 import { LazyComponent } from './utils/lazy-component-loader';
@@ -15,25 +17,26 @@ import { bundleOptimizer } from './core/bundle-optimizer';
 import { setupEnhancedLazyLoading } from './utils/lazyLoadImages';
 
 // Import existing modules
-import { FavoritesUI, FavoritesInit } from './components/favorites/favoritesindex'; // Assuming .ts
-import TabletSelector from './components/tablet/tabletSelector'; // Assuming .ts
-import { translateWithFallback } from './i18n-init'; // Assuming .ts
-import { UIManager } from './ui/ui-manager'; // Assuming .ts
-import { FormManager } from './ui/form-manager'; // Assuming .ts
-import { RecapManager } from './ui/recap-manager'; // Assuming .ts
-import { FavoriteObject } from './components/favorites/types'; // Import FavoriteObject type
+import { FavoritesUI, FavoritesInit } from './components/favorites/favoritesindex';
+import TabletSelector, { Tablet } from './components/tablet/tabletSelector';
+import { translateWithFallback } from './i18n-init'; // Keep this named import
+import initializeI18n from './i18n-init'; // Add default import
+import { UIManager } from './ui/ui-manager';
+import { FormManager } from './ui/form-manager';
+import { RecapManager } from './ui/recap-manager';
+import { FavoriteObject } from './components/favorites/types';
+// import { AreaDrawer } from './components/area/area-drawer'; // Commented out as file not found
 
 // Define types for global objects if they are expected to be on the window or global scope
 // These are illustrative; actual types depend on how these managers are structured.
 declare global {
     interface Window {
-        StorageManager?: { // Assuming StorageManager might exist on window
-            forceReset: () => FavoriteObject[];
+        StorageManager_unused?: { 
             diagnoseFavorites: () => void;
             clearCache: () => void;
             getFavorites: () => FavoriteObject[];
         };
-        PreferencesManager?: {
+        PreferencesManager_unused?: {
             init: () => void;
             _cleanupFavoriteReferences: () => void;
             saveCurrentState: () => void;
@@ -49,7 +52,7 @@ interface TabletData {
 }
 
 class AppState {
-    tabletData: TabletData[];
+    tabletData: Tablet[];
     editingFavoriteId: string | number | null;
     originalValues: Partial<FavoriteObject> | null; // Use Partial from imported FavoriteObject
     currentRatio: number;
@@ -70,6 +73,7 @@ class AppState {
             const response = await fetch('data/tablets.json');
             if (!response.ok) throw new Error('Failed to load tablet data');
             this.tabletData = await response.json();
+            console.log('Fetched tablet data:', this.tabletData);
             TabletSelector.init(this.tabletData); // TabletSelector should have its types defined
         } catch (error) {
             console.error('Error loading tablet data:', error);
@@ -106,73 +110,91 @@ class AppState {
     }
 
     private _initializeStorageDiagnostics(): void {
-        if (window.StorageManager) {
-            if (typeof window.StorageManager.forceReset === 'function') {
-                window.StorageManager.forceReset();
-            } else if (typeof window.StorageManager.diagnoseFavorites === 'function') {
-                window.StorageManager.diagnoseFavorites();
+        if (StorageManager) {
+            if (typeof StorageManager.diagnoseFavorites === 'function') {
+                StorageManager.diagnoseFavorites(); // Direct call if it exists
             }
         }
-        if (window.PreferencesManager?._cleanupFavoriteReferences) {
-            window.PreferencesManager._cleanupFavoriteReferences();
+        if (PreferencesManager?._cleanupFavoriteReferences) {
+            PreferencesManager._cleanupFavoriteReferences();
         }
-        if (window.StorageManager?.diagnoseFavorites) {
-            setTimeout(() => window.StorageManager!.diagnoseFavorites(), 500);
+        // The problematic line was here, let's adjust the logic slightly
+        // If StorageManager and diagnoseFavorites exist, call it after a delay.
+        if (StorageManager && typeof StorageManager.diagnoseFavorites === 'function') {
+            setTimeout(() => StorageManager!.diagnoseFavorites!(), 500);
         }
     }
 
     async init(): Promise<void> {
         try {
+            console.log('Initializing application...');
             notificationManager.init();
+            console.log('Notification manager initialized');
+            
             initLegacyCompatibility(); // Assuming this handles its own globals or is self-contained
+            console.log('Legacy compatibility initialized');
             
             dependencyManager.register('NotificationManager', notificationManager, true);
             dependencyManager.register('DisplayManager', displayManager, true);
-            dependencyManager.register('Utils', Utils, true);
+            dependencyManager.register('Utils', Utils, true); // Ensure Utils is registered
+            console.log('Core dependencies registered');
             
             this._initializeStorageDiagnostics();
+            console.log('Storage diagnostics initialized');
             
             if (typeof FavoritesUI !== 'undefined' && !FavoritesUI.isReady()) {
                 await FavoritesUI.init(); // Assuming init can be async or returns a Promise
+                console.log('FavoritesUI initialized');
             }
             
-            window.PreferencesManager?.init();
+            PreferencesManager?.init();
+            console.log('Preferences manager initialized');
             
             await this.loadTabletData();
+            console.log('Tablet data loaded');
             
-            FormManager.init(this);
-            UIManager.init(this);
+            FormManager.init(this as any); // Cast to any to resolve type mismatch temporarily
+            console.log('Form manager initialized');
+            
+            UIManager.init(this as any); // Cast to any to resolve type mismatch temporarily
+            console.log('UI manager initialized');
+            
             RecapManager.init(); // Assuming RecapManager takes no args or is self-contained
+            console.log('Recap manager initialized');
             
             dependencyManager.register('FormManager', FormManager, true);
             dependencyManager.register('UIManager', UIManager, true);
             dependencyManager.register('RecapManager', RecapManager, true);
+            console.log('UI dependencies registered');
             
             displayManager.init({
                 FormManager: FormManager,
-                PreferencesManager: window.PreferencesManager || null
+                PreferencesManager: PreferencesManager || null
             });
+            console.log('Display manager initialized');
             
-            this.debouncedUpdateRatio = DOMUtils.debounce(() => { // Use DOMUtils from imported Utils
+            this.debouncedUpdateRatio = Utils.DOM.debounce(() => {
                 const formManager = dependencyManager.get('FormManager') as typeof FormManager;
                 const elements = formManager.getFormElements();
                 if(!elements.areaWidth || !elements.areaHeight || !elements.customRatio) return;
 
-                const width = NumberUtils.parseFloatSafe(elements.areaWidth.value); // Use NumberUtils
-                const height = NumberUtils.parseFloatSafe(elements.areaHeight.value);
+                const width = Utils.Numbers.parseFloatSafe(elements.areaWidth.value);
+                const height = Utils.Numbers.parseFloatSafe(elements.areaHeight.value);
                 
                 if (height > 0 && width > 0) {
-                    const calculatedRatio = NumberUtils.calculateRatioMemoized(width, height); // Use NumberUtils
+                    const calculatedRatio = Utils.Numbers.calculateRatioMemoized ? Utils.Numbers.calculateRatioMemoized(width, height) : width / height;
                     if (!elements.customRatio.dataset.editing && !elements.customRatio.matches(':focus')) {
-                        elements.customRatio.value = NumberUtils.formatNumber(calculatedRatio, 3); // Use NumberUtils
+                        elements.customRatio.value = Utils.Numbers.formatNumber(calculatedRatio, 3);
                         this.currentRatio = calculatedRatio;
                     }
                 }
-            }, 300);
+            }, 250);
+            console.log('Debounced ratio update initialized');
             
             this.isInitialized = true;
             this._initializePerformanceOptimizations();
             displayManager.update();
+            console.log('Application initialization completed successfully');
             
         } catch (error) {
             console.error('Error initializing application:', error);
@@ -195,12 +217,12 @@ class AppState {
     private _setupRefreshHandlers(): void {
         window.addEventListener('keydown', (e: KeyboardEvent) => {
             if (e.key === 'F5' || (e.ctrlKey && e.key === 'r')) {
-                if (window.StorageManager) {
-                    if (typeof window.StorageManager.clearCache === 'function') {
-                        window.StorageManager.clearCache();
+                if (StorageManager) {
+                    if (typeof StorageManager.clearCache === 'function') {
+                        StorageManager.clearCache();
                     }
-                    if (typeof window.StorageManager.getFavorites === 'function') {
-                        window.StorageManager.getFavorites();
+                    if (typeof StorageManager.getFavorites === 'function') {
+                        StorageManager.getFavorites();
                     }
                 }
                 if (typeof FavoritesInit !== 'undefined') { // FavoritesInit might not be global
@@ -209,12 +231,12 @@ class AppState {
                         FavoritesInit.updateFavoriteCache(true);
                     }
                 }
-                if (window.PreferencesManager) {
-                    if (typeof window.PreferencesManager._cleanupFavoriteReferences === 'function') {
-                        window.PreferencesManager._cleanupFavoriteReferences();
+                if (PreferencesManager) {
+                    if (typeof PreferencesManager._cleanupFavoriteReferences === 'function') {
+                        PreferencesManager._cleanupFavoriteReferences();
                     }
-                    if (typeof window.PreferencesManager.saveCurrentState === 'function') {
-                        window.PreferencesManager.saveCurrentState();
+                    if (typeof PreferencesManager.saveCurrentState === 'function') {
+                        PreferencesManager.saveCurrentState();
                     }
                 }
             }
@@ -222,13 +244,16 @@ class AppState {
     }
 }
 // Define OriginalValues type for appState, can be moved to a types file
-interface OriginalValues extends Partial<FavoriteObject> {}
+interface OriginalValues extends Partial<FavoriteObject> {
+    presetInfo?: string | null | undefined; // Explicitly allow null here
+}
 
 
 export const appState = new AppState();
 
 document.addEventListener('DOMContentLoaded', async () => {
     try {
+        console.log('DOM content loaded, initializing application...');
         await appState.init();
         (appState as any)._setupRefreshHandlers(); // Access private method for setup
         
@@ -240,6 +265,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             e.preventDefault();
             return false;
         });
+        console.log('Application fully initialized and event handlers setup');
         
     } catch (error) {
         console.error('Failed to initialize application:', error);

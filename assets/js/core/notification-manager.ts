@@ -3,7 +3,8 @@
  * Replaces global Notifications object with a proper class-based system
  */
 
-import { dependencyManager } from './dependency-manager.js';
+import { dependencyManager } from './dependency-manager';
+import { translateWithFallback } from '../i18n-init';
 
 interface NotificationTypeConfig {
     bgColor: string;
@@ -66,15 +67,13 @@ export class NotificationManager {
      * @private
      */
     private _translateMessage(message: string): string {
-        // Try to get translation function from dependency manager
-        if (dependencyManager.has('TranslationManager')) {
-            const translationManager = dependencyManager.get('TranslationManager');
-            if (translationManager && typeof translationManager.translate === 'function') {
-                return translationManager.translate(message);
-            }
+        // Use directly imported translateWithFallback
+        // Fallback to global translation function if direct import somehow fails (defensive)
+        if (typeof translateWithFallback === 'function') {
+            return translateWithFallback(message, message);
         }
 
-        // Fallback to global translation function
+        // Fallback to global window functions if all else fails
         if (typeof (window as any).translateWithFallback === 'function') {
             return (window as any).translateWithFallback(message, message);
         }
