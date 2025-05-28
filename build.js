@@ -67,6 +67,12 @@ async function copyDir(src, dest) {
     const copyPromises = entries.map(async entry => {
       const srcPath = path.join(src, entry.name);
       const destPath = path.join(dest, entry.name);
+
+      // Skip copying assets/js directory
+      if (src === 'assets' && entry.name === 'js' && entry.isDirectory()) {
+        console.log(`- Skipping ${srcPath} directory`);
+        return;
+      }
       
       if (entry.isDirectory()) {
         await copyDir(srcPath, destPath);

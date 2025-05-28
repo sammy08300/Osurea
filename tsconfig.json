@@ -14,7 +14,14 @@
   },
   "include": [
     "assets/js/core/**/*.ts",  // Assumes core files are already .ts
-    "assets/js/utils/**/*.ts" // For the newly renamed utils files
+    "assets/js/utils/**/*.ts", // For the newly renamed utils files
+    "assets/js/components/area/**/*.ts",
+    "assets/js/components/tablet/**/*.ts",
+    "assets/js/components/ui/**/*.ts",
+    "assets/js/init/**/*.ts",
+    "assets/js/tests/**/*.ts",
+    "assets/js/ui/*.ts",
+    "assets/js/*.ts"
   ],
   "exclude": [
     "node_modules", "./public", "./compiled_ts",
