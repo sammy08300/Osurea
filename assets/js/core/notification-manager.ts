@@ -5,7 +5,21 @@
 
 import { dependencyManager } from './dependency-manager.js';
 
+interface NotificationTypeConfig {
+    bgColor: string;
+    iconPath: string;
+}
+
+interface NotificationTypes {
+    [key: string]: NotificationTypeConfig;
+}
+
 export class NotificationManager {
+    private container: HTMLElement | null;
+    private defaultDuration: number;
+    private isInitialized: boolean;
+    private notificationTypes: NotificationTypes;
+
     constructor() {
         this.container = null;
         this.defaultDuration = 1500;
@@ -35,7 +49,7 @@ export class NotificationManager {
      * @param {string} containerId - ID of the notification container
      * @returns {boolean} Whether initialization was successful
      */
-    init(containerId = 'notification-container') {
+    init(containerId: string = 'notification-container'): boolean {
         this.container = document.getElementById(containerId);
         if (!this.container) {
             console.error(`Notification container '${containerId}' not found`);
@@ -51,22 +65,22 @@ export class NotificationManager {
      * @returns {string} The translated message or the original
      * @private
      */
-    _translateMessage(message) {
+    private _translateMessage(message: string): string {
         // Try to get translation function from dependency manager
         if (dependencyManager.has('TranslationManager')) {
             const translationManager = dependencyManager.get('TranslationManager');
-            if (translationManager.translate) {
+            if (translationManager && typeof translationManager.translate === 'function') {
                 return translationManager.translate(message);
             }
         }
 
         // Fallback to global translation function
-        if (typeof window.translateWithFallback === 'function') {
-            return window.translateWithFallback(message, message);
+        if (typeof (window as any).translateWithFallback === 'function') {
+            return (window as any).translateWithFallback(message, message);
         }
 
-        if (typeof window.__ === 'function') {
-            return window.__(message, message);
+        if (typeof (window as any).__ === 'function') {
+            return (window as any).__(message, message);
         }
 
         // Return original message if no translation available
@@ -80,7 +94,7 @@ export class NotificationManager {
      * @returns {HTMLElement} The created notification element
      * @private
      */
-    _createNotificationElement(message, type) {
+    private _createNotificationElement(message: string, type: string): HTMLElement {
         const typeConfig = this.notificationTypes[type] || this.notificationTypes.info;
         
         // Translate the message
@@ -105,7 +119,7 @@ export class NotificationManager {
      * @returns {string} Escaped text
      * @private
      */
-    _escapeHtml(text) {
+    private _escapeHtml(text: string): string {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
@@ -117,7 +131,7 @@ export class NotificationManager {
      * @param {number} duration - Duration in ms before removal
      * @private
      */
-    _scheduleRemoval(notification, duration) {
+    private _scheduleRemoval(notification: HTMLElement, duration: number): void {
         const timeoutId = setTimeout(() => {
             if (notification.parentNode) {
                 notification.style.animationDuration = '0.3s';
@@ -147,8 +161,8 @@ export class NotificationManager {
      * @param {number} duration - Duration in ms to show the notification
      * @returns {HTMLElement|null} The notification element or null if container not found
      */
-    show(message, type = 'info', duration = this.defaultDuration) {
-        if (!this.isInitialized && !this.init()) {
+    show(message: string, type: string = 'info', duration: number = this.defaultDuration): HTMLElement | null {
+        if (!this.isInitialized && !this.init()) { // Ensure init is called if not initialized
             console.warn('NotificationManager not initialized, falling back to console');
             console.log(`[${type.toUpperCase()}] ${message}`);
             return null;
@@ -156,13 +170,17 @@ export class NotificationManager {
 
         try {
             const notification = this._createNotificationElement(message, type);
-            this.container.appendChild(notification);
-            this._scheduleRemoval(notification, duration);
-            
+            if (this.container) { // Check if container is not null
+                this.container.appendChild(notification);
+                this._scheduleRemoval(notification, duration);
+            } else {
+                console.error('Notification container is not available.');
+                return null;
+            }
             return notification;
-        } catch (error) {
-            console.error('Error showing notification:', error);
-            console.log(`[${type.toUpperCase()}] ${message}`);
+        } catch (error: any) {
+            console.error('Error showing notification:', error.message);
+            console.log(`[${type.toUpperCase()}] ${message}`); // Log original message
             return null;
         }
     }
@@ -173,8 +191,8 @@ export class NotificationManager {
      * @param {number} duration - Duration in ms
      * @returns {HTMLElement|null} The notification element
      */
-    success(message, duration = this.defaultDuration) {
-        return this.show(message, 'success', duration);
+    success(message: string, duration?: number): HTMLElement | null {
+        return this.show(message, 'success', duration ?? this.defaultDuration);
     }
 
     /**
@@ -183,8 +201,8 @@ export class NotificationManager {
      * @param {number} duration - Duration in ms
      * @returns {HTMLElement|null} The notification element
      */
-    error(message, duration = this.defaultDuration) {
-        return this.show(message, 'error', duration);
+    error(message: string, duration?: number): HTMLElement | null {
+        return this.show(message, 'error', duration ?? this.defaultDuration);
     }
 
     /**
@@ -193,8 +211,8 @@ export class NotificationManager {
      * @param {number} duration - Duration in ms
      * @returns {HTMLElement|null} The notification element
      */
-    info(message, duration = this.defaultDuration) {
-        return this.show(message, 'info', duration);
+    info(message: string, duration?: number): HTMLElement | null {
+        return this.show(message, 'info', duration ?? this.defaultDuration);
     }
 
     /**
@@ -203,14 +221,14 @@ export class NotificationManager {
      * @param {number} duration - Duration in ms
      * @returns {HTMLElement|null} The notification element
      */
-    warning(message, duration = this.defaultDuration) {
-        return this.show(message, 'warning', duration);
+    warning(message: string, duration?: number): HTMLElement | null {
+        return this.show(message, 'warning', duration ?? this.defaultDuration);
     }
 
     /**
      * Clear all notifications
      */
-    clear() {
+    clear(): void {
         if (this.container) {
             this.container.innerHTML = '';
         }
@@ -220,7 +238,7 @@ export class NotificationManager {
      * Set default duration for notifications
      * @param {number} duration - Duration in ms
      */
-    setDefaultDuration(duration) {
+    setDefaultDuration(duration: number): void {
         this.defaultDuration = duration;
     }
 
@@ -229,7 +247,7 @@ export class NotificationManager {
      * @param {string} name - Type name
      * @param {Object} config - Type configuration
      */
-    addNotificationType(name, config) {
+    addNotificationType(name: string, config: NotificationTypeConfig): void {
         this.notificationTypes[name] = config;
     }
 }
@@ -238,13 +256,13 @@ export class NotificationManager {
 export const notificationManager = new NotificationManager();
 
 // Legacy compatibility - register global Notifications object
-export function registerLegacyGlobals() {
-    window.Notifications = {
+export function registerLegacyGlobals(): void {
+    (window as any).Notifications = {
         init: () => notificationManager.init(),
-        show: (message, type, duration) => notificationManager.show(message, type, duration),
-        success: (message, duration) => notificationManager.success(message, duration),
-        error: (message, duration) => notificationManager.error(message, duration),
-        info: (message, duration) => notificationManager.info(message, duration),
-        warning: (message, duration) => notificationManager.warning(message, duration)
+        show: (message: string, type?: string, duration?: number) => notificationManager.show(message, type, duration),
+        success: (message: string, duration?: number) => notificationManager.success(message, duration),
+        error: (message: string, duration?: number) => notificationManager.error(message, duration),
+        info: (message: string, duration?: number) => notificationManager.info(message, duration),
+        warning: (message: string, duration?: number) => notificationManager.warning(message, duration)
     };
-} 
+}

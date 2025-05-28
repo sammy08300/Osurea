@@ -3,10 +3,19 @@
  * Replaces global window dependencies with a proper DI container
  */
 
+interface DependencyEntry {
+    factory: Function | object;
+    singleton: boolean;
+    instance?: any; // For singleton instances
+}
+
 class DependencyManager {
+    private dependencies: Map<string, DependencyEntry>;
+    private singletons: Map<string, any>; // Stores actual singleton instances
+
     constructor() {
-        this.dependencies = new Map();
-        this.singletons = new Map();
+        this.dependencies = new Map<string, DependencyEntry>();
+        this.singletons = new Map<string, any>();
     }
 
     /**
@@ -15,7 +24,7 @@ class DependencyManager {
      * @param {Function|Object} factory - Factory function or object
      * @param {boolean} singleton - Whether to create as singleton
      */
-    register(name, factory, singleton = false) {
+    register(name: string, factory: Function | object, singleton: boolean = false): void {
         this.dependencies.set(name, { factory, singleton });
     }
 
@@ -24,7 +33,7 @@ class DependencyManager {
      * @param {string} name - Dependency name
      * @returns {*} The dependency instance
      */
-    get(name) {
+    get(name: string): any {
         const dependency = this.dependencies.get(name);
         if (!dependency) {
             throw new Error(`Dependency '${name}' not found`);
@@ -33,15 +42,16 @@ class DependencyManager {
         if (dependency.singleton) {
             if (!this.singletons.has(name)) {
                 const instance = typeof dependency.factory === 'function' 
-                    ? dependency.factory() 
+                    ? (dependency.factory as Function)()
                     : dependency.factory;
                 this.singletons.set(name, instance);
             }
             return this.singletons.get(name);
         }
 
+        // For non-singletons, create a new instance each time if factory is a function
         return typeof dependency.factory === 'function' 
-            ? dependency.factory() 
+            ? (dependency.factory as Function)()
             : dependency.factory;
     }
 
@@ -50,7 +60,7 @@ class DependencyManager {
      * @param {string} name - Dependency name
      * @returns {boolean}
      */
-    has(name) {
+    has(name: string): boolean {
         return this.dependencies.has(name);
     }
 
@@ -60,9 +70,9 @@ class DependencyManager {
      * @param {string[]} deps - Array of dependency names
      * @returns {Function} Function with injected dependencies
      */
-    inject(target, deps) {
-        return (...args) => {
-            const injectedDeps = deps.map(dep => this.get(dep));
+    inject(target: Function, deps: string[]): Function {
+        return (...args: any[]) => {
+            const injectedDeps = deps.map((dep: string) => this.get(dep));
             return target(...injectedDeps, ...args);
         };
     }
@@ -70,7 +80,7 @@ class DependencyManager {
     /**
      * Clear all dependencies (useful for testing)
      */
-    clear() {
+    clear(): void {
         this.dependencies.clear();
         this.singletons.clear();
     }
@@ -80,4 +90,4 @@ class DependencyManager {
 export const dependencyManager = new DependencyManager();
 
 // Export class for testing
-export { DependencyManager }; 
+// export { DependencyManager }; // Class is already exported

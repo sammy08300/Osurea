@@ -3,15 +3,42 @@
  * Manages dynamic imports and bundle optimization strategies
  */
 
+interface ChunkInfo {
+    path: string;
+    dependencies: string[];
+    critical: boolean;
+    loaded: boolean;
+    loading: boolean;
+    module?: any; // Optional: to store the loaded module itself
+}
+
+interface ErrorEntry {
+    chunk: string;
+    error: string;
+    timestamp: number;
+}
+
+interface PerformanceMetrics {
+    loadTimes: Map<string, number>;
+    chunkSizes: Map<string, number>; // Assuming chunk sizes might be tracked later
+    errors: ErrorEntry[];
+}
+
 class BundleOptimizer {
+    private loadedChunks: Set<string>;
+    private preloadedChunks: Set<string>;
+    private criticalChunks: Set<string>;
+    private chunkRegistry: Map<string, ChunkInfo>;
+    private performanceMetrics: PerformanceMetrics;
+
     constructor() {
-        this.loadedChunks = new Set();
-        this.preloadedChunks = new Set();
-        this.criticalChunks = new Set(['core', 'utils', 'ui']);
-        this.chunkRegistry = new Map();
+        this.loadedChunks = new Set<string>();
+        this.preloadedChunks = new Set<string>();
+        this.criticalChunks = new Set<string>(['core', 'utils', 'ui']);
+        this.chunkRegistry = new Map<string, ChunkInfo>();
         this.performanceMetrics = {
-            loadTimes: new Map(),
-            chunkSizes: new Map(),
+            loadTimes: new Map<string, number>(),
+            chunkSizes: new Map<string, number>(),
             errors: []
         };
     }
@@ -23,7 +50,7 @@ class BundleOptimizer {
      * @param {Array<string>} dependencies - Dependencies for this chunk
      * @param {boolean} critical - Whether this chunk is critical for initial load
      */
-    registerChunk(chunkName, chunkPath, dependencies = [], critical = false) {
+    registerChunk(chunkName: string, chunkPath: string, dependencies: string[] = [], critical: boolean = false): void {
         this.chunkRegistry.set(chunkName, {
             path: chunkPath,
             dependencies,
@@ -42,7 +69,7 @@ class BundleOptimizer {
      * @param {string} chunkName - Name of the chunk to load
      * @returns {Promise} Promise that resolves to the loaded module
      */
-    async loadChunk(chunkName) {
+    async loadChunk(chunkName: string): Promise<any> {
         if (this.loadedChunks.has(chunkName)) {
             return this.getLoadedChunk(chunkName);
         }
@@ -62,11 +89,14 @@ class BundleOptimizer {
 
         try {
             // Load dependencies first
-            await this.loadDependencies(chunkInfo.dependencies);
+            if (chunkInfo.dependencies) {
+                await this.loadDependencies(chunkInfo.dependencies);
+            }
 
             // Load the actual chunk
             console.log(`Loading chunk: ${chunkName}`);
             const module = await import(chunkInfo.path);
+            chunkInfo.module = module; // Store the loaded module if needed
 
             // Record performance metrics
             const loadTime = performance.now() - startTime;
@@ -80,11 +110,11 @@ class BundleOptimizer {
             console.log(`Chunk ${chunkName} loaded in ${loadTime.toFixed(2)}ms`);
             return module;
 
-        } catch (error) {
+        } catch (error: any) { // Use 'any' or 'Error' for caught errors
             chunkInfo.loading = false;
             this.performanceMetrics.errors.push({
                 chunk: chunkName,
-                error: error.message,
+                error: error.message, // Access message property safely
                 timestamp: Date.now()
             });
             
@@ -97,10 +127,10 @@ class BundleOptimizer {
      * Load chunk dependencies
      * @private
      */
-    async loadDependencies(dependencies) {
-        if (dependencies.length === 0) return;
+    private async loadDependencies(dependencies: string[]): Promise<void> {
+        if (!dependencies || dependencies.length === 0) return;
 
-        const dependencyPromises = dependencies.map(dep => this.loadChunk(dep));
+        const dependencyPromises = dependencies.map((dep: string) => this.loadChunk(dep));
         await Promise.all(dependencyPromises);
     }
 
@@ -108,17 +138,20 @@ class BundleOptimizer {
      * Wait for a chunk that's currently loading
      * @private
      */
-    async waitForChunk(chunkName) {
+    private async waitForChunk(chunkName: string): Promise<any> {
         return new Promise((resolve, reject) => {
             const checkInterval = setInterval(() => {
                 const chunkInfo = this.chunkRegistry.get(chunkName);
                 
-                if (chunkInfo.loaded) {
+                if (chunkInfo && chunkInfo.loaded) {
                     clearInterval(checkInterval);
                     resolve(this.getLoadedChunk(chunkName));
-                } else if (!chunkInfo.loading) {
+                } else if (chunkInfo && !chunkInfo.loading) { // Check if chunkInfo exists
                     clearInterval(checkInterval);
-                    reject(new Error(`Chunk ${chunkName} failed to load`));
+                    reject(new Error(`Chunk ${chunkName} failed to load or was not found after waiting.`));
+                } else if (!chunkInfo) { // If chunkInfo becomes undefined
+                    clearInterval(checkInterval);
+                    reject(new Error(`Chunk ${chunkName} info disappeared while waiting.`));
                 }
             }, 10);
         });
@@ -128,26 +161,30 @@ class BundleOptimizer {
      * Get a loaded chunk from cache
      * @private
      */
-    getLoadedChunk(chunkName) {
-        // This would need to be implemented based on how modules are cached
-        // For now, we'll re-import (which should be cached by the browser)
+    private getLoadedChunk(chunkName: string): Promise<any> {
         const chunkInfo = this.chunkRegistry.get(chunkName);
-        return import(chunkInfo.path);
+        if (chunkInfo && chunkInfo.module) {
+            return Promise.resolve(chunkInfo.module);
+        } else if (chunkInfo) {
+            // Fallback to re-import if module isn't cached in chunkInfo
+            return import(chunkInfo.path);
+        }
+        return Promise.reject(new Error(`Chunk ${chunkName} not found in registry for getLoadedChunk.`));
     }
 
     /**
      * Preload chunks for better performance
      * @param {Array<string>} chunkNames - Array of chunk names to preload
      */
-    async preloadChunks(chunkNames) {
+    async preloadChunks(chunkNames: string[]): Promise<void> {
         const preloadPromises = chunkNames
-            .filter(name => !this.preloadedChunks.has(name))
-            .map(async name => {
+            .filter((name: string) => !this.preloadedChunks.has(name))
+            .map(async (name: string) => {
                 try {
                     await this.loadChunk(name);
                     this.preloadedChunks.add(name);
-                } catch (error) {
-                    console.warn(`Failed to preload chunk ${name}:`, error);
+                } catch (error) { // error is 'unknown' by default, can type as 'any' or 'Error'
+                    console.warn(`Failed to preload chunk ${name}:`, error instanceof Error ? error.message : error);
                 }
             });
 
@@ -186,16 +223,16 @@ class BundleOptimizer {
     /**
      * Get performance metrics
      */
-    getPerformanceMetrics() {
+    getPerformanceMetrics(): object {
         const totalLoadTime = Array.from(this.performanceMetrics.loadTimes.values())
-            .reduce((sum, time) => sum + time, 0);
+            .reduce((sum: number, time: number) => sum + time, 0);
 
         return {
             loadedChunks: this.loadedChunks.size,
             preloadedChunks: this.preloadedChunks.size,
             totalChunks: this.chunkRegistry.size,
             totalLoadTime: totalLoadTime.toFixed(2),
-            averageLoadTime: (totalLoadTime / this.loadedChunks.size || 0).toFixed(2),
+            averageLoadTime: (this.loadedChunks.size > 0 ? (totalLoadTime / this.loadedChunks.size) : 0).toFixed(2),
             errors: this.performanceMetrics.errors.length,
             loadTimes: Object.fromEntries(this.performanceMetrics.loadTimes),
             recentErrors: this.performanceMetrics.errors.slice(-5)
@@ -205,7 +242,7 @@ class BundleOptimizer {
     /**
      * Clear performance metrics
      */
-    clearMetrics() {
+    clearMetrics(): void {
         this.performanceMetrics.loadTimes.clear();
         this.performanceMetrics.chunkSizes.clear();
         this.performanceMetrics.errors = [];
@@ -214,13 +251,14 @@ class BundleOptimizer {
     /**
      * Get chunk loading statistics
      */
-    getStats() {
+    getStats(): object {
+        const totalRegistered = this.chunkRegistry.size;
         return {
-            registered: this.chunkRegistry.size,
+            registered: totalRegistered,
             loaded: this.loadedChunks.size,
             preloaded: this.preloadedChunks.size,
             critical: this.criticalChunks.size,
-            loadingProgress: (this.loadedChunks.size / this.chunkRegistry.size * 100).toFixed(1)
+            loadingProgress: (totalRegistered > 0 ? (this.loadedChunks.size / totalRegistered * 100) : 0).toFixed(1)
         };
     }
 }
@@ -232,9 +270,9 @@ export const bundleOptimizer = new BundleOptimizer();
 bundleOptimizer.initializeCommonChunks();
 
 // Export class for testing
-export { BundleOptimizer };
+// export { BundleOptimizer }; // Already exported by class BundleOptimizer {}
 
 // Global exports for debugging
 if (typeof window !== 'undefined') {
-    window.bundleOptimizer = bundleOptimizer;
-} 
+    (window as any).bundleOptimizer = bundleOptimizer;
+}

@@ -1,6 +1,7 @@
 const fs = require('fs').promises;
 const fsSync = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 
 // Configuration
 const CONFIG = {
@@ -117,6 +118,20 @@ function generatePerformanceReport() {
   return report;
 }
 
+// Compile TypeScript files
+async function compileTypeScript() {
+  console.log('Compiling TypeScript files...');
+  try {
+    // Execute the TypeScript compiler
+    execSync('npx tsc', { stdio: 'inherit' }); // stdio: 'inherit' will show tsc output in the console
+    console.log('TypeScript compilation successful.');
+  } catch (error) {
+    console.error('TypeScript compilation failed:', error);
+    // Propagate the error to stop the build process if compilation fails
+    throw new Error('TypeScript compilation failed.');
+  }
+}
+
 // Main build function
 async function build() {
   const startTime = Date.now();
@@ -127,6 +142,9 @@ async function build() {
     
     // Ensure public directory exists
     await ensureDir(CONFIG.publicDir);
+
+    // Compile TypeScript
+    await compileTypeScript();
     
     // Copy root files
     await copyRootFiles();
