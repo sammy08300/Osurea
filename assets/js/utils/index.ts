@@ -276,7 +276,9 @@ const Performance = {
             
             if (cache.size >= maxCacheSize) {
                 const firstKey = cache.keys().next().value;
-                cache.delete(firstKey);
+                if (typeof firstKey === 'string') {
+                    cache.delete(firstKey);
+                }
             }
             
             cache.set(key, result);
