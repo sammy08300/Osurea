@@ -16,7 +16,14 @@
     "moduleDetection": "force",
     "baseUrl": ".", // Optional: helps with path aliases if you use them
     "paths": { // Optional: example for path aliases
-      "@/*": ["assets/js/*"]
+      "@/*": ["src/js/*"],
+      "@locales/*": ["src/locales/*"],
+      "@components/*": ["src/js/components/*"],
+      "@core/*": ["src/js/core/*"],
+      "@utils/*": ["src/js/utils/*"],
+      "@init/*": ["src/js/init/*"],
+      "@ui/*": ["src/js/ui/*"],
+      "@tests/*": ["src/js/tests/*"]
     }
   },
   "ts-node": { // Added for ts-node ESM support
@@ -25,18 +32,16 @@
   },
   // build.ts and verify-build.ts are compiled separately now
   "include": [
-    "assets/js/**/*.ts",
-    "assets/locales/**/*.ts",
-    // "build.ts", // Removed
-    "service-worker.ts"
-    // "verify-build.ts" // Removed
-    // No need for more specific paths like "assets/js/ui/*.ts" if "assets/js/**/*.ts" is used.
+    "src/js/**/*.ts",
+    "src/locales/**/*.ts",
+    "src/service-worker.ts"
+    // No need for more specific paths like "src/js/ui/*.ts" if "src/js/**/*.ts" is used.
   ],
   "exclude": [
     "node_modules",
     "./public", // Exclude the output directory
     "./compiled_ts",
-    "assets/js/utils/README.md"
+    "src/js/utils/README.md" // Assuming README.md was also moved
     // Removed build.js, service-worker.js from exclude
   ]
 }

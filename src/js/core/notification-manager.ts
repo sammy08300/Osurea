@@ -3,8 +3,8 @@
  * Replaces global Notifications object with a proper class-based system
  */
 
-import { dependencyManager } from './dependency-manager.js';
-import { translateWithFallback } from '../i18n-init.js';
+import { dependencyManager } from './dependency-manager.ts';
+import { translateWithFallback } from '../i18n-init.ts';
 
 interface NotificationTypeConfig {
     bgColor: string;

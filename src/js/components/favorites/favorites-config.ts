@@ -3,7 +3,7 @@
  * Centralized configuration for the favorites component
  */
 
-import { FavoritesConfig, SortCriteria } from './types.js'; // Import FavoritesConfig and SortCriteria types
+import { FavoritesConfig, SortCriteria } from './types.ts'; // Import FavoritesConfig and SortCriteria types
 
 export const FAVORITES_CONFIG: FavoritesConfig = {
     // DOM Element IDs

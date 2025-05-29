@@ -1,12 +1,12 @@
 // favorite-init.ts - Favorites initialization module
-import { FavoritesEvents } from './favorite-events.js';
-import { translateWithFallback } from '../../../js/i18n-init.js';
-import { getFavorites } from './favorite-storage.js';
-import { sortFavorites as favoriteSortFavorites } from './favorite-sort.js'; // Renamed for clarity
-import { FavoritesRendering } from './favorite-rendering.js';
-import { FavoritesPopups } from './favorite-popup.js';
-import { FavoriteObject, SortCriteria } from './types.js'; // Import types
-import localeManager from '../../../locales/index.js'; // Assuming localeManager has its own types or is any
+import { FavoritesEvents } from './favorite-events.ts';
+import { translateWithFallback } from '../../i18n-init.ts';
+import { getFavorites } from './favorite-storage.ts';
+import { sortFavorites as favoriteSortFavorites } from './favorite-sort.ts'; // Renamed for clarity
+import { FavoritesRendering } from './favorite-rendering.ts';
+import { FavoritesPopups } from './favorite-popup.ts';
+import { FavoriteObject, SortCriteria } from './types.ts'; // Import types
+import localeManager from '../../../locales/index.ts'; // Assuming localeManager has its own types or is any
 
 interface FavoritesInitModule {
     favoritesList: HTMLElement | null;

@@ -22,23 +22,18 @@
   "main": "public/index.html",
   "scripts": {
     "start": "npx http-server ./public -o",
-    "dev": "npm-run-all --parallel watch:css watch:ts serve:public",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "test": "jest",
-    "build": "npm run build:css && tsc build.ts --target ES2020 --module commonjs --resolveJsonModule --esModuleInterop --skipLibCheck && move build.js build.cjs && node build.cjs && del build.cjs",
-    "build:full": "npm run build:css && tsc build.ts --target ES2020 --module commonjs --resolveJsonModule --esModuleInterop --skipLibCheck && move build.js build.cjs && node build.cjs && del build.cjs && tsc verify-build.ts --target ES2020 --module commonjs --resolveJsonModule --esModuleInterop --skipLibCheck && move verify-build.js verify.cjs && node verify.cjs && del verify.cjs",
-    "build:prod": "cross-env NODE_ENV=production npm run build:css && tsc build.ts --target ES2020 --module commonjs --resolveJsonModule --esModuleInterop --skipLibCheck && move build.js build.cjs && node build.cjs && del build.cjs",
-    "build:css": "postcss assets/css/main.css -o assets/css/styles.css",
-    "watch:css": "postcss assets/css/main.css -o assets/css/styles.css --watch",
-    "watch:ts": "npx tsc --watch",
     "serve:public": "npx http-server ./public -o",
     "analyze": "echo \"Bundle analysis would go here - consider adding webpack-bundle-analyzer\"",
-    "perf:test": "echo \"Performance testing - consider adding lighthouse-ci\"",
-    "optimize": "npm run build:prod && echo \"Optimization complete\"",
-    "verify:build": "tsc verify-build.ts --target ES2020 --module commonjs --resolveJsonModule --esModuleInterop --skipLibCheck && move verify-build.js verify.cjs && node verify.cjs && del verify.cjs"
+    "perf:test": "echo \"Performance testing - consider adding lighthouse-ci\""
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
     "@types/node": "^22.15.23",
+    "@vitejs/plugin-legacy": "^6.1.1",
     "autoprefixer": "^10.4.14",
     "cross-env": "^7.0.3",
     "cssnano": "^6.1.2",
@@ -47,6 +42,7 @@
     "postcss-cli": "^10.1.0",
     "tailwindcss": "^3.4.17",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5"
   }
 }

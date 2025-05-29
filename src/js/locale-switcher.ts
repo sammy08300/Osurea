@@ -1,4 +1,4 @@
-import localeManager from '../locales/index.js'; // .ts extension will be resolved
+import localeManager from '../locales/index.ts'; // .ts extension will be resolved
 
 // Define types for better code clarity and safety
 interface LocaleSwitcherElements {
