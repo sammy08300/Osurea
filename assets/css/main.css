@@ -1,0 +1,629 @@
+@import './favorites.css';
+@import './ui-improvements.css';
+
+/*
+====================================================
+  Tailwind Base Imports
+====================================================*/
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+====================================================
+  Global CSS Variables (Enhanced Portfolio Style)
+====================================================*/
+:root {
+    /* Core colors from your portfolio */
+    --background-dark: rgb(3, 7, 18);
+    --background-card: #161824;
+    --accent-blue: #3b82f6;
+    --accent-pink: #ff66ab;
+    --accent-green: #6fdd8b;
+    --text-light: #ffffff;
+    --text-secondary: #a0a0b0;
+    
+    /* Layout & transitions */
+    --border-radius: 12px;
+    --border-radius-sm: 8px;
+    --transition-fast: 0.1s ease;
+    --transition-normal: 0.2s ease;
+    --shadow-color: rgba(59, 130, 246, 0.3);
+    --focus-ring: 0 0 0 2px rgba(59, 130, 246, 0.5);
+    
+    /* Scrollbar styling */
+    --scrollbar-width: 8px;
+    --scrollbar-radius: 8px;
+    --scrollbar-track-bg: rgba(31, 41, 55, 0.3);
+    --scrollbar-thumb-bg: rgba(75, 85, 99, 0.8);
+    --scrollbar-thumb-hover: rgba(107, 114, 128, 0.9);
+    
+    /* Enhanced glass morphism */
+    --glass-bg: rgba(22, 24, 36, 0.95);
+    --glass-border: rgba(59, 130, 246, 0.2);
+    --glass-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    --glass-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.25);
+}
+
+/*
+====================================================
+  General Layout & Body
+====================================================*/
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    background-color: var(--background-dark);
+    color: var(--text-light);
+    font-family: 'Poppins', sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+    height: 100%;
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+}
+
+html.loading, body.loading {
+    overflow: hidden !important;
+}
+
+/*
+====================================================
+  Custom Scrollbar
+====================================================*/
+::-webkit-scrollbar {
+    width: var(--scrollbar-width);
+}
+
+::-webkit-scrollbar-track {
+    background: var(--scrollbar-track-bg);
+    border-radius: var(--scrollbar-radius);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb-bg);
+    border-radius: var(--scrollbar-radius);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(31, 41, 55, 0.4);
+    border-radius: 8px;
+    margin: 4px 0;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(59, 130, 246, 0.8) 0%, rgba(37, 99, 235, 0.9) 100%);
+    border-radius: 8px;
+    border: 2px solid rgba(31, 41, 55, 0.3);
+    transition: all 0.3s ease;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgba(59, 130, 246, 1) 0%, rgba(37, 99, 235, 1) 100%);
+    border: 2px solid rgba(59, 130, 246, 0.2);
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+}
+
+/*
+====================================================
+  Enhanced Input System
+====================================================*/
+input[type="number"], input[type="text"], input[type="range"], textarea {
+    background: rgba(22, 24, 36, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius-sm);
+    color: var(--text-light);
+    transition: all var(--transition-normal);
+    font-size: 0.9rem;
+}
+
+input[type="number"]:focus, input[type="text"]:focus, textarea:focus {
+    border-color: var(--accent-blue);
+    box-shadow: var(--focus-ring);
+    outline: none;
+    background: rgba(22, 24, 36, 0.95);
+}
+
+/* Enhanced range slider */
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+    height: 6px;
+    position: relative;
+}
+
+input[type="range"]::-webkit-slider-track {
+    background: #374151;
+    height: 6px;
+    border-radius: 3px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    background: linear-gradient(135deg, var(--accent-pink), #e55a9b);
+    height: 18px;
+    width: 18px;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    margin-top: -6px;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+    box-shadow: 0 6px 20px rgba(255, 102, 171, 0.5);
+}
+
+/*
+====================================================
+  Enhanced Visual Container
+====================================================*/
+#visual-container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(22, 24, 36, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius);
+    position: relative;
+    overflow: hidden;
+}
+
+#visual-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, rgba(59, 130, 246, 0.05) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+#tablet-boundary {
+    transition: width var(--transition-normal), height var(--transition-normal);
+    position: relative;
+    margin: auto;
+    border: 2px solid rgba(156, 163, 175, 0.6);
+    background: rgba(31, 41, 55, 0.4);
+    border-radius: 4px;
+}
+
+.rectangle, #rectangle {
+    cursor: grab;
+    user-select: none;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+    transition: none;
+    visibility: visible;
+    position: absolute;
+    transform-origin: center center;
+    background: rgba(59, 130, 246, 0.3) !important;
+    border: 2px solid var(--accent-blue) !important;
+    backdrop-filter: blur(5px);
+    pointer-events: auto;
+    z-index: 10;
+    will-change: transform, left, top, border-radius;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+    border-radius: var(--dynamic-border-radius, 0px);
+    transition: width var(--transition-fast), height var(--transition-fast), border-radius 0.15s ease-out;
+}
+
+.page-loaded #rectangle {
+    transition: width var(--transition-fast), height var(--transition-fast), border-radius 0.15s ease-out;
+}
+
+#rectangle.dragging {
+    transition: none !important;
+}
+
+#rectangle:active {
+    cursor: grabbing;
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.8);
+}
+
+/*
+====================================================
+  FIXED Tablet Selector - Menu déroulant corrigé
+====================================================*/
+.tablet-selector-container {
+    position: relative;
+    z-index: 999999;
+    isolation: isolate;
+}
+
+/* FORCE z-index pour toute la hiérarchie */
+.glass-card:has(.tablet-selector-container) {
+    z-index: 999999 !important;
+    position: relative !important;
+}
+
+/* S'assurer que les autres cartes n'interfèrent pas */
+.glass-card {
+    position: relative;
+    z-index: 1;
+}
+
+/* Spécifiquement pour éviter les conflits */
+.glass-card:not(:has(.tablet-selector-container)) {
+    z-index: 1 !important;
+}
+
+/* Menu déroulant avec position ABSOLUTE simple et efficace */
+#tabletSelectorPopup {
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 2147483647 !important; /* Maximum z-index possible */
+    background: rgba(17, 24, 39, 0.98);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(75, 85, 99, 0.4);
+    border-radius: 12px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
+    overflow: hidden;
+    transform-origin: top center;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 1;
+    visibility: visible;
+    transform: scaleY(1);
+    isolation: isolate;
+    margin-top: 4px;
+    /* Dimensions optimisées */
+    min-width: 400px;
+    max-width: 600px;
+    max-height: 80vh;
+}
+
+#tabletSelectorPopup.hidden {
+    opacity: 0;
+    visibility: hidden;
+    transform: scaleY(0.95);
+    pointer-events: none;
+}
+
+/* Structure interne optimisée */
+#tabletSelectorPopup .flex.flex-col {
+    height: auto;
+    max-height: 100%;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Barre de recherche compacte */
+#tabletSelectorPopup .p-4 {
+    padding: 12px 16px !important;
+    border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+    background: rgba(31, 41, 55, 0.3);
+    flex-shrink: 0;
+}
+
+#tabletSearch {
+    width: 100%;
+    padding: 8px 12px;
+    background: rgba(22, 24, 36, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: #f3f4f6;
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+#tabletSearch:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: rgba(22, 24, 36, 0.95);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+/* Conteneur principal des listes */
+#tabletSelectorPopup .flex.flex-1 {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    min-height: 250px;
+    max-height: 400px;
+}
+
+/* Colonne des marques - largeur fixe */
+#tabletSelectorPopup .w-1\/2:first-child {
+    width: 160px;
+    min-width: 160px;
+    max-width: 160px;
+    border-right: 1px solid rgba(75, 85, 99, 0.3);
+    overflow-y: auto;
+    background: rgba(31, 41, 55, 0.2);
+}
+
+/* Colonne des modèles - flexible */
+#tabletSelectorPopup .w-1\/2:last-child {
+    flex: 1;
+    overflow-y: auto;
+    background: rgba(17, 24, 39, 0.3);
+}
+
+/* Éléments de marque */
+.brand-item {
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #e5e7eb;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(75, 85, 99, 0.15);
+    transition: all 0.2s ease;
+}
+
+.brand-item:hover {
+    background: rgba(59, 130, 246, 0.15);
+    color: #ffffff;
+}
+
+.brand-item.active {
+    background: rgba(59, 130, 246, 0.25);
+    color: #60a5fa;
+    font-weight: 600;
+    position: relative;
+}
+
+.brand-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: #60a5fa;
+}
+
+/* Éléments de modèle */
+.model-item {
+    padding: 8px 12px;
+    color: #e5e7eb;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(75, 85, 99, 0.15);
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.model-item:hover {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.model-item .text-gray-100 {
+    color: #f3f4f6;
+    font-weight: 500;
+    font-size: 13px;
+}
+
+.model-item .text-gray-400 {
+    color: #9ca3af;
+    font-size: 11px;
+}
+
+.model-item.active {
+    background: rgba(59, 130, 246, 0.2);
+    color: #ffffff;
+}
+
+/* Bouton custom dimensions - compact */
+#customTabletButton {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(31, 41, 55, 0.8);
+    border: none;
+    border-top: 1px solid rgba(75, 85, 99, 0.3);
+    color: #f3f4f6;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex-shrink: 0;
+    font-size: 13px;
+}
+
+#customTabletButton:hover {
+    background: rgba(59, 130, 246, 0.2);
+    color: #ffffff;
+}
+
+/*
+====================================================
+  Enhanced Context Menu
+====================================================*/
+#context-menu {
+    transform-origin: top left;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
+    user-select: none;
+    pointer-events: auto;
+    z-index: 100000;
+    position: fixed;
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.9) translateY(-5px);
+    transition: opacity 0.15s cubic-bezier(0.4, 0, 0.2, 1), 
+                visibility 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 240px;
+    padding: 0.75rem;
+}
+
+#context-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1) translateY(0);
+}
+
+.context-menu-title {
+    color: var(--text-light);
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.context-menu-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+}
+
+#context-menu button {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-light);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: var(--border-radius-sm);
+    padding: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3rem;
+    position: relative;
+    overflow: hidden;
+}
+
+#context-menu button:hover {
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
+}
+
+/*
+====================================================
+  Enhanced Loading States
+====================================================*/
+#loading-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(3, 7, 18, 0.98);
+    backdrop-filter: blur(10px);
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.2s ease;
+}
+
+.loading-spinner {
+    position: relative;
+    width: 50px;
+    height: 50px;
+}
+
+.spinner-circle {
+    stroke: var(--accent-blue);
+    stroke-linecap: round;
+    transform-origin: center;
+    stroke-dasharray: 125;
+    stroke-dashoffset: 125;
+    animation: spinner-sweep 1.4s ease-in-out infinite, spinner-rotate 2s linear infinite;
+    filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.5));
+}
+
+/*
+====================================================
+  Enhanced Animations
+====================================================*/
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes spinner-rotate {
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes spinner-sweep {
+    0% { stroke-dashoffset: 125; }
+    50% { stroke-dashoffset: 0; }
+    100% { stroke-dashoffset: -125; }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/*
+====================================================
+  Responsive Design
+====================================================*/
+@media (max-width: 768px) {
+    #tabletSelectorPopup {
+        left: -10px !important;
+        right: -10px !important;
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+    
+    #tabletSelectorPopup .w-1\/2:first-child {
+        width: 120px !important;
+        min-width: 120px !important;
+        max-width: 120px !important;
+    }
+    
+    .brand-item, .model-item {
+        padding: 6px 8px;
+        font-size: 12px;
+    }
+    
+    #customTabletButton {
+        padding: 10px 12px;
+        font-size: 12px;
+    }
+}
+
+/*
+====================================================
+  Accessibility & Performance
+====================================================*/
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+*:focus-visible {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 2px;
+}

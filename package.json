@@ -1,0 +1,47 @@
+{
+  "name": "areasu",
+  "version": "2.0.0",
+  "description": "Un outil interactif pour les joueurs d'osu! permettant de visualiser et configurer la zone active de leur tablette graphique.",
+  "author": "Yuzuctus",
+  "license": "ISC",
+  "keywords": [
+    "osu",
+    "tablet",
+    "configuration",
+    "gaming"
+  ],
+  "homepage": "https://github.com/sammy08300/Areasu#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sammy08300/Areasu.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sammy08300/Areasu/issues"
+  },
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "npm-run-all --parallel watch:css serve:public",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npm run build:css && node build.js",
+    "build:prod": "cross-env NODE_ENV=production npm run build:css && node build.js",
+    "build:css": "postcss assets/css/main.css -o assets/css/styles.css",
+    "watch:css": "postcss assets/css/main.css -o assets/css/styles.css --watch",
+    "serve:public": "npx http-server ./ -o",
+    "analyze": "echo \"Bundle analysis would go here - consider adding webpack-bundle-analyzer\"",
+    "perf:test": "echo \"Performance testing - consider adding lighthouse-ci\"",
+    "optimize": "npm run build:prod && echo \"Optimization complete\""
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.14",
+    "cross-env": "^7.0.3",
+    "cssnano": "^6.1.2",
+    "npm-run-all": "^4.1.5",
+    "postcss": "^8.5.3",
+    "postcss-cli": "^10.1.0",
+    "tailwindcss": "^3.3.2",
+    "terser": "^5.26.0",
+    "clean-css": "^5.3.2",
+    "html-minifier-terser": "^7.2.0"
+  }
+}

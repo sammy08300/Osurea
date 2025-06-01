@@ -1,0 +1,61 @@
+# Dependencies
+/node_modules
+
+# Testing
+/coverage
+
+# Production
+/build
+/dist
+/public
+
+# Misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE
+.idea/
+.vscode/
+
+# Logs
+logs
+*.log
+
+# Cache
+.cache/
+.npm
+.eslintcache
+
+# Optional eslint cache
+.eslintcache
+
+# Build output / Generated files
+assets/css/styles.css
+OLD FAVORITES
+
+# Generated files
+dist/
+build/
+
+# Test files (temporary - only ignore temporary test files)
+test-integration.html
+*.test.html
+test-*.html
+
+# Backup files
+*.backup
+*.bak
+*.orig
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini

@@ -1,0 +1,14 @@
+/**
+ * Styles pour le slider supprimés car nous utilisons désormais des styles inline directement dans le JS
+ */
+
+/* Styles conservés uniquement pour le champ numérique */
+input[type="number"]#radius-input {
+  border-color: #4b5563;
+  transition: border-color 0.15s;
+}
+
+input[type="number"]#radius-input:focus {
+  border-color: #ec4899;
+  outline: none;
+} 
