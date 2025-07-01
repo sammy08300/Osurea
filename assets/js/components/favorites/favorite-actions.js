@@ -32,8 +32,8 @@ export const FavoritesActions = {
         }
         try {
             // Example: update the fields of the form (to adapt according to the application)
-            document.getElementById('areaWidth').value = formatNumber(favorite.width);
-            document.getElementById('areaHeight').value = formatNumber(favorite.height);
+            document.getElementById('areaWidth').value = formatNumber(favorite.width, 3);
+            document.getElementById('areaHeight').value = formatNumber(favorite.height, 3);
             document.getElementById('areaOffsetX').value = formatNumber(favorite.x || favorite.offsetX, 3);
             document.getElementById('areaOffsetY').value = formatNumber(favorite.y || favorite.offsetY, 3);
             if (favorite.ratio) {
@@ -176,8 +176,8 @@ export const FavoritesActions = {
         }
         
         // Fill the form with the favorite values
-        document.getElementById('areaWidth').value = formatNumber(favorite.width);
-        document.getElementById('areaHeight').value = formatNumber(favorite.height);
+        document.getElementById('areaWidth').value = formatNumber(favorite.width, 3);
+        document.getElementById('areaHeight').value = formatNumber(favorite.height, 3);
         document.getElementById('areaOffsetX').value = formatNumber(favorite.x || favorite.offsetX, 3);
         document.getElementById('areaOffsetY').value = formatNumber(favorite.y || favorite.offsetY, 3);
         if (favorite.ratio) {
@@ -230,8 +230,8 @@ export const FavoritesActions = {
         const original = this.originalValues;
         
         if (original) {
-            document.getElementById('areaWidth').value = formatNumber(original.width);
-            document.getElementById('areaHeight').value = formatNumber(original.height);
+            document.getElementById('areaWidth').value = formatNumber(original.width, 3);
+            document.getElementById('areaHeight').value = formatNumber(original.height, 3);
             document.getElementById('areaOffsetX').value = formatNumber(original.x, 3);
             document.getElementById('areaOffsetY').value = formatNumber(original.y, 3);
             

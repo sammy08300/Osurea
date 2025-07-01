@@ -193,10 +193,11 @@ export const UIManager = {
     handleSwapDimensions() {
         const elements = FormManager.getFormElements();
         
-        // Swap width and height
-        const width = elements.areaWidth.value;
-        elements.areaWidth.value = elements.areaHeight.value;
-        elements.areaHeight.value = width;
+        // Swap width and height with proper formatting
+        const width = NumberUtils.parseFloatSafe(elements.areaWidth.value);
+        const height = NumberUtils.parseFloatSafe(elements.areaHeight.value);
+        elements.areaWidth.value = NumberUtils.formatNumber(height, 3);
+        elements.areaHeight.value = NumberUtils.formatNumber(width, 3);
         
         // If the lock is activated, update the ratio immediately
         if (elements.lockRatio && elements.lockRatio.getAttribute('aria-pressed') === 'true') {
@@ -237,7 +238,7 @@ export const UIManager = {
         const centerYLabel = translateWithFallback('area.positionY') || 'Centre Y';
         const borderRadiusLabel = translateWithFallback('area.radius') || 'Rayon de la bordure';
 
-        const info = `${titleLabel}\n${widthLabel}: ${NumberUtils.formatNumber(width)} mm\n${heightLabel}: ${NumberUtils.formatNumber(height)} mm\n${ratioLabel}: ${ratio}\n${centerXLabel}: ${NumberUtils.formatNumber(offsetX, 3)} mm\n${centerYLabel}: ${NumberUtils.formatNumber(offsetY, 3)} mm\n${borderRadiusLabel}: ${areaRadius}%`;
+        const info = `${titleLabel}\n${widthLabel}: ${NumberUtils.formatNumber(width, 3)} mm\n${heightLabel}: ${NumberUtils.formatNumber(height, 3)} mm\n${ratioLabel}: ${ratio}\n${centerXLabel}: ${NumberUtils.formatNumber(offsetX, 3)} mm\n${centerYLabel}: ${NumberUtils.formatNumber(offsetY, 3)} mm\n${borderRadiusLabel}: ${areaRadius}%`;
         
         DOMUtils.copyToClipboard(info);
         

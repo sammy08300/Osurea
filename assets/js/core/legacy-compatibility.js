@@ -24,6 +24,8 @@ export function registerLegacyGlobals() {
     window.debounce = Utils.debounce;
     window.throttle = Utils.throttle;
     window.DECIMAL_PRECISION_POSITION = Utils.DECIMAL_PRECISION_POSITION;
+    window.DECIMAL_PRECISION_DIMENSIONS = Utils.DECIMAL_PRECISION_DIMENSIONS;
+    window.DECIMAL_PRECISION_RATIO = Utils.DECIMAL_PRECISION_RATIO;
     window.Utils = Utils;
 
     // Display functions - only create if they don't already exist

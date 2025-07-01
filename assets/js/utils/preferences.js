@@ -478,8 +478,8 @@ const PreferencesManager = {
     _applyAreaPreferences(area) {
         // Set dimensions and offsets
         const areaFields = {
-            'areaWidth': [area.width, 1],
-            'areaHeight': [area.height, 1],
+            'areaWidth': [area.width, 3],
+            'areaHeight': [area.height, 3],
             'areaOffsetX': [area.offsetX, 3],
             'areaOffsetY': [area.offsetY, 3],
             'customRatio': [area.ratio, 3]

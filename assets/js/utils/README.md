@@ -254,6 +254,22 @@ Precision for positions (X/Y coordinates).
 const precision = Utils.DECIMAL_PRECISION_POSITION; // 3
 ```
 
+### `DECIMAL_PRECISION_DIMENSIONS: number`
+
+Precision for dimensions (Width/Height).
+
+```javascript
+const precision = Utils.DECIMAL_PRECISION_DIMENSIONS; // 3
+```
+
+### `DECIMAL_PRECISION_RATIO: number`
+
+Precision for ratio calculations.
+
+```javascript
+const precision = Utils.DECIMAL_PRECISION_RATIO; // 3
+```
+
 ---
 
 ## Legacy Compatibility

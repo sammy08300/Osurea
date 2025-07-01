@@ -7,6 +7,8 @@
 // Constants
 // -----------------------------------------------------------------------------
 const DECIMAL_PRECISION_POSITION = 3; // Precision for positions (X/Y)
+const DECIMAL_PRECISION_DIMENSIONS = 3; // Precision for dimensions (Width/Height)
+const DECIMAL_PRECISION_RATIO = 3; // Precision for ratio calculations
 
 // -----------------------------------------------------------------------------
 // DOM Utilities
@@ -382,6 +384,8 @@ Numbers.calculateRatioMemoized = Performance.createMemoizedCalculateRatio();
 export const Utils = {
     // Constants
     DECIMAL_PRECISION_POSITION,
+    DECIMAL_PRECISION_DIMENSIONS,
+    DECIMAL_PRECISION_RATIO,
     
     // Namespaced utilities
     DOM,
@@ -421,4 +425,6 @@ if (typeof window !== 'undefined') {
     window.parseFloatSafe = Numbers.parseFloatSafe;
     window.constrainAreaOffset = Numbers.constrainAreaOffset;
     window.DECIMAL_PRECISION_POSITION = DECIMAL_PRECISION_POSITION;
+    window.DECIMAL_PRECISION_DIMENSIONS = DECIMAL_PRECISION_DIMENSIONS;
+    window.DECIMAL_PRECISION_RATIO = DECIMAL_PRECISION_RATIO;
 } 

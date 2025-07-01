@@ -54,6 +54,8 @@ describe('Utils Module', () => {
 
         test('should have constants', () => {
             expect(Utils.DECIMAL_PRECISION_POSITION).toBe(3);
+            expect(Utils.DECIMAL_PRECISION_DIMENSIONS).toBe(3);
+            expect(Utils.DECIMAL_PRECISION_RATIO).toBe(3);
         });
     });
 

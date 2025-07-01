@@ -139,7 +139,7 @@ export const FormManager = {
                 // Constrain the active area width
                 const constrainedWidth = Math.min(areaWidth, tabletWidth);
                 if (constrainedWidth !== areaWidth) {
-                    elements.areaWidth.value = NumberUtils.formatNumber(constrainedWidth);
+                    elements.areaWidth.value = NumberUtils.formatNumber(constrainedWidth, 3);
                 }
                 
                 // Only update the height if the ratio is locked
@@ -151,7 +151,7 @@ export const FormManager = {
                     newHeight = Math.min(newHeight, tabletHeight);
                     
                     if (!isNaN(newHeight) && newHeight >= 0) {
-                        elements.areaHeight.value = NumberUtils.formatNumber(newHeight);
+                        elements.areaHeight.value = NumberUtils.formatNumber(newHeight, 3);
                     }
                 } else if (this.appState) {
                     this.appState.debouncedUpdateRatio();
@@ -194,7 +194,7 @@ export const FormManager = {
                 // Constrain the active area height
                 const constrainedHeight = Math.min(areaHeight, tabletHeight);
                 if (constrainedHeight !== areaHeight) {
-                    elements.areaHeight.value = NumberUtils.formatNumber(constrainedHeight);
+                    elements.areaHeight.value = NumberUtils.formatNumber(constrainedHeight, 3);
                 }
                 
                 // Only update the width if the ratio is locked
@@ -206,7 +206,7 @@ export const FormManager = {
                     newWidth = Math.min(newWidth, tabletWidth);
                     
                     if (!isNaN(newWidth) && newWidth >= 0) {
-                        elements.areaWidth.value = NumberUtils.formatNumber(newWidth);
+                        elements.areaWidth.value = NumberUtils.formatNumber(newWidth, 3);
                     }
                 } else if (this.appState) {
                     this.appState.debouncedUpdateRatio();
@@ -330,7 +330,7 @@ export const FormManager = {
                     const newHeight = currentWidth / this.appState.currentRatio;
                     
                     if (!isNaN(newHeight) && newHeight >= 0) {
-                        elements.areaHeight.value = NumberUtils.formatNumber(newHeight);
+                        elements.areaHeight.value = NumberUtils.formatNumber(newHeight, 3);
                     }
                 }
             } else if (this.appState) {
@@ -530,10 +530,10 @@ export const FormManager = {
         
         // Restore basic form values
         if (elements.areaWidth) {
-            elements.areaWidth.value = NumberUtils.formatNumber(originalValues.width);
+            elements.areaWidth.value = NumberUtils.formatNumber(originalValues.width, 3);
         }
         if (elements.areaHeight) {
-            elements.areaHeight.value = NumberUtils.formatNumber(originalValues.height);
+            elements.areaHeight.value = NumberUtils.formatNumber(originalValues.height, 3);
         }
         if (elements.areaOffsetX) {
             elements.areaOffsetX.value = NumberUtils.formatNumber(originalValues.x, 3);
