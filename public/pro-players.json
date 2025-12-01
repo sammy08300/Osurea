@@ -1,0 +1,21 @@
+{
+  "players": [
+    {
+      "name": "mrekk",
+      "tablet": {
+        "brand": "Wacom",
+        "model": "CTL-472",
+        "width": 152,
+        "height": 95
+      },
+      "area": {
+        "width": 58.0,
+        "height": 45.2,
+        "x": 68.9,
+        "y": 26.4,
+        "radius": 0,
+        "rotation": 0
+      }
+    }
+  ]
+}

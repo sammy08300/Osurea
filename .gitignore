@@ -1,62 +1,46 @@
 # Dependencies
-/node_modules
+node_modules/
 
-# Testing
-/coverage
+# Build output
+dist/
+build/
 
-# Production
-/build
-/dist
-/public
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 
-# Misc
+# OS files
 .DS_Store
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+Thumbs.db
+Desktop.ini
 
-# Debug
+# Logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# IDE
-.idea/
-.vscode/
-
-# Logs
-logs
-*.log
+# Environment files
+.env
+.env.local
+.env.*.local
 
 # Cache
 .cache/
-.npm
-.eslintcache
+.parcel-cache/
+.vite/
 
-# Optional eslint cache
-.eslintcache
+# Coverage (Vitest)
+coverage/
 
-# Build output / Generated files
-assets/css/styles.css
-OLD FAVORITES
+# Temporary files
+*.tmp
+*.temp
 
-# Generated files
-dist/
-build/
-
-# Test files (temporary - only ignore temporary test files)
-test-integration.html
-*.test.html
-test-*.html
-
-# Backup files
-*.backup
-*.bak
-*.orig
-
-# OS generated files
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-.env
+# Lock files (optionnel - décommenter si tu veux ignorer)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
