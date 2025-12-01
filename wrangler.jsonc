@@ -1,7 +1,5 @@
 {
   "name": "osurea",
   "compatibility_date": "2025-12-01",
-  "assets": {
-    "directory": "./dist"
-  }
+  "pages_build_output_dir": "./dist"
 }
