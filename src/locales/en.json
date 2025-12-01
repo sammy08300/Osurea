@@ -71,6 +71,8 @@
   "favorites.savePrompt": "Name for this configuration:",
   "favorites.confirmDelete": "Delete this favorite?",
   "favorites.namePrompt": "Name for this configuration:",
+  "favorites.commentLabel": "Comment (optional)",
+  "favorites.commentPlaceholder": "E.g., This area works well when I...",
   "favorites.defaultName": "My Area",
 
   "alignment.title": "Area Positioning",

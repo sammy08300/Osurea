@@ -7,7 +7,7 @@
 import { icon } from './icons.js';
 import { t } from './i18n.js';
 import { getFavorites, addFavorite, removeFavorite, updateFavorite } from './storage.js';
-import { prompt, confirmDelete, showEditFavoriteModal } from './modal.js';
+import { confirmDelete, showEditFavoriteModal, showSaveFavoriteModal } from './modal.js';
 import { escapeHtml } from './utils.js';
 
 /** @type {HTMLElement|null} */
@@ -92,6 +92,10 @@ function generatePreview(tablet, area) {
  * Render a single favorite card
  */
 function renderFavoriteCard(favorite) {
+  const commentHtml = favorite.comment 
+    ? `<div class="favorite-comment" title="${escapeHtml(favorite.comment)}">${escapeHtml(favorite.comment)}</div>` 
+    : '';
+  
   return `
     <div class="favorite-card" data-id="${escapeHtml(favorite.id)}">
       <div class="favorite-preview-wrapper">
@@ -99,6 +103,7 @@ function renderFavoriteCard(favorite) {
       </div>
       <div class="favorite-info">
         <h3 class="favorite-name">${escapeHtml(favorite.name)}</h3>
+        ${commentHtml}
         <div class="favorite-details">
           <span class="favorite-tablet">${escapeHtml(favorite.tablet.brand)} ${escapeHtml(
             favorite.tablet.model
@@ -242,6 +247,7 @@ async function editFavorite(id) {
   if (result) {
     const updates = {
       name: result.name?.trim() || favorite.name,
+      comment: result.comment?.trim() ?? favorite.comment ?? '',
       area: {
         ...favorite.area,
         width: result.width || favorite.area.width,
@@ -293,12 +299,14 @@ export async function saveCurrentAsFavorite(tablet, area) {
   const defaultName = `${tablet.brand} ${tablet.model} - ${area.width.toFixed(
     0
   )}×${area.height.toFixed(0)}`;
-  const name = await prompt(t('favorites.savePrompt'), defaultName, t('favorites.save'));
+  
+  const result = await showSaveFavoriteModal(defaultName);
 
-  if (!name || !name.trim()) return null;
+  if (!result || !result.name?.trim()) return null;
 
   const favorite = addFavorite({
-    name: name.trim(),
+    name: result.name.trim(),
+    comment: result.comment?.trim() || '',
     tablet,
     area,
     createdAt: new Date().toISOString(),

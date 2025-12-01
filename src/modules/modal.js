@@ -207,10 +207,18 @@ function showModal(options) {
       if (type === 'prompt') {
         const value = container.querySelector('#modal-input')?.value;
         close(value);
+      } else if (type === 'save-favorite') {
+        // Collect name and comment for save favorite
+        const formData = {
+          name: container.querySelector('#save-name')?.value,
+          comment: container.querySelector('#save-comment')?.value,
+        };
+        close(formData);
       } else if (type === 'edit-favorite') {
-        // Collect all form data
+        // Collect all form data including comment
         const formData = {
           name: container.querySelector('#edit-name')?.value,
+          comment: container.querySelector('#edit-comment')?.value,
           width: parseFloat(container.querySelector('#edit-width')?.value) || 0,
           height: parseFloat(container.querySelector('#edit-height')?.value) || 0,
           x: parseFloat(container.querySelector('#edit-x')?.value) || 0,
@@ -355,6 +363,42 @@ export async function showRecapModal(data) {
 }
 
 /**
+ * Show save favorite modal with name and comment fields
+ */
+export async function showSaveFavoriteModal(defaultName = '') {
+  const content = `
+    <div class="modal-form">
+      <div class="modal-form-section">
+        <div class="input-group">
+          <label for="save-name">${t('favorites.namePrompt')}</label>
+          <input type="text" id="save-name" class="input" value="${defaultName}" />
+        </div>
+      </div>
+      
+      <div class="modal-form-section">
+        <div class="input-group">
+          <label for="save-comment">${t('favorites.commentLabel')}</label>
+          <textarea 
+            id="save-comment" 
+            class="input textarea" 
+            rows="3" 
+            placeholder="${t('favorites.commentPlaceholder')}"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+  `;
+
+  return showModal({
+    type: 'save-favorite',
+    title: t('favorites.save'),
+    customContent: content,
+    confirmText: t('modal.save'),
+    cancelText: t('modal.cancel'),
+  });
+}
+
+/**
  * Show edit favorite modal with all fields
  */
 export async function showEditFavoriteModal(favorite) {
@@ -365,6 +409,18 @@ export async function showEditFavoriteModal(favorite) {
         <div class="input-group">
           <label for="edit-name">${t('favorites.namePrompt')}</label>
           <input type="text" id="edit-name" class="input" value="${favorite.name || ''}" />
+        </div>
+      </div>
+      
+      <div class="modal-form-section">
+        <div class="input-group">
+          <label for="edit-comment">${t('favorites.commentLabel')}</label>
+          <textarea 
+            id="edit-comment" 
+            class="input textarea" 
+            rows="3" 
+            placeholder="${t('favorites.commentPlaceholder')}"
+          >${favorite.comment || ''}</textarea>
         </div>
       </div>
       

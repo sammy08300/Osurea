@@ -44,6 +44,7 @@ import { generateId } from './utils.js';
  * @typedef {Object} Favorite
  * @property {string} id - Unique identifier
  * @property {string} name - User-defined name
+ * @property {string} [comment] - User comment/note
  * @property {Tablet} tablet - Tablet configuration
  * @property {Area} area - Area configuration
  * @property {string} createdAt - ISO date string
@@ -215,6 +216,7 @@ export function addFavorite(config) {
   const favorite = {
     id: generateId(),
     name: config.name || 'Untitled',
+    comment: config.comment || '',
     tablet: {
       brand: config.tablet?.brand || '',
       model: config.tablet?.model || '',

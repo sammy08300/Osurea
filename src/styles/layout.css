@@ -1005,6 +1005,17 @@
   margin-bottom: 2px;
 }
 
+.favorite-comment {
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px;
+  max-width: 100%;
+}
+
 .favorite-details {
   font-size: 0.6875rem;
   color: var(--color-text-muted);
@@ -1243,6 +1254,15 @@
 .input:focus {
   outline: none;
   border-color: var(--color-primary);
+}
+
+.textarea {
+  height: auto;
+  min-height: 80px;
+  padding: var(--space-sm) var(--space-md);
+  resize: vertical;
+  font-family: var(--font-family);
+  line-height: 1.5;
 }
 
 .modal-footer {
